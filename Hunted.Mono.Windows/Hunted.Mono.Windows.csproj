@@ -8,8 +8,8 @@
     <ProjectGuid>{DA064B16-1E33-4E75-8BB4-18D2D180BB3A}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LudumDare26.Mono.Windows</RootNamespace>
-    <AssemblyName>OtherSpace</AssemblyName>
+    <RootNamespace>Hunted.Mono.Windows</RootNamespace>
+    <AssemblyName>Hunted</AssemblyName>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -32,7 +32,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>game.ico</ApplicationIcon>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\Hunted\AudioController.cs">
@@ -46,6 +46,9 @@
     </Compile>
     <Compile Include="..\Hunted\ParticleController.cs">
       <Link>ParticleController.cs</Link>
+    </Compile>
+    <Compile Include="..\Hunted\PerlinNoise.cs">
+      <Link>PerlinNoise.cs</Link>
     </Compile>
     <Compile Include="..\Hunted\ScreenManager\GameScreen.cs">
       <Link>ScreenManager\GameScreen.cs</Link>
@@ -92,6 +95,9 @@
     <Compile Include="..\Hunted\Screens\PlayerIndexEventArgs.cs">
       <Link>Screens\PlayerIndexEventArgs.cs</Link>
     </Compile>
+    <Compile Include="..\Hunted\TerrainGeneration.cs">
+      <Link>TerrainGeneration.cs</Link>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -102,32 +108,35 @@
     </Reference>
     <Reference Include="SharpDX, Version=2.4.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\_References\Win\SharpDX.dll</HintPath>
+      <HintPath>..\..\MonoGame\MonoGame.Framework\bin\Windows\Debug\SharpDX.dll</HintPath>
     </Reference>
-    <Reference Include="SharpDX.Direct2D1">
-      <HintPath>..\_References\Win\SharpDX.Direct2D1.dll</HintPath>
+    <Reference Include="SharpDX.Direct2D1, Version=2.4.2.0, Culture=neutral, PublicKeyToken=627a3d6d1956f55a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\MonoGame\MonoGame.Framework\bin\Windows\Debug\SharpDX.Direct2D1.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct3D11, Version=2.4.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\_References\Win\SharpDX.Direct3D11.dll</HintPath>
+      <HintPath>..\..\MonoGame\MonoGame.Framework\bin\Windows\Debug\SharpDX.Direct3D11.dll</HintPath>
     </Reference>
-    <Reference Include="SharpDX.Direct3D9">
-      <HintPath>..\_References\Win\SharpDX.Direct3D9.dll</HintPath>
+    <Reference Include="SharpDX.Direct3D9, Version=2.4.2.0, Culture=neutral, PublicKeyToken=627a3d6d1956f55a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\MonoGame\MonoGame.Framework\bin\Windows\Debug\SharpDX.Direct3D9.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.DXGI, Version=2.4.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\_References\Win\SharpDX.DXGI.dll</HintPath>
+      <HintPath>..\..\MonoGame\MonoGame.Framework\bin\Windows\Debug\SharpDX.DXGI.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.MediaFoundation, Version=2.4.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\_References\Win\SharpDX.MediaFoundation.dll</HintPath>
+      <HintPath>..\..\MonoGame\MonoGame.Framework\bin\Windows\Debug\SharpDX.MediaFoundation.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.XAudio2, Version=2.4.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\_References\Win\SharpDX.XAudio2.dll</HintPath>
+      <HintPath>..\..\MonoGame\MonoGame.Framework\bin\Windows\Debug\SharpDX.XAudio2.dll</HintPath>
     </Reference>
-    <Reference Include="SharpDX.XInput">
-      <HintPath>..\_References\Win\SharpDX.XInput.dll</HintPath>
+    <Reference Include="SharpDX.XInput, Version=2.4.2.0, Culture=neutral, PublicKeyToken=627a3d6d1956f55a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\MonoGame\MonoGame.Framework\bin\Windows\Debug\SharpDX.XInput.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
@@ -145,6 +154,20 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Content\sfx\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\blank.xnb">
+      <Link>Content\blank.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\map.xnb">
+      <Link>Content\map.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\TilesWIP.xnb">
+      <Link>Content\TilesWIP.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
