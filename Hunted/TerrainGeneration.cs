@@ -9,13 +9,14 @@ namespace Hunted
 {
     public static class TerrainGeneration
     {
+        const int TILESHEET_WIDTH = 10;
+        
         const int SAND = 14;
         const int SAND_ALT = 17;
         const int WATER = 12;
         const int GRASS = 47;
         const int GRASS_ALT1 = 15;
         const int GRASS_ALT2 = 29;
-        const int TREE = 30;
         const int CONCRETE = 60;
 
         const int SAND_EDGE_UP = 22;
@@ -47,6 +48,18 @@ namespace Hunted
         const int GRASS_CORNER_OUTSIDE_TR = 38;
         const int GRASS_CORNER_OUTSIDE_BL = 56;
         const int GRASS_CORNER_OUTSIDE_BR = 58;
+
+        const int TREE = 31;
+        static int[] TREES = new int[] { 31, 32, 41, 51, 93, 94, 95, 96, 97, 98, 99 };
+        static List<Rectangle> BIG_TREES = new List<Rectangle>() {
+            new Rectangle(2,4,4,3),
+            new Rectangle(1,7,2,2),
+            new Rectangle(1,9,2,2),
+            new Rectangle(3,7,3,3),
+            new Rectangle(6,7,3,3),
+            new Rectangle(9,6,2,2),
+            new Rectangle(9,8,2,2)
+        };
 
         static Random rand = new Random();
 
@@ -253,8 +266,48 @@ namespace Hunted
                         int r = rand.Next(50);
                         if (r == 9) terrainLayer.Tiles[x, y] = map.Tiles[SAND_ALT];
                     }
+
+                    // Tree alts
+                    if (GetTileIndex(map, wallLayer, x, y) == TREE)
+                    {
+                        //if (rand.Next(10) == 0)
+                        //{
+                            // Big tree
+                        if(!TryDrawBigTree(map, wallLayer, x, y)) wallLayer.Tiles[x, y] = map.Tiles[TREES[rand.Next(TREES.Length)]];
+
+                    }
                 }
             }
+        }
+
+        private static bool TryDrawBigTree(Map map, TileLayer wallLayer, int x, int y)
+        {
+            Rectangle thisTree = BIG_TREES[rand.Next(7)];
+
+            bool canFit = true;
+            for (int xx = x; xx < x + thisTree.Width; xx++)
+                for (int yy = y; yy < y + thisTree.Height; yy++)
+                    if (GetTileIndex(map, wallLayer, xx, yy) != TREE) canFit = false;
+
+            if (canFit)
+            {
+                int mapx = x;
+                int mapy = y;
+                for (int xx = thisTree.Left; xx < thisTree.Right; xx++)
+                {
+                    for (int yy = thisTree.Top; yy < thisTree.Bottom; yy++)
+                    {
+                        int tile = ((yy-1) * TILESHEET_WIDTH) + (xx % (TILESHEET_WIDTH+1));
+                        wallLayer.Tiles[mapx, mapy] = map.Tiles[tile];
+                        mapy++;
+                    }
+                    mapy = y;
+                    mapx++;
+                }
+
+            }
+
+            return canFit;
         }
 
         private static void CreateCompounds(Map map, TileLayer terrainLayer, TileLayer wallLayer, List<Compound> compounds, float[][] noise, float height, float distance, int minsize)
