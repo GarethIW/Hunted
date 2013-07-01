@@ -101,13 +101,13 @@ namespace Hunted
 
 
             // Trees
-            float[][] treeNoise = PerlinNoise.GeneratePerlinNoise(map.Width, map.Height, 5);
+            float[][] treeNoise = PerlinNoise.GeneratePerlinNoise(map.Width, map.Height, 4);
 
             for (int y = 0; y < map.Width; y++)
             {
                 for (int x = 0; x < map.Height; x++)
                 {
-                    if (noise[y][x] > 0.65f)
+                    if (noise[y][x] > 0.62f)
                         if (treeNoise[y][x] > 0.5f)
                             wallLayer.Tiles[x, y] = map.Tiles[TREE];
                 }
