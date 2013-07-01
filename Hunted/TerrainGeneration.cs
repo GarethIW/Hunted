@@ -18,6 +18,7 @@ namespace Hunted
         const int GRASS_ALT1 = 15;
         const int GRASS_ALT2 = 29;
         const int CONCRETE = 101;
+        const int CARPARK = 108;
 
         const int SAND_EDGE_UP = 22;
         const int SAND_EDGE_DOWN = 2;
@@ -394,15 +395,16 @@ namespace Hunted
                                     exits[rand.Next(4)] = true;
 
                                 bool carparkPlaced = false;
+                                Building carpark = null;
 
                                 if (exits[0])
                                 {
                                     int doorx = rand.Next(innerBounds.Width - 7) + 3;
                                     for (int xx = innerBounds.Left + doorx; xx < (innerBounds.Left + doorx) + 4; xx++) wallLayer.Tiles[xx, innerBounds.Top] = null;
-                                    if (!carparkPlaced && rand.Next(5) == 1)
+                                    if (!carparkPlaced && rand.Next(3) == 1)
                                     {
-                                        Building cp = new Building() { Type = BuildingType.Carpark, Rect = new Rectangle((innerBounds.Left + doorx), innerBounds.Top + 2, 4, 4) };
-                                        newCompound.Buildings.Add(cp);
+                                        carpark = new Building() { Type = BuildingType.Carpark, Rect = new Rectangle((innerBounds.Left + doorx), innerBounds.Top + 2, 4, 4) };
+                                        newCompound.Buildings.Add(carpark);
                                         carparkPlaced = true;
                                     }
                                 }
@@ -410,10 +412,10 @@ namespace Hunted
                                 {
                                     int doorx = rand.Next(innerBounds.Width - 7) + 3;
                                     for (int xx = innerBounds.Left + doorx; xx < (innerBounds.Left + doorx) + 4; xx++) wallLayer.Tiles[xx, innerBounds.Bottom] = null;
-                                    if (!carparkPlaced && rand.Next(5) == 1)
+                                    if (!carparkPlaced && rand.Next(3) == 1)
                                     {
-                                        Building cp = new Building() { Type = BuildingType.Carpark, Rect = new Rectangle((innerBounds.Left + doorx), innerBounds.Top -6, 4, 4) };
-                                        newCompound.Buildings.Add(cp);
+                                        carpark = new Building() { Type = BuildingType.Carpark, Rect = new Rectangle((innerBounds.Left + doorx), innerBounds.Bottom - 6, 4, 4) };
+                                        newCompound.Buildings.Add(carpark);
                                         carparkPlaced = true;
                                     }
                                 }
@@ -421,10 +423,10 @@ namespace Hunted
                                 {
                                     int doory = rand.Next(innerBounds.Height - 7) + 3;
                                     for (int yy = innerBounds.Top + doory; yy < (innerBounds.Top + doory) + 4; yy++) wallLayer.Tiles[innerBounds.Left,yy] = null;
-                                    if (!carparkPlaced && rand.Next(5) == 1)
+                                    if (!carparkPlaced && rand.Next(3) == 1)
                                     {
-                                        Building cp = new Building() { Type = BuildingType.Carpark, Rect = new Rectangle(innerBounds.Left + 2, (innerBounds.Top + doory), 4, 4) };
-                                        newCompound.Buildings.Add(cp);
+                                        carpark = new Building() { Type = BuildingType.Carpark, Rect = new Rectangle(innerBounds.Left + 2, (innerBounds.Top + doory), 4, 4) };
+                                        newCompound.Buildings.Add(carpark);
                                         carparkPlaced = true;
                                     }
                                 }
@@ -432,22 +434,106 @@ namespace Hunted
                                 {
                                     int doory = rand.Next(innerBounds.Height - 7) + 3;
                                     for (int yy = innerBounds.Top + doory; yy < (innerBounds.Top + doory) + 4; yy++) wallLayer.Tiles[innerBounds.Right, yy] = null;
-                                    if (!carparkPlaced && rand.Next(5) == 1)
+                                    if (!carparkPlaced && rand.Next(3) == 1)
                                     {
-                                        Building cp = new Building() { Type = BuildingType.Carpark, Rect = new Rectangle(innerBounds.Right - 6, (innerBounds.Top + doory), 4, 4) };
-                                        newCompound.Buildings.Add(cp);
+                                        carpark = new Building() { Type = BuildingType.Carpark, Rect = new Rectangle(innerBounds.Right - 6, (innerBounds.Top + doory), 4, 4) };
+                                        newCompound.Buildings.Add(carpark);
                                         carparkPlaced = true;
                                     }
                                 }
 
+                                if(carpark!=null)
+                                    for (int xx = carpark.Rect.Left; xx < carpark.Rect.Right; xx++)
+                                        for (int yy = carpark.Rect.Top; yy < carpark.Rect.Bottom; yy++)
+                                             terrainLayer.Tiles[xx, yy] = map.Tiles[CARPARK];
 
+                                MakeBuildings(map, wallLayer, terrainLayer, newCompound);
 
-                                compounds.Add(newCompund);
+                                compounds.Add(newCompound);
                             }
                         }
                     }
                 }
             }
+        }
+
+        private static void MakeBuildings(Map map, TileLayer wallLayer, TileLayer terrainLayer, Compound newCompound)
+        {
+            Rectangle innerBounds = newCompound.InnerBounds;
+            innerBounds.Inflate(-2, -2);
+
+            // Helipad
+            Building heliPad = null;
+            
+            for (int i = 0; i < 10; i++)
+            {
+                Point pos = new Point(innerBounds.Left + rand.Next(innerBounds.Width), innerBounds.Top + rand.Next(innerBounds.Height));
+                Rectangle rect = new Rectangle(pos.X - 3, pos.Y - 3, 6, 6);
+
+                bool canPlace = true;
+
+                foreach (Building b in newCompound.Buildings)
+                {
+                    Rectangle br = b.Rect;
+                    br.Inflate(2, 2);
+                    if (br.Intersects(rect)) canPlace = false;
+                }
+
+                if (!innerBounds.Contains(rect)) canPlace = false;
+
+                if (canPlace)
+                {
+                    heliPad = new Building() { Rect = rect, Type = BuildingType.Helipad };
+                    break;
+                }
+            }
+
+            if (heliPad != null)
+            {
+                newCompound.Buildings.Add(heliPad);
+
+                for (int xx = heliPad.Rect.Left; xx < heliPad.Rect.Right; xx++)
+                    for (int yy = heliPad.Rect.Top; yy < heliPad.Rect.Bottom; yy++)
+                        terrainLayer.Tiles[xx, yy] = map.Tiles[CARPARK];
+            }
+
+            
+
+            // Buildings!
+            for (int i = 0; i < 50; i++)
+            {
+                Building newBuilding = null;
+
+                Point pos = new Point(innerBounds.Left + 4 + rand.Next(innerBounds.Width - 8), innerBounds.Top + 4 + rand.Next(innerBounds.Height-8));
+                Rectangle rect = new Rectangle(pos.X, pos.Y, 1, 1);
+                rect.Inflate(6 + rand.Next(10), 6 + rand.Next(10));
+
+                bool canPlace = true;
+
+                foreach (Building b in newCompound.Buildings)
+                {
+                    Rectangle br = b.Rect;
+                    br.Inflate(2, 2);
+                    if (br.Intersects(rect)) canPlace = false;
+                }
+
+                if (!innerBounds.Contains(rect)) canPlace = false;
+
+                if (canPlace)
+                {
+                    newBuilding = new Building() { Rect = rect, Type = BuildingType.Building };
+                }
+
+                if (newBuilding != null)
+                {
+                    newCompound.Buildings.Add(newBuilding);
+
+                    for (int xx = newBuilding.Rect.Left; xx < newBuilding.Rect.Right; xx++)
+                        for (int yy = newBuilding.Rect.Top; yy < newBuilding.Rect.Bottom; yy++)
+                            terrainLayer.Tiles[xx, yy] = map.Tiles[WALL_HORIZ];
+                }
+            }
+
         }
 
         static int GetTileIndex(Map map, TileLayer layer, int x, int y)

@@ -33,6 +33,7 @@
       <Name>map</Name>
       <Importer>TmxImporter</Importer>
       <Processor>TmxProcessor</Processor>
+      <SubType>Designer</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
