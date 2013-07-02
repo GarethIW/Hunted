@@ -103,7 +103,7 @@ namespace Hunted
                 ColorSourceBlend = Blend.DestinationColor,
                 ColorDestinationBlend = Blend.SourceColor,
                 ColorBlendFunction = BlendFunction.Add,
-                AlphaSourceBlend = Blend.SourceAlpha,
+                AlphaSourceBlend = Blend.One,
                 AlphaDestinationBlend = Blend.One,
                 AlphaBlendFunction = BlendFunction.Add
                  
@@ -229,8 +229,8 @@ namespace Hunted
             spriteBatch.End();
 
             spriteBatch.Begin(SpriteSortMode.Deferred, lightsBS, SamplerState.PointClamp, null, null, null);
-            spriteBatch.Draw(spotTex, new Vector2(spriteBatch.GraphicsDevice.Viewport.Width, spriteBatch.GraphicsDevice.Viewport.Height) / 2, null, Color.White * 0.5f, 0f, new Vector2(spotTex.Width, spotTex.Height) / 2, 0.75f, SpriteEffects.None, 1);
-            //spriteBatch.Draw(spotTex, new Vector2(spriteBatch.GraphicsDevice.Viewport.Width, spriteBatch.GraphicsDevice.Viewport.Height) / 2, null, Color.White, 0f, new Vector2(spotTex.Width, spotTex.Height) / 2, 0.75f, SpriteEffects.None, 1);
+            spriteBatch.Draw(spotTex, new Vector2(spriteBatch.GraphicsDevice.Viewport.Width, spriteBatch.GraphicsDevice.Viewport.Height) / 2, null, Color.White, 0f, new Vector2(spotTex.Width, spotTex.Height) / 2, 0.75f, SpriteEffects.None, 1);
+            spriteBatch.Draw(spotTex, new Vector2(spriteBatch.GraphicsDevice.Viewport.Width, spriteBatch.GraphicsDevice.Viewport.Height) / 2, null, Color.White, 0f, new Vector2(spotTex.Width, spotTex.Height) / 2, 0.75f, SpriteEffects.None, 1);
 
             spriteBatch.End();
 
