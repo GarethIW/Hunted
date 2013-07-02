@@ -433,12 +433,20 @@ namespace TiledLib
                             continue;
                         // - tile.Source.Height + TileHeight;
 
+#if WINRT
+                        int qual = 5;
+                        float defbright = 0.06f;
+#else
+                        int qual = 2;
+                        float defbright = 0.03f;
+#endif
+
                         // Ambient shadow
-                        for (int i = 1; i < 40; i += 2)
+                        for (int i = 1; i < 40; i += qual)
                         {
                             Rectangle r = new Rectangle((x * TileWidth) + (int)(lightingEngine.CurrentShadowVect.X * i), (y * TileHeight) + (int)(lightingEngine.CurrentShadowVect.Y * i), tile.Source.Width, tile.Source.Height);
 
-                            spriteBatch.Draw(tile.Texture, r, tile.Source, Color.Black * 0.03f);
+                            spriteBatch.Draw(tile.Texture, r, tile.Source, Color.Black * defbright);
                         }
 
                         foreach (LightSource ls in lightingEngine.LightSources)
@@ -461,9 +469,9 @@ namespace TiledLib
                                 }
 
                                 float shadowAmount = (2f / 400f) * (400f - dist);
-                                float shadowBrightness = 0.04f * (1f - (lightingEngine.CurrentSunColor.ToVector3().Z));
+                                float shadowBrightness = (defbright + 0.01f) * (1f - (lightingEngine.CurrentSunColor.ToVector3().Z));
 
-                                for (int i = 1; i < 40; i += 2)
+                                for (int i = 1; i < 40; i += qual)
                                 {
                                     Rectangle r = new Rectangle((x * TileWidth) + (int)(dir.X * shadowAmount * i), (y * TileHeight) + (int)(dir.Y * shadowAmount * i), tile.Source.Width, tile.Source.Height);
 

@@ -48,6 +48,9 @@ namespace Hunted
 
         DateTime TimeOfDay = new DateTime(2013,1,1,8,0,0);
 
+        BlendState lightsBS;
+
+        Texture2D spotTex;
         #endregion
 
         #region Initialization
@@ -77,21 +80,34 @@ namespace Hunted
             AudioController.LoadContent(content);
 
             //gameFont = content.Load<SpriteFont>("menufont");
-          
+
+            spotTex = content.Load<Texture2D>("spot");
+
             gameMap = content.Load<Map>("map");
 
             TerrainGeneration.GenerateTerrain(gameMap);
 
             gameCamera = new Camera(ScreenManager.GraphicsDevice.Viewport, gameMap);
             gameCamera.ClampRect = new Rectangle(0, 5 * gameMap.TileHeight, gameMap.Width * gameMap.TileWidth, gameMap.Height * gameMap.TileHeight);
-            gameCamera.Zoom = 0.025f;
+            gameCamera.Zoom = 1f;
             //gameCamera.Position = gameHero.Position - (new Vector2(ScreenManager.GraphicsDevice.Viewport.Width, ScreenManager.GraphicsDevice.Viewport.Height) / 2);
             gameCamera.Position = new Vector2((gameMap.Width * gameMap.TileWidth), (gameMap.Height * gameMap.TileHeight)) / 2;
             gameCamera.Target = gameCamera.Position;
             gameCamera.Update(ScreenManager.GraphicsDevice.Viewport.Bounds);
 
-            cameraLightSource.Type = LightSourceType.Directional;
+            cameraLightSource.Type = LightSourceType.Spot;
             lightingEngine.LightSources.Add(cameraLightSource);
+
+            lightsBS = new BlendState()
+            {
+                ColorSourceBlend = Blend.DestinationColor,
+                ColorDestinationBlend = Blend.SourceColor,
+                ColorBlendFunction = BlendFunction.Add,
+                AlphaSourceBlend = Blend.SourceAlpha,
+                AlphaDestinationBlend = Blend.One,
+                AlphaBlendFunction = BlendFunction.Add
+                 
+            };
 
             ScreenManager.Game.ResetElapsedTime();
         }
@@ -212,7 +228,9 @@ namespace Hunted
             gameMap.DrawLayer(spriteBatch, "Wall", gameCamera, lightingEngine);
             spriteBatch.End();
 
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied , SamplerState.PointClamp, null, null, null, gameCamera.CameraMatrix);
+            spriteBatch.Begin(SpriteSortMode.Deferred, lightsBS, SamplerState.PointClamp, null, null, null);
+            spriteBatch.Draw(spotTex, new Vector2(spriteBatch.GraphicsDevice.Viewport.Width, spriteBatch.GraphicsDevice.Viewport.Height) / 2, null, Color.White * 0.5f, 0f, new Vector2(spotTex.Width, spotTex.Height) / 2, 0.75f, SpriteEffects.None, 1);
+            //spriteBatch.Draw(spotTex, new Vector2(spriteBatch.GraphicsDevice.Viewport.Width, spriteBatch.GraphicsDevice.Viewport.Height) / 2, null, Color.White, 0f, new Vector2(spotTex.Width, spotTex.Height) / 2, 0.75f, SpriteEffects.None, 1);
 
             spriteBatch.End();
 

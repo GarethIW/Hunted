@@ -50,6 +50,9 @@
     <Compile Include="..\Hunted\ParticleController.cs">
       <Link>ParticleController.cs</Link>
     </Compile>
+    <Compile Include="..\Hunted\PerlinNoise.cs">
+      <Link>PerlinNoise.cs</Link>
+    </Compile>
     <Compile Include="..\hunted\screenmanager\GameScreen.cs">
       <Link>ScreenManager\GameScreen.cs</Link>
     </Compile>
@@ -94,6 +97,9 @@
     </Compile>
     <Compile Include="..\hunted\screens\PlayerIndexEventArgs.cs">
       <Link>Screens\PlayerIndexEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\Hunted\TerrainGeneration.cs">
+      <Link>TerrainGeneration.cs</Link>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
