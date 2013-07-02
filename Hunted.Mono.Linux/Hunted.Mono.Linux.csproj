@@ -38,6 +38,9 @@
     <Compile Include="..\Hunted\AudioController.cs">
       <Link>AudioController.cs</Link>
     </Compile>
+    <Compile Include="..\Hunted\Compound.cs">
+      <Link>Compound.cs</Link>
+    </Compile>
     <Compile Include="..\Hunted\Game.cs">
       <Link>Game.cs</Link>
     </Compile>

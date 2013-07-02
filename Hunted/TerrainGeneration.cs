@@ -500,13 +500,13 @@ namespace Hunted
             
 
             // Buildings!
-            for (int i = 0; i < 50; i++)
+            for (int i = 0; i < 100; i++)
             {
                 Building newBuilding = null;
 
                 Point pos = new Point(innerBounds.Left + 4 + rand.Next(innerBounds.Width - 8), innerBounds.Top + 4 + rand.Next(innerBounds.Height-8));
                 Rectangle rect = new Rectangle(pos.X, pos.Y, 1, 1);
-                rect.Inflate(6 + rand.Next(10), 6 + rand.Next(10));
+                rect.Inflate(5 + rand.Next(10), 5 + rand.Next(10));
 
                 bool canPlace = true;
 
@@ -528,9 +528,52 @@ namespace Hunted
                 {
                     newCompound.Buildings.Add(newBuilding);
 
-                    for (int xx = newBuilding.Rect.Left; xx < newBuilding.Rect.Right; xx++)
-                        for (int yy = newBuilding.Rect.Top; yy < newBuilding.Rect.Bottom; yy++)
-                            terrainLayer.Tiles[xx, yy] = map.Tiles[WALL_HORIZ];
+
+                    // Outer walls
+                    wallLayer.Tiles[rect.Left, rect.Top] = map.Tiles[WALL_TL];
+                    wallLayer.Tiles[rect.Right, rect.Top] = map.Tiles[WALL_TR];
+                    wallLayer.Tiles[rect.Left, rect.Bottom] = map.Tiles[WALL_BL];
+                    wallLayer.Tiles[rect.Right, rect.Bottom] = map.Tiles[WALL_BR];
+
+                    for (int xx = rect.Left + 1; xx <= rect.Right - 1; xx++)
+                    {
+                        wallLayer.Tiles[xx, rect.Top] = map.Tiles[WALL_HORIZ];
+                        wallLayer.Tiles[xx, rect.Bottom] = map.Tiles[WALL_HORIZ];
+                    } 
+                    for (int yy = rect.Top + 1; yy <= rect.Bottom - 1; yy++)
+                    {
+                        wallLayer.Tiles[rect.Left,yy] = map.Tiles[WALL_VERT];
+                        wallLayer.Tiles[rect.Right,yy] = map.Tiles[WALL_VERT];
+                    }
+
+                    // Exits
+                    bool[] exits = new bool[4] { false, false, false, false };
+                        exits[rand.Next(4)] = true;
+
+                    if (exits[0])
+                    {
+                        int doorx = rand.Next(rect.Width - 7) + 3;
+                        for (int xx = rect.Left + doorx; xx < (rect.Left + doorx) + 4; xx++) wallLayer.Tiles[xx, rect.Top] = null;
+                    }
+                    if (exits[1])
+                    {
+                        int doorx = rand.Next(rect.Width - 7) + 3;
+                        for (int xx = rect.Left + doorx; xx < (rect.Left + doorx) + 4; xx++) wallLayer.Tiles[xx, rect.Bottom] = null;
+                    }
+                    if (exits[2])
+                    {
+                        int doory = rand.Next(rect.Height - 7) + 3;
+                        for (int yy = rect.Top + doory; yy < (rect.Top + doory) + 4; yy++) wallLayer.Tiles[rect.Left, yy] = null;
+                    }
+                    if (exits[3])
+                    {
+                        int doory = rand.Next(rect.Height - 7) + 3;
+                        for (int yy = rect.Top + doory; yy < (rect.Top + doory) + 4; yy++) wallLayer.Tiles[rect.Right, yy] = null;
+                    }
+
+                    //for (int xx = newBuilding.Rect.Left; xx < newBuilding.Rect.Right; xx++)
+                    //    for (int yy = newBuilding.Rect.Top; yy < newBuilding.Rect.Bottom; yy++)
+                    //        terrainLayer.Tiles[xx, yy] = map.Tiles[WALL_HORIZ];
                 }
             }
 

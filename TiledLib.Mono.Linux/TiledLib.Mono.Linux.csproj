@@ -52,6 +52,9 @@
     <Compile Include="..\TiledLib\Layer.cs">
       <Link>Layer.cs</Link>
     </Compile>
+    <Compile Include="..\TiledLib\Lighting.cs">
+      <Link>Lighting.cs</Link>
+    </Compile>
     <Compile Include="..\TiledLib\Map.cs">
       <Link>Map.cs</Link>
     </Compile>

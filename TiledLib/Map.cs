@@ -275,7 +275,7 @@ namespace TiledLib
         /// <param name="spriteBatch">The SpriteBatch to use to render the layer.</param>
         /// <param name="layerName">The name of the layer to draw.</param>
         /// <param name="gameCamera">The camera to use for positioning.</param>
-        public void DrawLayer(SpriteBatch spriteBatch, string layerName, Camera gameCamera, Color color)
+        public void DrawLayer(SpriteBatch spriteBatch, string layerName, Camera gameCamera, LightingEngine lightingEngine)
         {
             var l = GetLayer(layerName);
 
@@ -290,7 +290,7 @@ namespace TiledLib
             {
                 
 
-                DrawLayer(spriteBatch, l, gameCamera, color);
+                DrawLayer(spriteBatch, l, gameCamera, lightingEngine);
             }
         }
 
@@ -336,7 +336,7 @@ namespace TiledLib
         /// <param name="offset">A pixel amount to offset the tile positioning by</param>
         /// <param name="alpha">Layer opacity.</param>
         /// <param name="color">The color to use when drawing.</param>
-        public void DrawLayer(SpriteBatch spriteBatch, Layer layer, Camera gameCamera, Color color)
+        public void DrawLayer(SpriteBatch spriteBatch, Layer layer, Camera gameCamera, LightingEngine lightingEngine)
         {
             if (!layer.Visible)
                 return;
@@ -376,7 +376,7 @@ namespace TiledLib
                             Rectangle r = new Rectangle(x * TileWidth, y * TileHeight, tile.Source.Width, tile.Source.Height);
 
 
-                        spriteBatch.Draw(tile.Texture, r, tile.Source, color);
+                        spriteBatch.Draw(tile.Texture, r, tile.Source, lightingEngine.CurrentSunColor);
                         //}
 
                     }
@@ -385,6 +385,100 @@ namespace TiledLib
 
             }
 
+        }
+
+        public void DrawShadows(SpriteBatch spriteBatch, string layerName, Camera gameCamera, LightingEngine lightingEngine)
+        {
+            var l = GetLayer(layerName);
+
+            if (l == null)
+                return;
+
+            if (!l.Visible)
+                return;
+
+            if (gameCamera.Zoom < 0.5f) return;
+
+            TileLayer tileLayer = l as TileLayer;
+            if (tileLayer != null)
+            {
+
+                Rectangle worldArea = new Rectangle((int)((gameCamera.Position.X - (int)(((float)gameCamera.Width)))), (int)((gameCamera.Position.Y - (int)(((float)gameCamera.Height)))), (int)((gameCamera.Width) * 2), (int)((gameCamera.Height) * 2));
+
+                //Rectangle worldArea = new Rectangle(0, (int)gameCamera.Position.Y - (int)(((float)gameCamera.Height) * (2f-scale)), TileWidth * Width, (int)(((float)gameCamera.Height*2 ) * (3f-(2f*scale))));
+
+                // figure out the min and max tile indices to draw
+                worldArea.Inflate((int)((gameCamera.Width / gameCamera.Zoom) - gameCamera.Width), (int)((gameCamera.Height / gameCamera.Zoom) - gameCamera.Height));
+
+                int minX = Math.Max((int)Math.Floor((float)worldArea.Left / TileWidth), 0);
+                int maxX = Math.Min((int)Math.Ceiling((float)worldArea.Right / TileWidth), Width);
+
+                int minY = Math.Max((int)Math.Floor((float)worldArea.Top / TileHeight), 0);
+                int maxY = Math.Min((int)Math.Ceiling((float)worldArea.Bottom / TileHeight), Height);
+
+                //minX = 0;
+                //maxX = 1000;
+                //minY = 0;
+                //maxY = 1000;
+
+                for (int x = minX; x < maxX; x++)
+                {
+                    for (int y = minY; y < maxY; y++)
+                    {
+                        //if ((new Vector2((x * TileWidth) + (TileWidth / 2), (y * TileHeight) + (TileHeight / 2)) - new Vector2(worldArea.Center.X, worldArea.Center.Y)).Length() < gameCamera.Width * 0.75)
+                        //{
+                        Tile tile = tileLayer.Tiles[x, y];
+
+                        if (tile == null)
+                            continue;
+                        // - tile.Source.Height + TileHeight;
+
+                        // Ambient shadow
+                        for (int i = 1; i < 40; i += 2)
+                        {
+                            Rectangle r = new Rectangle((x * TileWidth) + (int)(lightingEngine.CurrentShadowVect.X * i), (y * TileHeight) + (int)(lightingEngine.CurrentShadowVect.Y * i), tile.Source.Width, tile.Source.Height);
+
+                            spriteBatch.Draw(tile.Texture, r, tile.Source, Color.Black * 0.03f);
+                        }
+
+                        foreach (LightSource ls in lightingEngine.LightSources)
+                        {
+                            Vector2 tilepos = new Vector2(x * TileWidth, y * TileWidth) + (new Vector2(TileWidth, TileHeight) / 2);
+                            float dist = (tilepos - ls.Position).Length();
+                            if (dist < 400f)
+                            {
+                                Vector2 dir = Vector2.Zero;
+
+                                switch (ls.Type)
+                                {
+                                    case LightSourceType.Spot:
+                                        dir = tilepos - ls.Position;
+                                        dir.Normalize();
+                                        break;
+                                    case LightSourceType.Directional:
+                                        dir = ls.Direction;
+                                        break;
+                                }
+
+                                float shadowAmount = (2f / 400f) * (400f - dist);
+                                float shadowBrightness = 0.04f * (1f - (lightingEngine.CurrentSunColor.ToVector3().Z));
+
+                                for (int i = 1; i < 40; i += 2)
+                                {
+                                    Rectangle r = new Rectangle((x * TileWidth) + (int)(dir.X * shadowAmount * i), (y * TileHeight) + (int)(dir.Y * shadowAmount * i), tile.Source.Width, tile.Source.Height);
+
+                                    spriteBatch.Draw(tile.Texture, r, tile.Source, Color.Black * shadowBrightness);
+                                }
+                            }
+                        }
+
+                        //}
+
+                    }
+                }
+                
+                
+            }
         }
 
         
@@ -515,5 +609,7 @@ namespace TiledLib
                 Tiles[i] = null;
             }
         }
+
+        
     }
 }

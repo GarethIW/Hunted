@@ -36,11 +36,17 @@ namespace Hunted
         Map gameMap;
         Camera gameCamera;
 
+        LightingEngine lightingEngine = new LightingEngine();
+
         RenderTarget2D gameRenderTarget;
 
         Vector2 mousePos;
 
         KeyboardState lastKeyboardState;
+
+        LightSource cameraLightSource = new LightSource();
+
+        DateTime TimeOfDay = new DateTime(2013,1,1,8,0,0);
 
         #endregion
 
@@ -83,7 +89,9 @@ namespace Hunted
             gameCamera.Position = new Vector2((gameMap.Width * gameMap.TileWidth), (gameMap.Height * gameMap.TileHeight)) / 2;
             gameCamera.Target = gameCamera.Position;
             gameCamera.Update(ScreenManager.GraphicsDevice.Viewport.Bounds);
-        
+
+            cameraLightSource.Type = LightSourceType.Directional;
+            lightingEngine.LightSources.Add(cameraLightSource);
 
             ScreenManager.Game.ResetElapsedTime();
         }
@@ -115,6 +123,10 @@ namespace Hunted
 
             if (IsActive)
             {
+                lightingEngine.Update(gameTime, ref TimeOfDay);
+
+                cameraLightSource.Position = gameCamera.Position;
+                cameraLightSource.Direction = new Vector2(1f, 1f);
 
                 gameCamera.Update(new Rectangle(0, 0, ScreenManager.GraphicsDevice.Viewport.Width, ScreenManager.GraphicsDevice.Viewport.Height));
 
@@ -194,20 +206,13 @@ namespace Hunted
             //float zoom = 1f;
 
             //Matrix transform = Matrix.CreateTranslation(ScreenManager.GraphicsDevice.Viewport.Width / 2, ScreenManager.GraphicsDevice.Viewport.Height / 2, 0) * Matrix.CreateRotationZ(-gameCamera.Rotation);
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
-            gameMap.DrawLayer(spriteBatch, "Terrain", gameCamera, Color.White);
-            gameMap.DrawLayer(spriteBatch, "Wall", gameCamera, Color.White);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
+            gameMap.DrawLayer(spriteBatch, "Terrain", gameCamera, lightingEngine);
+            gameMap.DrawShadows(spriteBatch, "Wall", gameCamera, lightingEngine);
+            gameMap.DrawLayer(spriteBatch, "Wall", gameCamera, lightingEngine);
             spriteBatch.End();
 
-
-
-
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied , SamplerState.PointClamp, null, null, null, gameCamera.CameraMatrix);
-
-            
-
-            //gameMap.DrawLayer(spriteBatch, "Collision", gameCamera);
-         
 
             spriteBatch.End();
 
@@ -221,6 +226,9 @@ namespace Hunted
                 ScreenManager.FadeBackBufferToBlack(1f - TransitionAlpha);
         }
 
+        
+
+       
 
         #endregion
     }

@@ -38,9 +38,11 @@ namespace Hunted
             Components.Add(screenManager);
 
             IsMouseVisible = true;
+#if !WINRT
             graphics.PreferredBackBufferWidth = 1280;
             graphics.PreferredBackBufferHeight = 720;
             graphics.ApplyChanges();
+#endif
 
             base.Initialize();
         }
