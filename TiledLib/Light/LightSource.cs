@@ -16,17 +16,16 @@ namespace TiledLib
         VeryHigh
     }
 
-    public enum LightSourceType
+    public enum BeamStencilType
     {
-        Spot,
-        Directional
+        None,
+        Wide,
+        Narrow
     }
 
     public class LightSource
     {
         private GraphicsDevice graphics;
-
-        public LightSourceType Type;
 
         public RenderTarget2D PrintedLight;
         public RenderTarget2D BeamLight;
@@ -34,6 +33,7 @@ namespace TiledLib
         public Vector2 RenderTargetSize { get; set; }
         public Vector2 Size { get; set; }
         private float qualityRatio;
+        public float Rotation;
         public Color Color;
 
         public Texture2D BeamStencil;
@@ -46,7 +46,7 @@ namespace TiledLib
             get { return this.Position - new Vector2(this.Radius, this.Radius); }
         }
 
-        public LightSource(LightSourceType type, GraphicsDevice graphics, int radius, LightAreaQuality quality, Color color, Texture2D beamStencil)
+        public LightSource(GraphicsDevice graphics, int radius, LightAreaQuality quality, Color color, BeamStencilType bst)
         {
             switch (quality)
             {
@@ -66,7 +66,6 @@ namespace TiledLib
                     this.qualityRatio = 1f;
                     break;
             }
-            this.Type = type;
             this.graphics = graphics;
             this.Radius = radius;
             this.RenderRadius = (float)radius * this.qualityRatio;
@@ -77,7 +76,7 @@ namespace TiledLib
             PrintedLight = new RenderTarget2D(graphics, (int)baseSize, (int)baseSize);
             BeamLight = new RenderTarget2D(graphics, (int)baseSize, (int)baseSize);
             this.Color = color;
-            BeamStencil = beamStencil;
+            if(bst!= BeamStencilType.None) BeamStencil = LightingEngine.Instance.BeamStencils[bst];
         }
 
         public Vector2 ToRelativePosition(Vector2 worldPosition)
@@ -93,9 +92,9 @@ namespace TiledLib
             }
         }
 
-        public Vector2 RelativeZeroHLSL(ShadowCasterMap shadowMap)
+        public Vector2 RelativeZeroHLSL(ShadowCasterMap shadowMap, Camera gameCamera)
         {
-            Vector2 sizedRelativeZero = this.RelativeZero * shadowMap.PrecisionRatio;
+            Vector2 sizedRelativeZero = ((this.RelativeZero - (gameCamera.Position)) + new Vector2(gameCamera.Width / 2, gameCamera.Height / 2)) * shadowMap.PrecisionRatio;
             float shadowmapRelativeZeroX = sizedRelativeZero.X / shadowMap.Size.X;
             shadowmapRelativeZeroX -= (shadowmapRelativeZeroX % shadowMap.PixelSizeHLSL.X) * shadowMap.PrecisionRatio;
             float shadowmapRelativeZeroY = sizedRelativeZero.Y / shadowMap.Size.Y;

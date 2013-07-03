@@ -87,8 +87,15 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="beamstencil.png">
-      <Name>beamstencil</Name>
+    <Compile Include="beamwide.png">
+      <Name>beamwide</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="beamnarrow.png">
+      <Name>beamnarrow</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>

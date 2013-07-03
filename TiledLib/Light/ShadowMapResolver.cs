@@ -128,31 +128,31 @@ namespace TiledLib
             return false;
         }
 
-        public void ResolveShadows(ShadowCasterMap shadowCasterMap, LightSource resultLight, PostEffect postEffect, Vector2 newPosition)
+        public void ResolveShadows(ShadowCasterMap shadowCasterMap, LightSource resultLight, PostEffect postEffect, Vector2 newPosition, Camera gameCamera)
         {
             resultLight.Position = newPosition;
-            this.ResolveShadows(shadowCasterMap, resultLight, postEffect, 1f);
+            this.ResolveShadows(shadowCasterMap, resultLight, postEffect, 1f, gameCamera);
         }
 
-        public void ResolveShadows(ShadowCasterMap shadowCasterMap, LightSource resultLight, PostEffect postEffect, float distanceMod, Vector2 newPosition)
+        public void ResolveShadows(ShadowCasterMap shadowCasterMap, LightSource resultLight, PostEffect postEffect, float distanceMod, Vector2 newPosition, Camera gameCamera)
         {
             resultLight.Position = newPosition;
-            this.ResolveShadows(shadowCasterMap, resultLight, postEffect, distanceMod);
+            this.ResolveShadows(shadowCasterMap, resultLight, postEffect, distanceMod, gameCamera);
         }
 
-        public void ResolveShadows(ShadowCasterMap shadowCasterMap, LightSource resultLight, PostEffect postEffect)
+        public void ResolveShadows(ShadowCasterMap shadowCasterMap, LightSource resultLight, PostEffect postEffect, Camera gameCamera)
         {
-            this.ResolveShadows(shadowCasterMap, resultLight, postEffect, 1f);
+            this.ResolveShadows(shadowCasterMap, resultLight, postEffect, 1f, gameCamera);
         }
 
-        public void ResolveShadows(ShadowCasterMap shadowCasterMap, LightSource resultLight, PostEffect postEffect, float distanceMod)
+        public void ResolveShadows(ShadowCasterMap shadowCasterMap, LightSource resultLight, PostEffect postEffect, float distanceMod, Camera gameCamera)
         {
 
 
             BlendState backupBlendState = graphicsDevice.BlendState;
             graphicsDevice.BlendState = BlendState.Opaque;
 
-            this.ExecuteTechniqueDistortAndComputeDistance(shadowCasterMap, resultLight, shadowMapDistorted, "DistortAndComputeDistances");
+            this.ExecuteTechniqueDistortAndComputeDistance(shadowCasterMap, resultLight, shadowMapDistorted, "DistortAndComputeDistances", gameCamera);
 
             // Horizontal reduction
             this.ApplyHorizontalReduction(shadowMapDistorted, this.shadowMapDigested);
@@ -254,12 +254,12 @@ namespace TiledLib
             graphicsDevice.BlendState = backupBlendState;
         }
 
-        private void ExecuteTechniqueDistortAndComputeDistance(ShadowCasterMap shadowCasterMap, LightSource light, RenderTarget2D destination, string techniqueName)
+        private void ExecuteTechniqueDistortAndComputeDistance(ShadowCasterMap shadowCasterMap, LightSource light, RenderTarget2D destination, string techniqueName, Camera gameCamera)
         {
             graphicsDevice.SetRenderTarget(destination);
             graphicsDevice.Clear(Color.White);
 
-            this.lightsFX.ResolveShadowsEffect.Parameters["lightRelativeZero"].SetValue(light.RelativeZeroHLSL(shadowCasterMap));
+            this.lightsFX.ResolveShadowsEffect.Parameters["lightRelativeZero"].SetValue(light.RelativeZeroHLSL(shadowCasterMap, gameCamera));
 
             Vector2 shadowCasterMapPortion = (light.Size * shadowCasterMap.PrecisionRatio) / shadowCasterMap.Size;
             this.lightsFX.ResolveShadowsEffect.Parameters["shadowCasterMapPortion"].SetValue(shadowCasterMapPortion);
