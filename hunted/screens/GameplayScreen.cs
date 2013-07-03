@@ -47,11 +47,17 @@ namespace Hunted
 
         //iledLib.LightSource cameraLightSource = new LightSource();
 
-        DateTime TimeOfDay = new DateTime(2013,1,1,8,0,0);
+        DateTime TimeOfDay = new DateTime(2013,1,1,0,0,0);
 
         double mapUpdate = 0;
 
         LightSource lightSource1;
+
+        Texture2D beamStencil;
+        RenderTarget2D beamRT;
+
+        DepthStencilState dss = new DepthStencilState();
+        AlphaTestEffect ate;
 
         #endregion
 
@@ -105,7 +111,22 @@ namespace Hunted
             minimapRT = new RenderTarget2D(ScreenManager.GraphicsDevice, 200, 200);
 
 
-            lightSource1 = new LightSource(LightSourceType.Spot, ScreenManager.GraphicsDevice, 300, LightAreaQuality.Middle, new Color(1f, 1f, 1f), lightingEngine.spotBG);
+            lightSource1 = new LightSource(LightSourceType.Spot, ScreenManager.GraphicsDevice, 600, LightAreaQuality.Middle, new Color(1f, 1f, 1f), lightingEngine.spotBG);
+
+            beamStencil = content.Load<Texture2D>("beamstencil");
+            beamRT = new RenderTarget2D(ScreenManager.GraphicsDevice, ScreenManager.GraphicsDevice.Viewport.Width, ScreenManager.GraphicsDevice.Viewport.Height);
+            dss.StencilEnable = true;
+            dss.StencilFunction = CompareFunction.Always;
+            dss.StencilPass = StencilOperation.Keep;
+            dss.ReferenceStencil = 1;
+            ate = new AlphaTestEffect(ScreenManager.GraphicsDevice);
+            ate.AlphaFunction = CompareFunction.NotEqual;
+            
+            ate.ReferenceAlpha = 1;
+            Matrix projection = Matrix.CreateOrthographicOffCenter(0, ScreenManager.GraphicsDevice.Viewport.Height, ScreenManager.GraphicsDevice.Viewport.Width, 0, 0, 1);
+            Matrix halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
+            ate.Projection = halfPixelOffset * projection;   
+
 
             ScreenManager.Game.ResetElapsedTime();
         }
@@ -241,6 +262,8 @@ namespace Hunted
 
             //float zoom = 1f;
 
+
+
             lightingEngine.ShadowMap.StartGeneratingShadowCasteMap(false);
             {
                 //this.shadowMap.AddShadowCaster(testTexture, Vector2.Zero, testTexture.Width, testTexture.Height);
@@ -253,10 +276,40 @@ namespace Hunted
 
             lightingEngine.ShadowmapResolver.ResolveShadows(lightingEngine.ShadowMap, lightSource1, PostEffect.LinearAttenuation_BlurHigh, 1f, new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2, ScreenManager.GraphicsDevice.Viewport.Height / 2));
 
+            
+            //ScreenManager.GraphicsDevice.SetRenderTarget(null);
+
+            //ScreenManager.GraphicsDevice.SetRenderTarget(lightSource1.PrintedLight);
+            ////spriteBatch.Begin(SpriteSortMode.Deferred, null, null, dss, null, ate);
+            ////spriteBatch.Begin();
+            ////spriteBatch.Draw(beamRT, new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2, ScreenManager.GraphicsDevice.Viewport.Height / 2), null, Color.White, 0f, new Vector2(0f, beamStencil.Height / 2), 1f, SpriteEffects.None, 1);
+            ////spriteBatch.End();
+            //ScreenManager.GraphicsDevice.SetRenderTarget(null);
+
+            ScreenManager.GraphicsDevice.SetRenderTarget(lightSource1.BeamLight);
+
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque);
+            //ScreenManager.GraphicsDevice.Clear(Color.Black);
+            spriteBatch.Draw(lightSource1.PrintedLight, Vector2.Zero,null, Color.White);
+            ////spriteBatch.Draw(beamStencil, new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2, ScreenManager.GraphicsDevice.Viewport.Height / 2), null, Color.White, 0f, new Vector2(0f, beamStencil.Height / 2), 1f, SpriteEffects.None, 1);
+            spriteBatch.End();
+
+            //spriteBatch.Begin(SpriteSortMode.Deferred, null, null, dss, null, ate);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null);
+
+            //spriteBatch.Draw(lightSource1.PrintedLight, Vector2.Zero, null, Color.White);
+            spriteBatch.Draw(beamStencil, lightSource1.RenderTargetSize / 2, null, Color.White, 0f, new Vector2(beamStencil.Width / 2, beamStencil.Height / 2), (lightSource1.RenderRadius*2)/beamStencil.Width, SpriteEffects.None, 1);
+
+            ////spriteBatch.End();
+            spriteBatch.End();
+
+            
+
+
             ScreenManager.GraphicsDevice.SetRenderTarget(lightingEngine.ScreenLights);
             {
                 ScreenManager.GraphicsDevice.Clear(Color.Black);
-                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive);
+                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, null, null);
                 {
                     lightSource1.Draw(spriteBatch);
                 }
@@ -270,8 +323,12 @@ namespace Hunted
             gameMap.DrawShadows(spriteBatch, "Wall", gameCamera, lightingEngine);
             spriteBatch.End();
 
-            // This command impress a texture on another using 2xMultiplicative blend, which is perfect to paste our lights on the underlying image
-            lightingEngine.LFX.PrintLightsOverTexture(null, spriteBatch, ScreenManager.GraphicsDevice, lightingEngine.ScreenLights, lightingEngine.ScreenGround, 0.5f * (1f - (lightingEngine.CurrentSunColor.ToVector3().Z)));
+            
+           
+
+                // This command impress a texture on another using 2xMultiplicative blend, which is perfect to paste our lights on the underlying image
+                lightingEngine.LFX.PrintLightsOverTexture(null, spriteBatch, ScreenManager.GraphicsDevice, lightingEngine.ScreenLights, lightingEngine.ScreenGround, 0.5f * (1f - (lightingEngine.CurrentSunColor.ToVector3().Z)));
+            
 
             // We re-print the elements not affected by the light (in this case the shadow casters)
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));

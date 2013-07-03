@@ -21,7 +21,7 @@ float4 MultiBlend(float2 texCoord : TEXCOORD0, float4 color : COLOR0) : COLOR0
 	colorShadow = tex2D(LightSampler, newCoord);
   }
 
-  float4 resultColor = (colorGround * colorShadow + colorShadow * colorGround) * 4.0f;
+  float4 resultColor = (colorGround * colorShadow + colorShadow * colorGround) * 6.0f;
 
   return lerp(colorGround, resultColor, MixFactor);
 }

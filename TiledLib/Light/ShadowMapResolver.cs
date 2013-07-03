@@ -52,7 +52,7 @@ namespace TiledLib
 
         SpriteBatch spriteBatch;
 
-        public ShadowMapResolver(GraphicsDevice graphicsDevice, LightsFX lightsFX, int resolverRadius, SpriteBatch sb)
+        public ShadowMapResolver(GraphicsDevice graphicsDevice, LightsFX lightsFX, int resolverRadius)
         {
             this.graphicsDevice = graphicsDevice;
 
@@ -61,8 +61,6 @@ namespace TiledLib
             this.resolverRadiusDesired = resolverRadius;
 
             int resolverRadiusModified = this.resolverRadiusDesired;
-
-            this.spriteBatch = sb;
 
             bool reductionPlanCreated = false;
             List<ShadowMapReductionStep> listReductionSteps = new List<ShadowMapReductionStep>();

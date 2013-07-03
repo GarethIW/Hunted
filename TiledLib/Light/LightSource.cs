@@ -29,6 +29,7 @@ namespace TiledLib
         public LightSourceType Type;
 
         public RenderTarget2D PrintedLight;
+        public RenderTarget2D BeamLight;
         public Vector2 Position { get; set; }
         public Vector2 RenderTargetSize { get; set; }
         public Vector2 Size { get; set; }
@@ -74,6 +75,7 @@ namespace TiledLib
             baseSize *= this.qualityRatio;
             this.RenderTargetSize = new Vector2(baseSize);
             PrintedLight = new RenderTarget2D(graphics, (int)baseSize, (int)baseSize);
+            BeamLight = new RenderTarget2D(graphics, (int)baseSize, (int)baseSize);
             this.Color = color;
             BeamStencil = beamStencil;
         }
@@ -104,7 +106,7 @@ namespace TiledLib
         public void Draw(SpriteBatch spriteBatch)
         {
             int size = (int)(this.Radius * 2f);
-            spriteBatch.Draw(this.PrintedLight, new Rectangle((int)this.PrintPosition.X, (int)this.PrintPosition.Y, size, size), this.Color);
+            spriteBatch.Draw(this.BeamLight, new Rectangle((int)this.PrintPosition.X, (int)this.PrintPosition.Y, size, size), this.Color);
         }
 
         public void Draw(SpriteBatch spriteBatch, byte opacity)
