@@ -1,4 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +10,12 @@ namespace TiledLib
 {
     public class LightingEngine
     {
+        Texture2D spotBG;
+        Texture2D spotFG;
+
+        RenderTarget2D spotRT;
+        BlendState lightsBS;
+
         Color[] sunColors = new Color[] {
             new Color(0.2f,0.2f,0.2f), new Color(0.3f,0.2f,0.2f),  new Color(0.4f,0.2f,0.2f), new Color(0.5f,0.3f,0.3f), new Color(0.7f,0.5f,0.4f), new Color(0.8f,0.6f,0.5f),
             new Color(0.9f,0.7f,0.7f), new Color(1f,9f,9f), new Color(1f,1f,1f), new Color(1f,1f,1f), new Color(1f,1f,1f), new Color(1f,1f,1f),
@@ -32,11 +40,53 @@ namespace TiledLib
             CurrentShadowVect = shadowVects[8];
         }
 
-        public void Update(GameTime gameTime, ref DateTime timeOfDay)
+        public void LoadContent(ContentManager content, GraphicsDevice gd)
         {
-            timeOfDay = timeOfDay.AddMinutes(gameTime.ElapsedGameTime.TotalSeconds * 100);
+            spotBG = content.Load<Texture2D>("spotbg");
+            spotFG = content.Load<Texture2D>("spotfg");
 
+            spotRT = new RenderTarget2D(gd, spotBG.Width, spotBG.Height);
+
+            lightsBS = new BlendState()
+            {
+                ColorSourceBlend = Blend.DestinationColor,
+                ColorDestinationBlend = Blend.SourceColor,
+                ColorBlendFunction = BlendFunction.Add,
+                AlphaSourceBlend = Blend.One,
+                AlphaDestinationBlend = Blend.One,
+                AlphaBlendFunction = BlendFunction.Add
+
+            };
+        }
+
+        public void Update(GameTime gameTime, DateTime timeOfDay, SpriteBatch sb, GraphicsDevice gd)
+        {
             CalcSunAndShadows(timeOfDay);
+            PrepareLights(sb, gd);
+        }
+
+        public void PrepareLights(SpriteBatch sb, GraphicsDevice gd)
+        {
+            gd.SetRenderTarget(spotRT);
+            sb.Begin();
+            sb.Draw(spotBG, Vector2.Zero, null, Color.White);
+            sb.Draw(spotFG, Vector2.Zero, null, Color.White * (1f - (CurrentSunColor.ToVector3().Z)));
+            sb.End();
+            gd.SetRenderTarget(null);
+        }
+
+        public void Draw(SpriteBatch sb, Camera gameCamera)
+        {
+            sb.Begin(SpriteSortMode.Deferred, lightsBS, SamplerState.PointClamp, null, null, null, gameCamera.CameraMatrix);
+            foreach (LightSource ls in LightSources)
+            {
+                sb.Draw(spotRT, ls.Position, null, Color.White, 0f, new Vector2(spotRT.Width, spotRT.Height) / 2, 1f, SpriteEffects.None, 1);
+                sb.Draw(spotRT, ls.Position, null, Color.White*0.995f, 0f, new Vector2(spotRT.Width, spotRT.Height) / 2, 1f, SpriteEffects.None, 1);
+
+            }
+            
+            sb.End();
+            
         }
 
         void CalcSunAndShadows(DateTime t)

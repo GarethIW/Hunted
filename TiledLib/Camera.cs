@@ -98,7 +98,7 @@ namespace TiledLib
 
             Rotation = TurnToFace(Vector2.Zero, AngleToVector(RotationTarget, 1f), Rotation, 0.02f);
 
-            CameraMatrix = Matrix.CreateTranslation(-(int)Position.X, -(int)Position.Y, 0) * Matrix.CreateScale(1f) * Matrix.CreateRotationZ(-Rotation) * Matrix.CreateTranslation(Width/2, Height-(bounds.Height/3),0);
+            CameraMatrix = Matrix.CreateTranslation(-(int)Position.X, -(int)Position.Y, 0) * Matrix.CreateScale(1f) * Matrix.CreateRotationZ(-Rotation) * Matrix.CreateTranslation(Width/2, Height/2,0);
             //CameraMatrix *= Matrix.CreateRotationZ(Rotation);
         }
 

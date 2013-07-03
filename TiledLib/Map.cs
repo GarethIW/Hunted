@@ -373,10 +373,10 @@ namespace TiledLib
                             if (tile == null)
                                 continue;
                             // - tile.Source.Height + TileHeight;
-                            Rectangle r = new Rectangle(x * TileWidth, y * TileHeight, tile.Source.Width, tile.Source.Height);
+                            //Rectangle r = new Rectangle(x * TileWidth, y * TileHeight, tile.Source.Width, tile.Source.Height);
 
 
-                        spriteBatch.Draw(tile.Texture, r, tile.Source, lightingEngine.CurrentSunColor);
+                            spriteBatch.Draw(tile.Texture, new Vector2((x * TileWidth), (y * TileHeight)), tile.Source, lightingEngine.CurrentSunColor);
                         //}
 
                     }
@@ -473,9 +473,9 @@ namespace TiledLib
 
                                 for (int i = 1; i < 40; i += qual)
                                 {
-                                    Rectangle r = new Rectangle((x * TileWidth) + (int)(dir.X * shadowAmount * i), (y * TileHeight) + (int)(dir.Y * shadowAmount * i), tile.Source.Width, tile.Source.Height);
+                                    //Rectangle r = new Rectangle((x * TileWidth) + (int)(dir.X * shadowAmount * i), (y * TileHeight) + (int)(dir.Y * shadowAmount * i), tile.Source.Width, tile.Source.Height);
 
-                                    spriteBatch.Draw(tile.Texture, r, tile.Source, Color.Black * shadowBrightness);
+                                    spriteBatch.Draw(tile.Texture, new Vector2((x * TileWidth) + (dir.X * shadowAmount * i), (y * TileHeight) + (dir.Y * shadowAmount * i)), tile.Source, Color.Black * shadowBrightness);
                                 }
                             }
                         }
@@ -489,7 +489,56 @@ namespace TiledLib
             }
         }
 
-        
+
+        public void DrawMinimap(SpriteBatch spriteBatch, Camera gameCamera, float zoom, RenderTarget2D minimapRT, bool[,] mapFog)
+        {
+
+
+            Rectangle worldArea = new Rectangle((int)((gameCamera.Position.X - (int)(((float)minimapRT.Width)))), (int)((gameCamera.Position.Y - (int)(((float)minimapRT.Height)))), (int)((minimapRT.Width) * 2), (int)((minimapRT.Height) * 2));
+
+                //Rectangle worldArea = new Rectangle(0, (int)gameCamera.Position.Y - (int)(((float)gameCamera.Height) * (2f-scale)), TileWidth * Width, (int)(((float)gameCamera.Height*2 ) * (3f-(2f*scale))));
+
+                // figure out the min and max tile indices to draw
+            worldArea.Inflate((int)((minimapRT.Width / zoom) - minimapRT.Width), (int)((minimapRT.Height / zoom) - minimapRT.Height));
+
+                int minX = Math.Max((int)Math.Floor((float)worldArea.Left / TileWidth), 0);
+                int maxX = Math.Min((int)Math.Ceiling((float)worldArea.Right / TileWidth), Width);
+
+                int minY = Math.Max((int)Math.Floor((float)worldArea.Top / TileHeight), 0);
+                int maxY = Math.Min((int)Math.Ceiling((float)worldArea.Bottom / TileHeight), Height);
+
+                //minX = 0;
+                //maxX = 1000;
+                //minY = 0;
+                //maxY = 1000;
+
+                TileLayer terrainLayer = GetLayer("Terrain") as TileLayer;
+                TileLayer wallLayer = GetLayer("Wall") as TileLayer;
+
+                for (int x = minX; x < maxX; x++)
+                {
+                    for (int y = minY; y < maxY; y++)
+                    {
+                        if (!mapFog[x, y]) continue;
+
+                        Tile tile = terrainLayer.Tiles[x, y];
+                        if (tile != null)
+                        {
+                            Rectangle r = new Rectangle(x * TileWidth, y * TileHeight, tile.Source.Width, tile.Source.Height);
+                            spriteBatch.Draw(tile.Texture, r, tile.Source, Color.White);
+                        }
+                        tile = wallLayer.Tiles[x, y];
+                        if (tile != null)
+                        {
+                            Rectangle r = new Rectangle(x * TileWidth, y * TileHeight, tile.Source.Width, tile.Source.Height);
+                            spriteBatch.Draw(tile.Texture, r, tile.Source, Color.White);
+                        }
+
+                    }
+                }
+
+
+        }
 
         public bool? CheckCollision(Vector2 position)
         {

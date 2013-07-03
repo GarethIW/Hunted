@@ -38,7 +38,8 @@ namespace Hunted
 
         LightingEngine lightingEngine = new LightingEngine();
 
-        RenderTarget2D gameRenderTarget;
+        RenderTarget2D minimapRT;
+        bool[,] mapFog;
 
         Vector2 mousePos;
 
@@ -48,9 +49,8 @@ namespace Hunted
 
         DateTime TimeOfDay = new DateTime(2013,1,1,8,0,0);
 
-        BlendState lightsBS;
+        double mapUpdate = 0;
 
-        Texture2D spotTex;
         #endregion
 
         #region Initialization
@@ -81,9 +81,11 @@ namespace Hunted
 
             //gameFont = content.Load<SpriteFont>("menufont");
 
-            spotTex = content.Load<Texture2D>("spot");
+            lightingEngine.LoadContent(content, ScreenManager.GraphicsDevice);
 
             gameMap = content.Load<Map>("map");
+
+            mapFog = new bool[gameMap.Width, gameMap.Height];
 
             TerrainGeneration.GenerateTerrain(gameMap);
 
@@ -98,16 +100,7 @@ namespace Hunted
             cameraLightSource.Type = LightSourceType.Spot;
             lightingEngine.LightSources.Add(cameraLightSource);
 
-            lightsBS = new BlendState()
-            {
-                ColorSourceBlend = Blend.DestinationColor,
-                ColorDestinationBlend = Blend.SourceColor,
-                ColorBlendFunction = BlendFunction.Add,
-                AlphaSourceBlend = Blend.One,
-                AlphaDestinationBlend = Blend.One,
-                AlphaBlendFunction = BlendFunction.Add
-                 
-            };
+            minimapRT = new RenderTarget2D(ScreenManager.GraphicsDevice, 200, 200);
 
             ScreenManager.Game.ResetElapsedTime();
         }
@@ -139,13 +132,34 @@ namespace Hunted
 
             if (IsActive)
             {
-                lightingEngine.Update(gameTime, ref TimeOfDay);
+                TimeOfDay = TimeOfDay.AddMinutes(gameTime.ElapsedGameTime.TotalSeconds * 10);
+
+                lightingEngine.Update(gameTime, TimeOfDay, ScreenManager.SpriteBatch, ScreenManager.GraphicsDevice);
 
                 cameraLightSource.Position = gameCamera.Position;
                 cameraLightSource.Direction = new Vector2(1f, 1f);
 
                 gameCamera.Update(new Rectangle(0, 0, ScreenManager.GraphicsDevice.Viewport.Width, ScreenManager.GraphicsDevice.Viewport.Height));
 
+                mapUpdate += gameTime.ElapsedGameTime.TotalMilliseconds;
+                if (mapUpdate >= 100)
+                {
+                    for (float a = 0.0f; a < MathHelper.TwoPi; a += 0.1f)
+                    {
+                        for (float r = 0.0f; r < 800f; r += 50f)
+                        {
+                            Vector2 p = gameCamera.Position + (new Vector2((float)Math.Cos(a), (float)Math.Sin(a)) * r);
+                            mapFog[(int)(p.X / gameMap.TileWidth), (int)(p.Y / gameMap.TileHeight)] = true;
+                        }
+                    }
+                    ScreenManager.GraphicsDevice.SetRenderTarget(minimapRT);
+                    ScreenManager.GraphicsDevice.Clear(Color.Black);
+                    ScreenManager.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(0.05f) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(minimapRT.Width / 2, minimapRT.Height / 2, 0));
+                    gameMap.DrawMinimap(ScreenManager.SpriteBatch, gameCamera, 0.05f, minimapRT, mapFog);
+                    ScreenManager.SpriteBatch.End();
+                    ScreenManager.GraphicsDevice.SetRenderTarget(null);
+                    mapUpdate = 0;
+                }
             }
 
                
@@ -228,15 +242,11 @@ namespace Hunted
             gameMap.DrawLayer(spriteBatch, "Wall", gameCamera, lightingEngine);
             spriteBatch.End();
 
-            spriteBatch.Begin(SpriteSortMode.Deferred, lightsBS, SamplerState.PointClamp, null, null, null);
-            spriteBatch.Draw(spotTex, new Vector2(spriteBatch.GraphicsDevice.Viewport.Width, spriteBatch.GraphicsDevice.Viewport.Height) / 2, null, Color.White, 0f, new Vector2(spotTex.Width, spotTex.Height) / 2, 0.75f, SpriteEffects.None, 1);
-            spriteBatch.Draw(spotTex, new Vector2(spriteBatch.GraphicsDevice.Viewport.Width, spriteBatch.GraphicsDevice.Viewport.Height) / 2, null, Color.White, 0f, new Vector2(spotTex.Width, spotTex.Height) / 2, 0.75f, SpriteEffects.None, 1);
+            lightingEngine.Draw(spriteBatch, gameCamera);
 
-            spriteBatch.End();
-
-          
             spriteBatch.Begin();
             //gameHUD.Draw(spriteBatch);
+            spriteBatch.Draw(minimapRT, new Vector2(ScreenManager.GraphicsDevice.Viewport.Width - 20 - minimapRT.Width, 20), null, Color.White);
             spriteBatch.End();
 
             // If the game is transitioning on or off, fade it out to black.
