@@ -275,7 +275,7 @@ namespace TiledLib
         /// <param name="spriteBatch">The SpriteBatch to use to render the layer.</param>
         /// <param name="layerName">The name of the layer to draw.</param>
         /// <param name="gameCamera">The camera to use for positioning.</param>
-        public void DrawLayer(SpriteBatch spriteBatch, string layerName, Camera gameCamera, LightingEngine lightingEngine)
+        public void DrawLayer(SpriteBatch spriteBatch, string layerName, Camera gameCamera, LightingEngine lightingEngine, Color color)
         {
             var l = GetLayer(layerName);
 
@@ -290,7 +290,7 @@ namespace TiledLib
             {
                 
 
-                DrawLayer(spriteBatch, l, gameCamera, lightingEngine);
+                DrawLayer(spriteBatch, l, gameCamera, lightingEngine, color);
             }
         }
 
@@ -336,7 +336,7 @@ namespace TiledLib
         /// <param name="offset">A pixel amount to offset the tile positioning by</param>
         /// <param name="alpha">Layer opacity.</param>
         /// <param name="color">The color to use when drawing.</param>
-        public void DrawLayer(SpriteBatch spriteBatch, Layer layer, Camera gameCamera, LightingEngine lightingEngine)
+        public void DrawLayer(SpriteBatch spriteBatch, Layer layer, Camera gameCamera, LightingEngine lightingEngine, Color color)
         {
             if (!layer.Visible)
                 return;
@@ -376,7 +376,7 @@ namespace TiledLib
                             //Rectangle r = new Rectangle(x * TileWidth, y * TileHeight, tile.Source.Width, tile.Source.Height);
 
 
-                            spriteBatch.Draw(tile.Texture, new Vector2((x * TileWidth), (y * TileHeight)), tile.Source, lightingEngine.CurrentSunColor);
+                        spriteBatch.Draw(tile.Texture, new Vector2((x * TileWidth), (y * TileHeight)), tile.Source, color==Color.White?lightingEngine.CurrentSunColor:color);
                         //}
 
                     }
@@ -449,36 +449,36 @@ namespace TiledLib
                             spriteBatch.Draw(tile.Texture, r, tile.Source, Color.Black * defbright);
                         }
 
-                        foreach (LightSource ls in lightingEngine.LightSources)
-                        {
-                            Vector2 tilepos = new Vector2(x * TileWidth, y * TileWidth) + (new Vector2(TileWidth, TileHeight) / 2);
-                            float dist = (tilepos - ls.Position).Length();
-                            if (dist < 400f)
-                            {
-                                Vector2 dir = Vector2.Zero;
+                        //foreach (LightSource ls in lightingEngine.LightSources)
+                        //{
+                        //    Vector2 tilepos = new Vector2(x * TileWidth, y * TileWidth) + (new Vector2(TileWidth, TileHeight) / 2);
+                        //    float dist = (tilepos - ls.Position).Length();
+                        //    if (dist < 400f)
+                        //    {
+                        //        Vector2 dir = Vector2.Zero;
 
-                                switch (ls.Type)
-                                {
-                                    case LightSourceType.Spot:
-                                        dir = tilepos - ls.Position;
-                                        dir.Normalize();
-                                        break;
-                                    case LightSourceType.Directional:
-                                        dir = ls.Direction;
-                                        break;
-                                }
+                        //        switch (ls.Type)
+                        //        {
+                        //            case LightSourceType.Spot:
+                        //                dir = tilepos - ls.Position;
+                        //                dir.Normalize();
+                        //                break;
+                        //            case LightSourceType.Directional:
+                        //                dir = ls.Direction;
+                        //                break;
+                        //        }
 
-                                float shadowAmount = (2f / 400f) * (400f - dist);
-                                float shadowBrightness = (defbright + 0.01f) * (1f - (lightingEngine.CurrentSunColor.ToVector3().Z));
+                        //        float shadowAmount = (2f / 400f) * (400f - dist);
+                        //        float shadowBrightness = (defbright + 0.01f) * (1f - (lightingEngine.CurrentSunColor.ToVector3().Z));
 
-                                for (int i = 1; i < 40; i += qual)
-                                {
-                                    //Rectangle r = new Rectangle((x * TileWidth) + (int)(dir.X * shadowAmount * i), (y * TileHeight) + (int)(dir.Y * shadowAmount * i), tile.Source.Width, tile.Source.Height);
+                        //        for (int i = 1; i < 40; i += qual)
+                        //        {
+                        //            //Rectangle r = new Rectangle((x * TileWidth) + (int)(dir.X * shadowAmount * i), (y * TileHeight) + (int)(dir.Y * shadowAmount * i), tile.Source.Width, tile.Source.Height);
 
-                                    spriteBatch.Draw(tile.Texture, new Vector2((x * TileWidth) + (dir.X * shadowAmount * i), (y * TileHeight) + (dir.Y * shadowAmount * i)), tile.Source, Color.Black * shadowBrightness);
-                                }
-                            }
-                        }
+                        //            spriteBatch.Draw(tile.Texture, new Vector2((x * TileWidth) + (dir.X * shadowAmount * i), (y * TileHeight) + (dir.Y * shadowAmount * i)), tile.Source, Color.Black * shadowBrightness);
+                        //        }
+                        //    }
+                        //}
 
                         //}
 

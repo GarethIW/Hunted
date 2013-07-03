@@ -10,11 +10,18 @@ namespace TiledLib
 {
     public class LightingEngine
     {
-        Texture2D spotBG;
-        Texture2D spotFG;
+        public Texture2D spotBG;
+        public Texture2D spotFG;
 
         RenderTarget2D spotRT;
         BlendState lightsBS;
+
+        public LightsFX LFX;
+        public ShadowMapResolver ShadowmapResolver;
+
+        public ShadowCasterMap ShadowMap;
+        public RenderTarget2D ScreenLights;
+        public RenderTarget2D ScreenGround;
 
         Color[] sunColors = new Color[] {
             new Color(0.2f,0.2f,0.2f), new Color(0.3f,0.2f,0.2f),  new Color(0.4f,0.2f,0.2f), new Color(0.5f,0.3f,0.3f), new Color(0.7f,0.5f,0.4f), new Color(0.8f,0.6f,0.5f),
@@ -40,7 +47,7 @@ namespace TiledLib
             CurrentShadowVect = shadowVects[8];
         }
 
-        public void LoadContent(ContentManager content, GraphicsDevice gd)
+        public void LoadContent(ContentManager content, GraphicsDevice gd, SpriteBatch sb)
         {
             spotBG = content.Load<Texture2D>("spotbg");
             spotFG = content.Load<Texture2D>("spotfg");
@@ -57,6 +64,16 @@ namespace TiledLib
                 AlphaBlendFunction = BlendFunction.Add
 
             };
+
+            LFX = new LightsFX(
+                content.Load<Effect>("resolveShadowsEffect"),
+                content.Load<Effect>("reductionEffect"),
+                content.Load<Effect>("2xMultiBlend"));
+            ShadowmapResolver = new ShadowMapResolver(gd, LFX, 256);
+
+            ShadowMap = new ShadowCasterMap(PrecisionSettings.VeryHigh, gd, sb);
+            ScreenLights = new RenderTarget2D(gd, gd.Viewport.Width, gd.Viewport.Height);
+            ScreenGround = new RenderTarget2D(gd, gd.Viewport.Width, gd.Viewport.Height);
         }
 
         public void Update(GameTime gameTime, DateTime timeOfDay, SpriteBatch sb, GraphicsDevice gd)
@@ -103,16 +120,7 @@ namespace TiledLib
         }
     }
 
-    public enum LightSourceType
-    {
-        Spot,
-        Directional
-    }
 
-    public class LightSource
-    {
-        public LightSourceType Type;
-        public Vector2 Position;
-        public Vector2 Direction;
-    }
+
+
 }

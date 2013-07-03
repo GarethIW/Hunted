@@ -62,6 +62,12 @@
     <Compile Include="Camera.cs" />
     <Compile Include="Layer.cs" />
     <Compile Include="Lighting.cs" />
+    <Compile Include="Light\LightsFX.cs" />
+    <Compile Include="Light\LightSource.cs" />
+    <Compile Include="Light\QuadRenderComponent.cs" />
+    <Compile Include="Light\ShadowCasterMap.cs" />
+    <Compile Include="Light\ShadowMapReductionStep.cs" />
+    <Compile Include="Light\ShadowMapResolver.cs" />
     <Compile Include="Map.cs" />
     <Compile Include="MapObject.cs" />
     <Compile Include="MapObjectLayer.cs" />
