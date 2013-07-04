@@ -515,23 +515,25 @@ namespace TiledLib
                 TileLayer terrainLayer = GetLayer("Terrain") as TileLayer;
                 TileLayer wallLayer = GetLayer("Wall") as TileLayer;
 
-                for (int x = minX; x < maxX; x++)
+               for (int x = minX; x < maxX; x++)
+               //     for (int x = 0; x < 1; x++)
                 {
                     for (int y = minY; y < maxY; y++)
+                    //    for (int y = minY; y <= minY; y++)
                     {
                         if (!mapFog[x, y]) continue;
 
                         Tile tile = terrainLayer.Tiles[x, y];
                         if (tile != null)
                         {
-                            Rectangle r = new Rectangle(x * TileWidth, y * TileHeight, tile.Source.Width, tile.Source.Height);
-                            spriteBatch.Draw(tile.Texture, r, tile.Source, Color.White);
+                            //Rectangle r = new Rectangle(x * TileWidth, y * TileHeight, tile.Source.Width, tile.Source.Height);
+                            spriteBatch.Draw(tile.Texture, new Vector2(x * TileWidth, y * TileHeight), tile.Source, Color.White);
                         }
                         tile = wallLayer.Tiles[x, y];
                         if (tile != null)
                         {
-                            Rectangle r = new Rectangle(x * TileWidth, y * TileHeight, tile.Source.Width, tile.Source.Height);
-                            spriteBatch.Draw(tile.Texture, r, tile.Source, Color.White);
+                            //Rectangle r = new Rectangle(x * TileWidth, y * TileHeight, tile.Source.Width, tile.Source.Height);
+                            spriteBatch.Draw(tile.Texture, new Vector2(x * TileWidth, y * TileHeight), tile.Source, Color.White);
                         }
 
                     }

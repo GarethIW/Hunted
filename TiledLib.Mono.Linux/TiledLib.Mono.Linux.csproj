@@ -55,6 +55,24 @@
     <Compile Include="..\TiledLib\Lighting.cs">
       <Link>Lighting.cs</Link>
     </Compile>
+    <Compile Include="..\TiledLib\Light\LightsFX.cs">
+      <Link>Light\LightsFX.cs</Link>
+    </Compile>
+    <Compile Include="..\TiledLib\Light\LightSource.cs">
+      <Link>Light\LightSource.cs</Link>
+    </Compile>
+    <Compile Include="..\TiledLib\Light\QuadRenderComponent.cs">
+      <Link>Light\QuadRenderComponent.cs</Link>
+    </Compile>
+    <Compile Include="..\TiledLib\Light\ShadowCasterMap.cs">
+      <Link>Light\ShadowCasterMap.cs</Link>
+    </Compile>
+    <Compile Include="..\TiledLib\Light\ShadowMapReductionStep.cs">
+      <Link>Light\ShadowMapReductionStep.cs</Link>
+    </Compile>
+    <Compile Include="..\TiledLib\Light\ShadowMapResolver.cs">
+      <Link>Light\ShadowMapResolver.cs</Link>
+    </Compile>
     <Compile Include="..\TiledLib\Map.cs">
       <Link>Map.cs</Link>
     </Compile>

@@ -33,7 +33,7 @@
   <ItemGroup>
     <Reference Include="MonoGame.Framework, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\MonoGame\MonoGame.Framework\bin\Windows\Debug\MonoGame.Framework.dll</HintPath>
+      <HintPath>..\..\MonoGame\MonoGame.Framework\bin\WindowsGL\Debug\MonoGame.Framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -52,6 +52,24 @@
     </Compile>
     <Compile Include="..\TiledLib\Lighting.cs">
       <Link>Lighting.cs</Link>
+    </Compile>
+    <Compile Include="..\tiledlib\light\LightsFX.cs">
+      <Link>Light\LightsFX.cs</Link>
+    </Compile>
+    <Compile Include="..\tiledlib\light\LightSource.cs">
+      <Link>Light\LightSource.cs</Link>
+    </Compile>
+    <Compile Include="..\tiledlib\light\QuadRenderComponent.cs">
+      <Link>Light\QuadRenderComponent.cs</Link>
+    </Compile>
+    <Compile Include="..\tiledlib\light\ShadowCasterMap.cs">
+      <Link>Light\ShadowCasterMap.cs</Link>
+    </Compile>
+    <Compile Include="..\tiledlib\light\ShadowMapReductionStep.cs">
+      <Link>Light\ShadowMapReductionStep.cs</Link>
+    </Compile>
+    <Compile Include="..\tiledlib\light\ShadowMapResolver.cs">
+      <Link>Light\ShadowMapResolver.cs</Link>
     </Compile>
     <Compile Include="..\TiledLib\Map.cs">
       <Link>Map.cs</Link>

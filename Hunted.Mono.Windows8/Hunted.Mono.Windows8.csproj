@@ -188,10 +188,6 @@
       <Link>Content\map.xnb</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\hunted\bin\x86\debug\content\TilesWIP.xnb">
-      <Link>Content\TilesWIP.xnb</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\Logo.png" />

@@ -98,7 +98,7 @@ namespace Hunted
             TerrainGeneration.GenerateTerrain(gameMap);
 
             gameCamera = new Camera(ScreenManager.GraphicsDevice.Viewport, gameMap);
-            gameCamera.ClampRect = new Rectangle(0, 5 * gameMap.TileHeight, gameMap.Width * gameMap.TileWidth, gameMap.Height * gameMap.TileHeight);
+            gameCamera.ClampRect = new Rectangle(0, 0, gameMap.Width * gameMap.TileWidth, gameMap.Height * gameMap.TileHeight);
             gameCamera.Zoom = 1f;
             //gameCamera.Position = gameHero.Position - (new Vector2(ScreenManager.GraphicsDevice.Viewport.Width, ScreenManager.GraphicsDevice.Viewport.Height) / 2);
             gameCamera.Position = new Vector2((gameMap.Width * gameMap.TileWidth), (gameMap.Height * gameMap.TileHeight)) / 2;
@@ -118,13 +118,13 @@ namespace Hunted
             lightSource5 = new LightSource(ScreenManager.GraphicsDevice, 200, LightAreaQuality.Middle, new Color(1f, 1f, 1f), BeamStencilType.Narrow);
             lightSource6 = new LightSource(ScreenManager.GraphicsDevice, 400, LightAreaQuality.Middle, new Color(1f, 1f, 1f), BeamStencilType.Narrow);
             lightSource7 = new LightSource(ScreenManager.GraphicsDevice, 800, LightAreaQuality.Middle, new Color(1f, 1f, 1f), BeamStencilType.Narrow);
-            lightingEngine.LightSources.Add(lightSource1);
-            lightingEngine.LightSources.Add(lightSource2);
-            lightingEngine.LightSources.Add(lightSource3);
+            //lightingEngine.LightSources.Add(lightSource1);
+            //lightingEngine.LightSources.Add(lightSource2);
+            //lightingEngine.LightSources.Add(lightSource3);
             lightingEngine.LightSources.Add(lightSource4);
-            lightingEngine.LightSources.Add(lightSource5);
-            lightingEngine.LightSources.Add(lightSource6);
-            lightingEngine.LightSources.Add(lightSource7);
+            //lightingEngine.LightSources.Add(lightSource5);
+            //lightingEngine.LightSources.Add(lightSource6);
+            //lightingEngine.LightSources.Add(lightSource7);
 
             lightSource2.Rotation = 1f;
             lightSource3.Rotation = 2f;
@@ -163,7 +163,7 @@ namespace Hunted
 
             if (IsActive)
             {
-                //TimeOfDay = TimeOfDay.AddMinutes(gameTime.ElapsedGameTime.TotalSeconds * 50);
+                TimeOfDay = TimeOfDay.AddMinutes(gameTime.ElapsedGameTime.TotalSeconds * 50);
 
                 lightingEngine.Update(gameTime, TimeOfDay, ScreenManager.SpriteBatch, ScreenManager.GraphicsDevice);
                 lightSource1.Color = Color.White * (1f - (lightingEngine.CurrentSunColor.ToVector3().Z));
@@ -189,12 +189,6 @@ namespace Hunted
                                 mapFog[(int)(p.X / gameMap.TileWidth), (int)(p.Y / gameMap.TileHeight)] = true;
                         }
                     }
-                    ScreenManager.GraphicsDevice.SetRenderTarget(minimapRT);
-                    ScreenManager.GraphicsDevice.Clear(Color.Black);
-                    ScreenManager.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(0.05f) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(minimapRT.Width / 2, minimapRT.Height / 2, 0));
-                    gameMap.DrawMinimap(ScreenManager.SpriteBatch, gameCamera, 0.05f, minimapRT, mapFog);
-                    ScreenManager.SpriteBatch.End();
-                    ScreenManager.GraphicsDevice.SetRenderTarget(null);
                     mapUpdate = 0;
                 }
             }
@@ -259,6 +253,7 @@ namespace Hunted
         /// </summary>
         public override void Draw(GameTime gameTime)
         {
+            
             // This game has a blue background. Why? Because!
             ScreenManager.GraphicsDevice.Clear(ClearOptions.Target,
                                                Color.Black, 0, 0);
@@ -272,8 +267,13 @@ namespace Hunted
 
             //float zoom = 1f;
 
+            
 
             lightingEngine.Draw(spriteBatch, gameCamera, gameMap);
+
+           
+
+            lightingEngine.LFX.PrintLightsOverTexture(null, spriteBatch, spriteBatch.GraphicsDevice, lightingEngine.ScreenLights, lightingEngine.ScreenGround, 0.5f * (1f - (lightingEngine.CurrentSunColor.ToVector3().Z)));
             
             // We re-print the elements not affected by the light (in this case the shadow casters)
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
@@ -283,10 +283,23 @@ namespace Hunted
             spriteBatch.End();
 
 
+            if (mapUpdate == 0)
+            {
+                ScreenManager.GraphicsDevice.SetRenderTarget(minimapRT);
+                ScreenManager.GraphicsDevice.Clear(Color.Black);
+                ScreenManager.SpriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(0.05f) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(minimapRT.Width / 2, minimapRT.Height / 2, 0));
+                gameMap.DrawMinimap(ScreenManager.SpriteBatch, gameCamera, 0.05f, minimapRT, mapFog);
+                //ScreenManager.SpriteBatch.Draw(lightingEngine.BeamStencils[BeamStencilType.Narrow], Vector2.Zero, null, Color.White);
+                ScreenManager.SpriteBatch.End();
+                //ScreenManager.GraphicsDevice.SetRenderTarget(null);
+            }
+
             spriteBatch.Begin();
             //gameHUD.Draw(spriteBatch);
             spriteBatch.Draw(minimapRT, new Vector2(ScreenManager.GraphicsDevice.Viewport.Width - 20 - minimapRT.Width, 20), null, Color.White);
             spriteBatch.End();
+
+            
 
             // If the game is transitioning on or off, fade it out to black.
             if (TransitionPosition >= 0f)

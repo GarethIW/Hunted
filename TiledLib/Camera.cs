@@ -88,10 +88,10 @@ namespace TiledLib
 
             // Clamp target to map/camera bounds
             Target.X = MathHelper.Clamp(Target.X, ClampRect.X + (Width / 2), ClampRect.Width - (Width / 2));
-            Target.Y = MathHelper.Clamp(Target.Y, ClampRect.Y, ClampRect.Height - (Height/2));
+            Target.Y = MathHelper.Clamp(Target.Y, ClampRect.Y + (Height /2), ClampRect.Height - (Height / 2));
 
             Position.X = MathHelper.Clamp(Position.X, ClampRect.X + (Width / 2), ClampRect.Width - (Width / 2));
-            Position.Y = MathHelper.Clamp(Position.Y, ClampRect.Y, ClampRect.Height - (Height / 2));
+            Position.Y = MathHelper.Clamp(Position.Y, ClampRect.Y + (Height/2), ClampRect.Height - (Height / 2));
             
             // Move camera toward target
             Position = Vector2.Lerp(Position, Target, speed * 0.5f);

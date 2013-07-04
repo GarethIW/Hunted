@@ -95,7 +95,7 @@ namespace TiledLib
         public void EndGeneratingShadowCasterMap()
         {
             //this.spriteBatch.End();
-            this.graphics.SetRenderTarget(null);
+            //this.graphics.SetRenderTarget(null);
         }
     }
 }
