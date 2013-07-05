@@ -131,7 +131,7 @@ namespace Hunted
             lightSource4.Rotation = 3f;
             lightSource5.Rotation = 4f;
             lightSource6.Rotation = 5f;
-            lightSource7.Rotation = 6f;
+            lightSource7.Rotation = 0f;
             
             ScreenManager.Game.ResetElapsedTime();
         }
@@ -163,7 +163,7 @@ namespace Hunted
 
             if (IsActive)
             {
-                TimeOfDay = TimeOfDay.AddMinutes(gameTime.ElapsedGameTime.TotalSeconds * 10);
+                //TimeOfDay = TimeOfDay.AddMinutes(gameTime.ElapsedGameTime.TotalSeconds * 50);
 
                 lightingEngine.Update(gameTime, TimeOfDay, ScreenManager.SpriteBatch, ScreenManager.GraphicsDevice);
                 

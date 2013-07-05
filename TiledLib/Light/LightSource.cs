@@ -45,7 +45,7 @@ namespace TiledLib
         public Color Color;
 
         public Texture2D BeamStencil;
-        public Texture2D SpotStencil;
+        public RenderTarget2D SpotStencil;
 
         public int Radius;
         public float RenderRadius;
@@ -86,7 +86,7 @@ namespace TiledLib
             BeamLight = new RenderTarget2D(graphics, (int)baseSize, (int)baseSize);
             this.Color = color;
             if (bst != BeamStencilType.None) BeamStencil = LightingEngine.Instance.BeamStencils[bst];
-            if (sst != SpotStencilType.None) SpotStencil = LightingEngine.Instance.SpotStencils[sst];
+            if (sst != SpotStencilType.None) SpotStencil = LightingEngine.Instance.SpotStencils[sst].Item3;
         }
 
         public Vector2 ToRelativePosition(Vector2 worldPosition)
@@ -121,7 +121,7 @@ namespace TiledLib
             }
             else
             {
-                spriteBatch.Draw(this.SpotStencil, this.Position, null, this.Color, this.Rotation, new Vector2(SpotStencil.Width,SpotStencil.Height), 1f, SpriteEffects.None, 1);
+                spriteBatch.Draw(this.SpotStencil, this.Position, null, Color.White, this.Rotation, new Vector2(SpotStencil.Width,SpotStencil.Height)/2, 1f, SpriteEffects.None, 1);
             }
         }
 

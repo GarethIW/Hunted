@@ -20,7 +20,7 @@ namespace TiledLib
         public RenderTarget2D ScreenGround;
 
         public Dictionary<BeamStencilType, Texture2D> BeamStencils = new Dictionary<BeamStencilType, Texture2D>();
-        public Dictionary<SpotStencilType, Texture2D> SpotStencils = new Dictionary<SpotStencilType, Texture2D>();
+        public Dictionary<SpotStencilType, Tuple<Texture2D, Texture2D, RenderTarget2D>> SpotStencils = new Dictionary<SpotStencilType, Tuple<Texture2D, Texture2D, RenderTarget2D>>();
 
         BlendState spotBS;
 
@@ -72,7 +72,7 @@ namespace TiledLib
             BeamStencils.Add(BeamStencilType.Wide, content.Load<Texture2D>("beamwide"));
             BeamStencils.Add(BeamStencilType.Narrow, content.Load<Texture2D>("beamnarrow"));
 
-            SpotStencils.Add(SpotStencilType.Full, content.Load<Texture2D>("spot"));
+            SpotStencils.Add(SpotStencilType.Full, Tuple.Create<Texture2D, Texture2D, RenderTarget2D>(content.Load<Texture2D>("spotbg"), content.Load<Texture2D>("spotfg"), new RenderTarget2D(gd, content.Load<Texture2D>("spotbg").Width, content.Load<Texture2D>("spotbg").Height)));
 
             spotBS = new BlendState()
             {
@@ -91,6 +91,20 @@ namespace TiledLib
             foreach (LightSource ls in LightSources)
             {
                 ls.Color = Color.White * (1f - (CurrentSunColor.ToVector3().Z));
+            }
+            PrepareSpotLights(sb, gd);
+        }
+
+        void PrepareSpotLights(SpriteBatch sb, GraphicsDevice gd)
+        {
+            foreach (KeyValuePair<SpotStencilType, Tuple<Texture2D, Texture2D, RenderTarget2D>> kvp in SpotStencils)
+            {
+                gd.SetRenderTarget(kvp.Value.Item3);
+                sb.Begin();
+                sb.Draw(kvp.Value.Item1, Vector2.Zero, null, Color.White);
+                sb.Draw(kvp.Value.Item2, Vector2.Zero, null, Color.White * (1f - (CurrentSunColor.ToVector3().Z)));
+                sb.End();
+                gd.SetRenderTarget(null);
             }
         }
 
