@@ -29,6 +29,7 @@ namespace TiledLib
             graphics.Textures[1].GraphicsDevice.SamplerStates[1] = SamplerState.LinearClamp;
             spriteBatch.Draw(underlyingTexture, Vector2.Zero, Color.White);
             spriteBatch.End();
+
         }
 
         public void PrintLightsPortionOverTexture(RenderTarget2D renderTarget, SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Texture2D light, Vector2 portionStart, Vector2 portionSize, float portionScale, Texture2D underlyingTexture, float mixFactor0to1)

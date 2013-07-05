@@ -76,12 +76,9 @@ namespace TiledLib
 
             spotBS = new BlendState()
             {
-                AlphaBlendFunction = BlendFunction.Add,
-                AlphaDestinationBlend = Blend.SourceAlpha,
-                AlphaSourceBlend = Blend.DestinationAlpha,
-                ColorBlendFunction = BlendFunction.Add,
+                ColorSourceBlend = Blend.DestinationColor,
                 ColorDestinationBlend = Blend.SourceColor,
-                ColorSourceBlend = Blend.DestinationColor
+                ColorBlendFunction = BlendFunction.Add,
             };
         }
 
@@ -100,9 +97,10 @@ namespace TiledLib
             foreach (KeyValuePair<SpotStencilType, Tuple<Texture2D, Texture2D, RenderTarget2D>> kvp in SpotStencils)
             {
                 gd.SetRenderTarget(kvp.Value.Item3);
+                //gd.Clear(new Color(0.25f,0.25f,0.25f));
                 sb.Begin();
                 sb.Draw(kvp.Value.Item1, Vector2.Zero, null, Color.White);
-                sb.Draw(kvp.Value.Item2, Vector2.Zero, null, Color.White * (1f - (CurrentSunColor.ToVector3().Z)));
+                sb.Draw(kvp.Value.Item2, Vector2.Zero, null, Color.White * (1f - ((CurrentSunColor.ToVector3().Z))));
                 sb.End();
                 gd.SetRenderTarget(null);
             }
@@ -145,7 +143,7 @@ namespace TiledLib
                 spriteBatch.GraphicsDevice.Clear(Color.Black);
                 spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
                 {
-                    foreach (LightSource ls in LightSources)
+                    foreach (LightSource ls in LightSources.Where(src => src.SpotStencil == null))
                     {
                         if (!(ls.Position.X > (gameCamera.Position.X - (gameCamera.Width)) && ls.Position.X < (gameCamera.Position.X + (gameCamera.Width)) &&
                             ls.Position.Y > (gameCamera.Position.Y - (gameCamera.Height)) && ls.Position.Y < (gameCamera.Position.Y + (gameCamera.Height)))) continue;
@@ -163,9 +161,16 @@ namespace TiledLib
             gameMap.DrawShadows(spriteBatch, "Wall", gameCamera, this);
             spriteBatch.End();
 
+            
+
             LFX.PrintLightsOverTexture(null, spriteBatch, spriteBatch.GraphicsDevice, ScreenLights, ScreenGround, 0.4f * (1f - (CurrentSunColor.ToVector3().Z)));
 
-            spriteBatch.Begin(SpriteSortMode.Deferred, spotBS, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
+            
+        }
+
+        public void DrawSpots(SpriteBatch spriteBatch, Camera gameCamera, Map gameMap)
+        {
+            spriteBatch.Begin(SpriteSortMode.Deferred, spotBS, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
             foreach (LightSource ls in LightSources.Where(src => src.SpotStencil != null))
             {
                 if (!(ls.Position.X > (gameCamera.Position.X - (gameCamera.Width)) && ls.Position.X < (gameCamera.Position.X + (gameCamera.Width)) &&
