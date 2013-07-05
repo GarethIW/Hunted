@@ -20,12 +20,15 @@ namespace TiledLib
         public RenderTarget2D ScreenGround;
 
         public Dictionary<BeamStencilType, Texture2D> BeamStencils = new Dictionary<BeamStencilType, Texture2D>();
+        public Dictionary<SpotStencilType, Texture2D> SpotStencils = new Dictionary<SpotStencilType, Texture2D>();
+
+        BlendState spotBS;
 
         Color[] sunColors = new Color[] {
-            new Color(0.2f,0.2f,0.2f), new Color(0.3f,0.2f,0.2f),  new Color(0.4f,0.2f,0.2f), new Color(0.5f,0.3f,0.3f), new Color(0.7f,0.5f,0.4f), new Color(0.8f,0.6f,0.5f),
+            new Color(0.3f,0.3f,0.3f), new Color(0.3f,0.3f,0.3f),  new Color(0.4f,0.3f,0.3f), new Color(0.5f,0.3f,0.3f), new Color(0.7f,0.5f,0.4f), new Color(0.8f,0.6f,0.5f),
             new Color(0.9f,0.7f,0.7f), new Color(1f,9f,9f), new Color(1f,1f,1f), new Color(1f,1f,1f), new Color(1f,1f,1f), new Color(1f,1f,1f),
             new Color(1f,1f,1f), new Color(1f,1f,1f), new Color(1f,1f,1f), new Color(1f,1f,1f), new Color(1f,1f,1f), new Color(1f,9f,9f),
-            new Color(0.9f,0.7f,0.6f), new Color(0.8f,0.6f,0.5f), new Color(0.6f,0.5f,0.3f), new Color(0.4f,0.3f,0.2f), new Color(0.2f,0.2f,0.2f), new Color(0.2f,0.2f,0.2f)
+            new Color(0.9f,0.7f,0.6f), new Color(0.8f,0.6f,0.5f), new Color(0.6f,0.5f,0.3f), new Color(0.4f,0.3f,0.3f), new Color(0.3f,0.3f,0.3f), new Color(0.3f,0.3f,0.3f)
         };
         public Color CurrentSunColor;
 
@@ -49,12 +52,18 @@ namespace TiledLib
 
         public void LoadContent(ContentManager content, GraphicsDevice gd, SpriteBatch sb)
         {
-
+#if OPENGL
             LFX = new LightsFX(
                 content.Load<Effect>("resolveShadowsEffect.mgfxo"),
                 content.Load<Effect>("reductionEffect.mgfxo"),
                 content.Load<Effect>("2xMultiBlend.mgfxo"));
-            ShadowmapResolver = new ShadowMapResolver(gd, LFX, 256);
+#else
+            LFX = new LightsFX(
+                content.Load<Effect>("resolveShadowsEffect"),
+                content.Load<Effect>("reductionEffect"),
+                content.Load<Effect>("2xMultiBlend"));
+#endif
+            ShadowmapResolver = new ShadowMapResolver(gd, LFX, 128);
 
             ShadowMap = new ShadowCasterMap(PrecisionSettings.VeryHigh, gd, sb);
             ScreenLights = new RenderTarget2D(gd, gd.Viewport.Width, gd.Viewport.Height);
@@ -62,25 +71,45 @@ namespace TiledLib
 
             BeamStencils.Add(BeamStencilType.Wide, content.Load<Texture2D>("beamwide"));
             BeamStencils.Add(BeamStencilType.Narrow, content.Load<Texture2D>("beamnarrow"));
+
+            SpotStencils.Add(SpotStencilType.Full, content.Load<Texture2D>("spot"));
+
+            spotBS = new BlendState()
+            {
+                AlphaBlendFunction = BlendFunction.Add,
+                AlphaDestinationBlend = Blend.SourceAlpha,
+                AlphaSourceBlend = Blend.DestinationAlpha,
+                ColorBlendFunction = BlendFunction.Add,
+                ColorDestinationBlend = Blend.SourceColor,
+                ColorSourceBlend = Blend.DestinationColor
+            };
         }
 
         public void Update(GameTime gameTime, DateTime timeOfDay, SpriteBatch sb, GraphicsDevice gd)
         {
             CalcSunAndShadows(timeOfDay);
+            foreach (LightSource ls in LightSources)
+            {
+                ls.Color = Color.White * (1f - (CurrentSunColor.ToVector3().Z));
+            }
         }
 
         public void Draw(SpriteBatch spriteBatch, Camera gameCamera, Map gameMap)
         {
+            
             ShadowMap.StartGeneratingShadowCasteMap(false);
             {
-                spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
-                gameMap.DrawLayer(spriteBatch, "Wall", gameCamera, this, Color.Black);
+                spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
+                gameMap.DrawLayer(spriteBatch, "Wall", gameCamera, this, Color.LightGray);
                 spriteBatch.End();
             }
             ShadowMap.EndGeneratingShadowCasterMap();
 
-            foreach (LightSource ls in LightSources)
+            foreach (LightSource ls in LightSources.Where(src => src.SpotStencil==null))
             {
+                if (!(ls.Position.X > (gameCamera.Position.X - (gameCamera.Width)) && ls.Position.X < (gameCamera.Position.X + (gameCamera.Width)) &&
+                   ls.Position.Y > (gameCamera.Position.Y - (gameCamera.Height)) && ls.Position.Y < (gameCamera.Position.Y + (gameCamera.Height)))) continue;
+
                 ShadowmapResolver.ResolveShadows(ShadowMap, ls, PostEffect.LinearAttenuation_BlurHigh, gameCamera);
 
                 spriteBatch.GraphicsDevice.SetRenderTarget(ls.BeamLight);
@@ -91,7 +120,7 @@ namespace TiledLib
 
                 if (ls.BeamStencil != null)
                 {
-                    spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null);
+                    spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null);
                     spriteBatch.Draw(ls.BeamStencil, ls.RenderTargetSize / 2, null, Color.White, ls.Rotation, new Vector2(ls.BeamStencil.Width / 2, ls.BeamStencil.Height / 2), (ls.RenderRadius * 2) / ls.BeamStencil.Width, SpriteEffects.None, 1);
                     spriteBatch.End();
                 }
@@ -100,10 +129,13 @@ namespace TiledLib
             spriteBatch.GraphicsDevice.SetRenderTarget(ScreenLights);
             {
                 spriteBatch.GraphicsDevice.Clear(Color.Black);
-                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, null, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
+                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
                 {
                     foreach (LightSource ls in LightSources)
                     {
+                        if (!(ls.Position.X > (gameCamera.Position.X - (gameCamera.Width)) && ls.Position.X < (gameCamera.Position.X + (gameCamera.Width)) &&
+                            ls.Position.Y > (gameCamera.Position.Y - (gameCamera.Height)) && ls.Position.Y < (gameCamera.Position.Y + (gameCamera.Height)))) continue;
+
                         ls.Draw(spriteBatch);
                     }
                 }
@@ -112,13 +144,24 @@ namespace TiledLib
 
             spriteBatch.GraphicsDevice.SetRenderTarget(ScreenGround);
             spriteBatch.GraphicsDevice.Clear(Color.Black);
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, DepthStencilState.Default, RasterizerState.CullNone, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
             gameMap.DrawLayer(spriteBatch, "Terrain", gameCamera, this, Color.White);
             gameMap.DrawShadows(spriteBatch, "Wall", gameCamera, this);
             spriteBatch.End();
 
+            LFX.PrintLightsOverTexture(null, spriteBatch, spriteBatch.GraphicsDevice, ScreenLights, ScreenGround, 0.4f * (1f - (CurrentSunColor.ToVector3().Z)));
 
-            
+            spriteBatch.Begin(SpriteSortMode.Deferred, spotBS, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
+            foreach (LightSource ls in LightSources.Where(src => src.SpotStencil != null))
+            {
+                if (!(ls.Position.X > (gameCamera.Position.X - (gameCamera.Width)) && ls.Position.X < (gameCamera.Position.X + (gameCamera.Width)) &&
+                      ls.Position.Y > (gameCamera.Position.Y - (gameCamera.Height)) && ls.Position.Y < (gameCamera.Position.Y + (gameCamera.Height)))) continue;
+
+                ls.Draw(spriteBatch);
+                //ls.Draw(spriteBatch);
+
+            }
+            spriteBatch.End();
         }
 
         void CalcSunAndShadows(DateTime t)

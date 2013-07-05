@@ -43,6 +43,7 @@ namespace Hunted
 #if !WINRT
             graphics.PreferredBackBufferWidth = 1280;
             graphics.PreferredBackBufferHeight = 720;
+            //graphics.IsFullScreen = true;
             graphics.ApplyChanges();
 #endif
 
@@ -78,7 +79,7 @@ namespace Hunted
         protected override void Update(GameTime gameTime)
         {
             // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.F12))
                 this.Exit();
 
             // TODO: Add your update logic here

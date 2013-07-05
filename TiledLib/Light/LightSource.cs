@@ -23,6 +23,14 @@ namespace TiledLib
         Narrow
     }
 
+    public enum SpotStencilType
+    {
+        None,
+        Full,
+        Half,
+        Beam
+    }
+
     public class LightSource
     {
         private GraphicsDevice graphics;
@@ -37,6 +45,7 @@ namespace TiledLib
         public Color Color;
 
         public Texture2D BeamStencil;
+        public Texture2D SpotStencil;
 
         public int Radius;
         public float RenderRadius;
@@ -46,7 +55,7 @@ namespace TiledLib
             get { return this.Position - new Vector2(this.Radius, this.Radius); }
         }
 
-        public LightSource(GraphicsDevice graphics, int radius, LightAreaQuality quality, Color color, BeamStencilType bst)
+        public LightSource(GraphicsDevice graphics, int radius, LightAreaQuality quality, Color color, BeamStencilType bst, SpotStencilType sst)
         {
             switch (quality)
             {
@@ -76,7 +85,8 @@ namespace TiledLib
             PrintedLight = new RenderTarget2D(graphics, (int)baseSize, (int)baseSize);
             BeamLight = new RenderTarget2D(graphics, (int)baseSize, (int)baseSize);
             this.Color = color;
-            if(bst!= BeamStencilType.None) BeamStencil = LightingEngine.Instance.BeamStencils[bst];
+            if (bst != BeamStencilType.None) BeamStencil = LightingEngine.Instance.BeamStencils[bst];
+            if (sst != SpotStencilType.None) SpotStencil = LightingEngine.Instance.SpotStencils[sst];
         }
 
         public Vector2 ToRelativePosition(Vector2 worldPosition)
@@ -104,8 +114,15 @@ namespace TiledLib
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            int size = (int)(this.Radius * 2f);
-            spriteBatch.Draw(this.BeamLight, new Rectangle((int)this.PrintPosition.X, (int)this.PrintPosition.Y, size, size), this.Color);
+            if (SpotStencil == null)
+            {
+                int size = (int)(this.Radius * 2f);
+                spriteBatch.Draw(this.BeamLight, new Rectangle((int)this.PrintPosition.X, (int)this.PrintPosition.Y, size, size), this.Color);
+            }
+            else
+            {
+                spriteBatch.Draw(this.SpotStencil, this.Position, null, this.Color, this.Rotation, new Vector2(SpotStencil.Width,SpotStencil.Height), 1f, SpriteEffects.None, 1);
+            }
         }
 
         public void Draw(SpriteBatch spriteBatch, byte opacity)
