@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using System.Linq;
 
 namespace TiledLib
 {
@@ -54,13 +55,20 @@ namespace TiledLib
 		/// </summary>
 		public Collection<Tile> Tiles { get; private set; }
 
+        public Dictionary<string, List<Tile>> TileSetDictionary = new Dictionary<string, List<Tile>>();
+
 		/// <summary>
 		/// Gets a collection of all of the layers in the map.
 		/// </summary>
 		public ReadOnlyCollection<Layer> Layers { get; private set; }
 
         //private Layer collisionLayer;
-	
+
+        public int AnimFrame = 0;
+        double frameTime;
+        double frameTargetTime = 1000;
+        int numFrames = 2;
+
 		internal Map(ContentReader reader) 
 		{
 			// read in the basic map information
@@ -81,6 +89,8 @@ namespace TiledLib
 			int numTileSets = reader.ReadInt32();
 			for (int i = 0; i < numTileSets; i++)
 			{
+                List<Tile> tsTiles = new List<Tile>();
+
 				// get the id and texture
 				int firstId = reader.ReadInt32();
                 string tilesetName = reader.ReadString();
@@ -106,6 +116,7 @@ namespace TiledLib
 
 				// read in each individual tile
 				int numTiles = reader.ReadInt32();
+                int tsIndex = 1;
 				for (int j = 0; j < numTiles; j++)
 				{
 					int id = firstId + j;
@@ -114,12 +125,16 @@ namespace TiledLib
 					props.Read(reader);
 
 					Tile t = new Tile(texture, source, props, collisionBitData);
+                    
 					while (id >= tiles.Count)
 					{
 						tiles.Add(null);
 					}
 					tiles.Insert(id, t);
+                    tsTiles.Add(t);
+                    tsIndex++;
 				}
+                TileSetDictionary.Add(tilesetName, tsTiles);
 			}
 
 			// read in all the layers
@@ -175,6 +190,17 @@ namespace TiledLib
 				namedLayers.Add(name, layer);
 			}
 		}
+
+        public void Update(GameTime gameTime)
+        {
+            frameTime += gameTime.ElapsedGameTime.TotalMilliseconds;
+            if (frameTime >= frameTargetTime)
+            {
+                frameTime = 0;
+                AnimFrame++;
+                if (AnimFrame == numFrames) AnimFrame = 0;
+            }
+        }
 
 		/// <summary>
 		/// Gets a layer by name.
@@ -369,9 +395,15 @@ namespace TiledLib
                         //if ((new Vector2((x * TileWidth) + (TileWidth / 2), (y * TileHeight) + (TileHeight / 2)) - new Vector2(worldArea.Center.X, worldArea.Center.Y)).Length() < gameCamera.Width * 0.75)
                         //{
                             Tile tile = tileLayer.Tiles[x, y];
-
+                            
                             if (tile == null)
                                 continue;
+
+                            if (AnimFrame > 0 && tile.Properties.Contains("Anim"))
+                            {
+                                tile = TileSetDictionary["ts" + (AnimFrame + 1)][TileSetDictionary["ts1"].IndexOf(tile)];
+                            }
+                            //    if (tile.Properties.Contains("Anim")) tile = Tiles.Where(t => t!=null && t.Properties.Contains("Anim") && t.Properties["Anim"] == tile.Properties["Anim"] + AnimFrame).First();
                             // - tile.Source.Height + TileHeight;
                             //Rectangle r = new Rectangle(x * TileWidth, y * TileHeight, tile.Source.Width, tile.Source.Height);
 

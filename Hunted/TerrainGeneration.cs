@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -71,12 +72,14 @@ namespace Hunted
 
         static Random rand = new Random();
 
-        public static void GenerateTerrain(Map map)
+        public static void GenerateTerrain(Map map, LightingEngine lightingEngine, GraphicsDevice gd)
         {
             List<Compound> compounds = new List<Compound>();
 
             TileLayer terrainLayer = map.GetLayer("Terrain") as TileLayer;
             TileLayer wallLayer = map.GetLayer("Wall") as TileLayer;
+
+            lightingEngine.LightSources.Clear();
 
             for (int y = 0; y < map.Width; y++)
             {
@@ -255,8 +258,8 @@ namespace Hunted
             }
             
             // Compounds
-            CreateCompounds(map, terrainLayer, wallLayer, compounds, noise, 0.65f, 20000f, 20);
-            CreateCompounds(map, terrainLayer, wallLayer, compounds, noise, 0.75f, 12000f, 30);
+            CreateCompounds(map, terrainLayer, wallLayer, compounds, noise, 0.65f, 20000f, 20, lightingEngine, gd);
+            CreateCompounds(map, terrainLayer, wallLayer, compounds, noise, 0.75f, 12000f, 30, lightingEngine, gd);
 
             // Alt tiles
             for (int y = 0; y < map.Width; y++)
@@ -318,7 +321,7 @@ namespace Hunted
             return canFit;
         }
 
-        private static void CreateCompounds(Map map, TileLayer terrainLayer, TileLayer wallLayer, List<Compound> compounds, float[][] noise, float height, float distance, int minsize)
+        private static void CreateCompounds(Map map, TileLayer terrainLayer, TileLayer wallLayer, List<Compound> compounds, float[][] noise, float height, float distance, int minsize, LightingEngine lightingEngine, GraphicsDevice gd)
         {
             for (int y = 40; y < map.Width - 40; y++)
             {
@@ -374,6 +377,7 @@ namespace Hunted
                                 wallLayer.Tiles[innerBounds.Right, innerBounds.Top] = map.Tiles[WALL_TR];
                                 wallLayer.Tiles[innerBounds.Left, innerBounds.Bottom] = map.Tiles[WALL_BL];
                                 wallLayer.Tiles[innerBounds.Right, innerBounds.Bottom] = map.Tiles[WALL_BR];
+
 
                                 for (int xx = innerBounds.Left + 1; xx <= innerBounds.Right - 1; xx++)
                                 {
@@ -442,7 +446,66 @@ namespace Hunted
                                     }
                                 }
 
-                                if(carpark!=null)
+                                int lightSpacing = 5;
+                                for (int xx = innerBounds.Left + 4; xx <= innerBounds.Right - 4; xx++)
+                                {
+                                    lightSpacing++;
+                                    if (lightSpacing == 6)
+                                    {
+                                        lightSpacing = 0;
+                                    
+                                        if (GetTileIndex(map, wallLayer, xx, innerBounds.Top) == WALL_HORIZ &&
+                                            GetTileIndex(map, wallLayer, xx-2, innerBounds.Top) == WALL_HORIZ &&
+                                            GetTileIndex(map, wallLayer, xx+2, innerBounds.Top) == WALL_HORIZ)
+                                        {
+                                            LightSource ls = new LightSource(gd, 300, LightAreaQuality.Low, Color.White, BeamStencilType.None, SpotStencilType.Half);
+                                            ls.Rotation = MathHelper.PiOver2;
+                                            ls.Position = new Vector2((xx * map.TileWidth) + (map.TileWidth / 2), ((innerBounds.Top + 1) * map.TileHeight));
+                                            lightingEngine.LightSources.Add(ls);
+                                        }
+
+                                        if (GetTileIndex(map, wallLayer, xx, innerBounds.Bottom) == WALL_HORIZ &&
+                                            GetTileIndex(map, wallLayer, xx-2, innerBounds.Bottom) == WALL_HORIZ &&
+                                            GetTileIndex(map, wallLayer, xx+2, innerBounds.Bottom) == WALL_HORIZ)
+                                        {
+                                            LightSource ls = new LightSource(gd, 300, LightAreaQuality.Low, Color.White, BeamStencilType.None, SpotStencilType.Half);
+                                            ls.Rotation = MathHelper.PiOver2 + MathHelper.Pi;
+                                            ls.Position = new Vector2((xx * map.TileWidth) + (map.TileWidth / 2), ((innerBounds.Bottom) * map.TileHeight));
+                                            lightingEngine.LightSources.Add(ls);
+                                        }
+                                    }
+                                }
+                                lightSpacing = 5;
+                                for (int yy = innerBounds.Top + 4; yy <= innerBounds.Bottom - 4; yy++)
+                                {
+                                    lightSpacing++;
+                                    if (lightSpacing == 6)
+                                    {
+                                        lightSpacing = 0;
+
+                                        if (GetTileIndex(map, wallLayer, innerBounds.Left, yy) == WALL_VERT &&
+                                            GetTileIndex(map, wallLayer, innerBounds.Left, yy - 2) == WALL_VERT &&
+                                            GetTileIndex(map, wallLayer, innerBounds.Left, yy + 2) == WALL_VERT)
+                                        {
+                                            LightSource ls = new LightSource(gd, 300, LightAreaQuality.Low, Color.White, BeamStencilType.None, SpotStencilType.Half);
+                                            //ls.Rotation = MathHelper.PiOver2;
+                                            ls.Position = new Vector2(((innerBounds.Left+1) * map.TileWidth), (yy * map.TileHeight)+(map.TileHeight/2));
+                                            lightingEngine.LightSources.Add(ls);
+                                        }
+
+                                        if (GetTileIndex(map, wallLayer, innerBounds.Right, yy) == WALL_VERT &&
+                                           GetTileIndex(map, wallLayer, innerBounds.Right, yy - 2) == WALL_VERT &&
+                                           GetTileIndex(map, wallLayer, innerBounds.Right, yy + 2) == WALL_VERT)
+                                        {
+                                            LightSource ls = new LightSource(gd, 300, LightAreaQuality.Low, Color.White, BeamStencilType.None, SpotStencilType.Half);
+                                            ls.Rotation = MathHelper.Pi;
+                                            ls.Position = new Vector2(((innerBounds.Right) * map.TileWidth), (yy * map.TileHeight) + (map.TileHeight / 2));
+                                            lightingEngine.LightSources.Add(ls);
+                                        }
+                                    }
+                                }
+
+                                if (carpark!=null)
                                     for (int xx = carpark.Rect.Left; xx < carpark.Rect.Right; xx++)
                                         for (int yy = carpark.Rect.Top; yy < carpark.Rect.Bottom; yy++)
                                              terrainLayer.Tiles[xx, yy] = map.Tiles[CARPARK];

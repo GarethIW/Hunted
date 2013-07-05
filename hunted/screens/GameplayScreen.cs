@@ -51,13 +51,8 @@ namespace Hunted
 
         double mapUpdate = 0;
 
-        LightSource lightSource1;
-        LightSource lightSource2;
-        LightSource lightSource3;
-        LightSource lightSource4;
-        LightSource lightSource5;
-        LightSource lightSource6;
-        LightSource lightSource7;
+        //LightSource lightSource1;
+
 
         #endregion
 
@@ -95,7 +90,7 @@ namespace Hunted
 
             mapFog = new bool[gameMap.Width, gameMap.Height];
 
-            TerrainGeneration.GenerateTerrain(gameMap);
+            TerrainGeneration.GenerateTerrain(gameMap, lightingEngine, ScreenManager.GraphicsDevice);
 
             gameCamera = new Camera(ScreenManager.GraphicsDevice.Viewport, gameMap);
             gameCamera.ClampRect = new Rectangle(0, 0, gameMap.Width * gameMap.TileWidth, gameMap.Height * gameMap.TileHeight);
@@ -111,27 +106,9 @@ namespace Hunted
             minimapRT = new RenderTarget2D(ScreenManager.GraphicsDevice, 200, 200);
 
 
-            lightSource1 = new LightSource(ScreenManager.GraphicsDevice, 600, LightAreaQuality.Low, new Color(1f, 1f, 1f), BeamStencilType.Wide, SpotStencilType.None);
-            lightSource2 = new LightSource(ScreenManager.GraphicsDevice, 200, LightAreaQuality.Low, new Color(1f, 1f, 1f), BeamStencilType.Narrow, SpotStencilType.None);
-            lightSource3 = new LightSource(ScreenManager.GraphicsDevice, 700, LightAreaQuality.Low, new Color(1f, 1f, 1f), BeamStencilType.Narrow, SpotStencilType.None);
-            lightSource4 = new LightSource(ScreenManager.GraphicsDevice, 200, LightAreaQuality.High, new Color(1f, 1f, 1f), BeamStencilType.None, SpotStencilType.None);
-            lightSource5 = new LightSource(ScreenManager.GraphicsDevice, 200, LightAreaQuality.Low, new Color(1f, 1f, 1f), BeamStencilType.Narrow, SpotStencilType.None);
-            lightSource6 = new LightSource(ScreenManager.GraphicsDevice, 400, LightAreaQuality.Low, new Color(1f, 1f, 1f), BeamStencilType.Narrow, SpotStencilType.None);
-            lightSource7 = new LightSource(ScreenManager.GraphicsDevice, 800, LightAreaQuality.Low, new Color(1f, 1f, 1f), BeamStencilType.None, SpotStencilType.Full);
-            //lightingEngine.LightSources.Add(lightSource1);
-            //lightingEngine.LightSources.Add(lightSource2);
-            //lightingEngine.LightSources.Add(lightSource3);
-            lightingEngine.LightSources.Add(lightSource4);
-            //lightingEngine.LightSources.Add(lightSource5);
-            //lightingEngine.LightSources.Add(lightSource6);
-            lightingEngine.LightSources.Add(lightSource7);
+            //lightSource1 = new LightSource(ScreenManager.GraphicsDevice, 600, LightAreaQuality.Low, new Color(1f, 1f, 1f), BeamStencilType.Wide, SpotStencilType.None);
 
-            lightSource2.Rotation = 1f;
-            lightSource3.Rotation = 2f;
-            lightSource4.Rotation = 3f;
-            lightSource5.Rotation = 4f;
-            lightSource6.Rotation = 5f;
-            lightSource7.Rotation = 0f;
+            //lightingEngine.LightSources.Add(lightSource1);
             
             ScreenManager.Game.ResetElapsedTime();
         }
@@ -166,15 +143,10 @@ namespace Hunted
                 TimeOfDay = TimeOfDay.AddMinutes(gameTime.ElapsedGameTime.TotalSeconds * 50);
 
                 lightingEngine.Update(gameTime, TimeOfDay, ScreenManager.SpriteBatch, ScreenManager.GraphicsDevice);
-                
-                lightSource1.Position = new Vector2(1000, 1000);
-                lightSource2.Position = new Vector2(2000, 2000);
-                lightSource3.Position = new Vector2(3000, 3000);
-                lightSource5.Position = new Vector2(4000, 4000);
-                lightSource6.Position = new Vector2(5000, 5000);
-                lightSource7.Position = new Vector2(50000, 50000);
 
-                lightSource4.Position = gameCamera.Position;
+                gameMap.Update(gameTime);
+
+                //lightSource1.Position = new Vector2(1000, 1000);
 
                 //cameraLightSource.Position = gameCamera.Position;
                 //cameraLightSource.Direction = new Vector2(1f, 1f);
@@ -231,7 +203,7 @@ namespace Hunted
         
             if(IsActive)
             {
-                if (keyboardState.IsKeyDown(Keys.Space) && !lastKeyboardState.IsKeyDown(Keys.Space)) TerrainGeneration.GenerateTerrain(gameMap);
+                if (keyboardState.IsKeyDown(Keys.Space) && !lastKeyboardState.IsKeyDown(Keys.Space)) TerrainGeneration.GenerateTerrain(gameMap, lightingEngine, ScreenManager.GraphicsDevice);
 
                 if (input.MouseDragging)
                 {

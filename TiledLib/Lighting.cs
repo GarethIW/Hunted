@@ -73,6 +73,7 @@ namespace TiledLib
             BeamStencils.Add(BeamStencilType.Narrow, content.Load<Texture2D>("beamnarrow"));
 
             SpotStencils.Add(SpotStencilType.Full, Tuple.Create<Texture2D, Texture2D, RenderTarget2D>(content.Load<Texture2D>("spotbg"), content.Load<Texture2D>("spotfg"), new RenderTarget2D(gd, content.Load<Texture2D>("spotbg").Width, content.Load<Texture2D>("spotbg").Height)));
+            SpotStencils.Add(SpotStencilType.Half, Tuple.Create<Texture2D, Texture2D, RenderTarget2D>(content.Load<Texture2D>("spotbg"), content.Load<Texture2D>("spothalf"), new RenderTarget2D(gd, content.Load<Texture2D>("spotbg").Width, content.Load<Texture2D>("spotbg").Height)));
 
             spotBS = new BlendState()
             {

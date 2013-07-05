@@ -2,9 +2,139 @@
 <map version="1.0" orientation="orthogonal" width="1000" height="1000" tilewidth="100" tileheight="100">
  <tileset firstgid="1" name="ts1" tilewidth="100" tileheight="100">
   <image source="ts1.png" width="1000" height="1300"/>
+  <tile id="0">
+   <properties>
+     <property name="Anim" value="Water1"/>
+   </properties>
+  </tile>
+  <tile id="1">
+    <properties>
+      <property name="Anim" value="Water2"/>
+    </properties>
+  </tile>
+  <tile id="2">
+    <properties>
+      <property name="Anim" value="Water3"/>
+    </properties>
+  </tile>
+  <tile id="3">
+    <properties>
+      <property name="Anim" value="Water4"/>
+    </properties>
+  </tile>
+  <tile id="4">
+    <properties>
+      <property name="Anim" value="Water5"/>
+    </properties>
+  </tile>
+  <tile id="10">
+   <properties>
+     <property name="Anim" value="Water6"/>
+   </properties>
+  </tile>
+  <tile id="11">
+    <properties>
+      <property name="Anim" value="Water7"/>
+    </properties>
+  </tile>
+  <tile id="12">
+   <properties>
+     <property name="Anim" value="Water8"/>
+   </properties>
+  </tile>
+  <tile id="20">
+   <properties>
+     <property name="Anim" value="Water9"/>
+   </properties>
+  </tile>
+   <tile id="21">
+     <properties>
+       <property name="Anim" value="Water10"/>
+     </properties>
+   </tile>
+   <tile id="22">
+     <properties>
+       <property name="Anim" value="Water11"/>
+     </properties>
+   </tile>
+   <tile id="23">
+     <properties>
+       <property name="Anim" value="Water12"/>
+     </properties>
+   </tile>
+  <tile id="24">
+   <properties>
+     <property name="Anim" value="Water13"/>
+   </properties>
+  </tile>
  </tileset>
  <tileset firstgid="131" name="ts2" tilewidth="100" tileheight="100">
   <image source="ts2.png" width="1000" height="1300"/>
+  <tile id="0">
+   <properties>
+    <property name="Anim" value="Water11"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="Anim" value="Water21"/>
+   </properties>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="Anim" value="Water31"/>
+   </properties>
+  </tile>
+  <tile id="3">
+   <properties>
+    <property name="Anim" value="Water41"/>
+   </properties>
+  </tile>
+  <tile id="4">
+   <properties>
+    <property name="Anim" value="Water51"/>
+   </properties>
+  </tile>
+  <tile id="10">
+   <properties>
+    <property name="Anim" value="Water61"/>
+   </properties>
+  </tile>
+  <tile id="11">
+   <properties>
+    <property name="Anim" value="Water71"/>
+   </properties>
+  </tile>
+  <tile id="12">
+   <properties>
+    <property name="Anim" value="Water81"/>
+   </properties>
+  </tile>
+  <tile id="20">
+   <properties>
+    <property name="Anim" value="Water91"/>
+   </properties>
+  </tile>
+  <tile id="21">
+   <properties>
+    <property name="Anim" value="Water101"/>
+   </properties>
+  </tile>
+  <tile id="22">
+   <properties>
+    <property name="Anim" value="Water111"/>
+   </properties>
+  </tile>
+  <tile id="23">
+   <properties>
+    <property name="Anim" value="Water121"/>
+   </properties>
+  </tile>
+  <tile id="24">
+   <properties>
+    <property name="Anim" value="Water131"/>
+   </properties>
+  </tile>
  </tileset>
  <layer name="Terrain" width="1000" height="1000">
   <data encoding="base64" compression="gzip">

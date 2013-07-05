@@ -123,7 +123,7 @@ namespace TiledLib
             {
                 for (int i = 0; i < 3; i++)
                 {
-                    spriteBatch.Draw(this.SpotStencil, this.Position, null, Color.White, this.Rotation, new Vector2(SpotStencil.Width, SpotStencil.Height) / 2, 1f, SpriteEffects.None, 1);
+                    spriteBatch.Draw(this.SpotStencil, this.Position, null, Color.White * (1f-(0.001f * i)), this.Rotation, new Vector2(SpotStencil.Width, SpotStencil.Height) / 2, 1f, SpriteEffects.None, 1);
                 }
                 //spriteBatch.Draw(this.SpotStencil, this.Position, null, Color.White, this.Rotation, new Vector2(SpotStencil.Width, SpotStencil.Height) / 2, 1f, SpriteEffects.None, 1);
 
