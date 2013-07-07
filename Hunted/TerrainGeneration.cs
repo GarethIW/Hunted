@@ -79,7 +79,8 @@ namespace Hunted
             TileLayer terrainLayer = map.GetLayer("Terrain") as TileLayer;
             TileLayer wallLayer = map.GetLayer("Wall") as TileLayer;
 
-            lightingEngine.LightSources.Clear();
+            for (int i = lightingEngine.LightSources.Count - 1; i >= 0; i--)
+                if (lightingEngine.LightSources[i].SpotStencil != null) lightingEngine.LightSources.RemoveAt(i);
 
             for (int y = 0; y < map.Width; y++)
             {
@@ -122,7 +123,6 @@ namespace Hunted
                     //    if (CountSurroundingTiles(map, terrainLayer, (map.Width - 1) - x, (map.Height - 1) - y, SAND) >= 5) terrainLayer.Tiles[(map.Width - 1) - x, (map.Height - 1) - y] = map.Tiles[SAND];
                 }
             }
-
 
             // Trees
             float[][] treeNoise = PerlinNoise.GeneratePerlinNoise(map.Width, map.Height, 4);

@@ -66,7 +66,7 @@ namespace TiledLib
 
         public int AnimFrame = 0;
         double frameTime;
-        double frameTargetTime = 1000;
+        double frameTargetTime = 500;
         int numFrames = 2;
 
 		internal Map(ContentReader reader) 
@@ -574,7 +574,7 @@ namespace TiledLib
 
         }
 
-        public bool? CheckCollision(Vector2 position)
+        public bool CheckCollision(Vector2 position)
         {
             for(int i=0;i<Layers.Count;i++)
             {
@@ -614,7 +614,7 @@ namespace TiledLib
                 }
             }
 
-            return null;
+            return false;
         }
 
         public bool CheckTileCollision(Vector2 position, int layer)

@@ -35,6 +35,7 @@ namespace Hunted
 
         Map gameMap;
         Camera gameCamera;
+        HeroDude gameHero;
 
         LightingEngine lightingEngine = new LightingEngine();
 
@@ -90,6 +91,9 @@ namespace Hunted
 
             mapFog = new bool[gameMap.Width, gameMap.Height];
 
+            gameHero = new HeroDude(new Vector2(50000,50000));
+            gameHero.LoadContent(content, ScreenManager.GraphicsDevice, lightingEngine);
+
             TerrainGeneration.GenerateTerrain(gameMap, lightingEngine, ScreenManager.GraphicsDevice);
 
             gameCamera = new Camera(ScreenManager.GraphicsDevice.Viewport, gameMap);
@@ -140,17 +144,19 @@ namespace Hunted
 
             if (IsActive)
             {
-                TimeOfDay = TimeOfDay.AddMinutes(gameTime.ElapsedGameTime.TotalSeconds * 50);
+                TimeOfDay = TimeOfDay.AddMinutes(gameTime.ElapsedGameTime.TotalSeconds);
 
                 lightingEngine.Update(gameTime, TimeOfDay, ScreenManager.SpriteBatch, ScreenManager.GraphicsDevice);
 
                 gameMap.Update(gameTime);
 
+
+                gameHero.Update(gameTime, gameMap);
                 //lightSource1.Position = new Vector2(1000, 1000);
 
                 //cameraLightSource.Position = gameCamera.Position;
                 //cameraLightSource.Direction = new Vector2(1f, 1f);
-
+                gameCamera.Target = gameHero.Position;
                 gameCamera.Update(new Rectangle(0, 0, ScreenManager.GraphicsDevice.Viewport.Width, ScreenManager.GraphicsDevice.Viewport.Height));
 
                 mapUpdate += gameTime.ElapsedGameTime.TotalMilliseconds;
@@ -217,6 +223,21 @@ namespace Hunted
                 mousePos = new Vector2(input.LastMouseState.X, input.LastMouseState.Y);
                 mousePos = Vector2.Transform(mousePos, Matrix.Invert(gameCamera.CameraMatrix));
 
+                if (input.CurrentGamePadStates[0].ThumbSticks.Left.Length() > 0.2f)
+                {
+                    gameHero.Move(new Vector2(input.CurrentGamePadStates[0].ThumbSticks.Left.X, -input.CurrentGamePadStates[0].ThumbSticks.Left.Y));
+                }
+                if (input.CurrentGamePadStates[0].ThumbSticks.Right.Length() > 0.2f)
+                {
+                    gameHero.LookAt(Helper.PointOnCircle(ref gameHero.Position, 200, Helper.V2ToAngle(new Vector2(input.CurrentGamePadStates[0].ThumbSticks.Right.X, -input.CurrentGamePadStates[0].ThumbSticks.Right.Y)) + MathHelper.PiOver2));
+                }
+                else
+                {
+                    if (input.CurrentGamePadStates[0].ThumbSticks.Left.Length() > 0.2f)
+                    {
+                        gameHero.LookAt(Helper.PointOnCircle(ref gameHero.Position, 200, Helper.V2ToAngle(new Vector2(input.CurrentGamePadStates[0].ThumbSticks.Left.X, -input.CurrentGamePadStates[0].ThumbSticks.Left.Y)) + MathHelper.PiOver2));
+                    }
+                }
             }
 
             lastKeyboardState = keyboardState;
@@ -261,6 +282,7 @@ namespace Hunted
            
             // We re-print the elements not affected by the light (in this case the shadow casters)
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
+            gameHero.Draw(spriteBatch, lightingEngine);
             gameMap.DrawLayer(spriteBatch, "Wall", gameCamera, lightingEngine, Color.White);
             spriteBatch.End();
 

@@ -79,7 +79,10 @@
   <ItemGroup>
     <Compile Include="AudioController.cs" />
     <Compile Include="Compound.cs" />
+    <Compile Include="Dude\HeroDude.cs" />
+    <Compile Include="Dude\Dude.cs" />
     <Compile Include="GameManager.cs" />
+    <Compile Include="Helper.cs" />
     <Compile Include="ParticleController.cs" />
     <Compile Include="PerlinNoise.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -100,6 +103,7 @@
     <Compile Include="Screens\PauseBackgroundScreen.cs" />
     <Compile Include="Screens\PauseMenuScreen.cs" />
     <Compile Include="Screens\PlayerIndexEventArgs.cs" />
+    <Compile Include="SpriteAnimation.cs" />
     <Compile Include="TerrainGeneration.cs" />
   </ItemGroup>
   <ItemGroup>

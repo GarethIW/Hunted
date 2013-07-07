@@ -89,9 +89,9 @@ namespace TiledContentPipeline
 						tile.Source = new Microsoft.Xna.Framework.Rectangle(rx, ry, tileSet.TileWidth, tileSet.TileHeight);
 
 						// get any properties from the tile set
-						if (tileSet.TileProperties.ContainsKey(y + x))
+						if (tileSet.TileProperties.ContainsKey((y*frameCountX) + x))
 						{
-							tile.Properties = tileSet.TileProperties[y + x];
+                            tile.Properties = tileSet.TileProperties[(y * frameCountX) + x];
 						}
 
 						// save the tile
