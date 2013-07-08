@@ -59,6 +59,11 @@
     <Reference Include="System.Net" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AStar\BreadCrumb.cs" />
+    <Compile Include="AStar\MinHeap.cs" />
+    <Compile Include="AStar\PathFinder.cs" />
+    <Compile Include="AStar\Point3D.cs" />
+    <Compile Include="AStar\World.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="Layer.cs" />
     <Compile Include="Lighting.cs" />

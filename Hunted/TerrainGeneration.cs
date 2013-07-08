@@ -640,6 +640,8 @@ namespace Hunted
                 }
             }
 
+            map.GetAStarData();
+
         }
 
         static int GetTileIndex(Map map, TileLayer layer, int x, int y)

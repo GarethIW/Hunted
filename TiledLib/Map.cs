@@ -62,6 +62,8 @@ namespace TiledLib
 		/// </summary>
 		public ReadOnlyCollection<Layer> Layers { get; private set; }
 
+        public AStar.World AStarWorld;
+
         //private Layer collisionLayer;
 
         public int AnimFrame = 0;
@@ -698,6 +700,31 @@ namespace TiledLib
                 }
 
                 Tiles[i] = null;
+            }
+        }
+
+        public void GetAStarData()
+        {
+            AStarWorld = null;
+
+            AStarWorld = new AStar.World(Width, Height);
+
+            foreach (var layer in Layers)
+            {
+                if (layer.GetType() == typeof(TileLayer))
+                {
+                    if (layer.Name == "Walls")
+                    {
+                        TileLayer tl = (TileLayer)layer;
+                        for (int y = 0; y < Height; y++)
+                        {
+                            for (int x = 0; x < Width; x++)
+                            {
+                                if (tl.Tiles[x, y] != null) AStarWorld.MarkPosition(new AStar.Point3D(x, y, 0), true);
+                            }
+                        }
+                    }
+                }
             }
         }
 
