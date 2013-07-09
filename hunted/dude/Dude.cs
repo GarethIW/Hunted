@@ -71,7 +71,7 @@ namespace Hunted
 
         public virtual void LookAt(Vector2 target)
         {
-            Rotation = Helper.TurnToFace(Position, target, Rotation, 1f, 1f);
+            Rotation = Helper.TurnToFace(Position, target, Rotation, 1f, 0.25f);
         }
 
         public virtual void Draw(SpriteBatch sb, LightingEngine lightingEngine)

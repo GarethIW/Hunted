@@ -54,6 +54,8 @@ namespace Hunted
 
         //LightSource lightSource1;
 
+        Texture2D crosshairTex;
+        Vector2 crosshairPos;
 
         #endregion
 
@@ -87,7 +89,7 @@ namespace Hunted
 
             lightingEngine.LoadContent(content, ScreenManager.GraphicsDevice, ScreenManager.SpriteBatch);
 
-            gameMap = content.Load<Map>("map");
+            gameMap = content.Load<Map>("map/map");
 
             mapFog = new bool[gameMap.Width, gameMap.Height];
 
@@ -109,6 +111,7 @@ namespace Hunted
 
             minimapRT = new RenderTarget2D(ScreenManager.GraphicsDevice, 200, 200);
 
+            crosshairTex = content.Load<Texture2D>("crosshair");
 
             //lightSource1 = new LightSource(ScreenManager.GraphicsDevice, 600, LightAreaQuality.Low, new Color(1f, 1f, 1f), BeamStencilType.Wide, SpotStencilType.None);
 
@@ -144,6 +147,8 @@ namespace Hunted
 
             if (IsActive)
             {
+                ScreenManager.Game.IsMouseVisible = false;
+
                 TimeOfDay = TimeOfDay.AddMinutes(gameTime.ElapsedGameTime.TotalSeconds);
 
                 lightingEngine.Update(gameTime, TimeOfDay, ScreenManager.SpriteBatch, ScreenManager.GraphicsDevice);
@@ -173,6 +178,8 @@ namespace Hunted
                     }
                     mapUpdate = 0;
                 }
+
+                
             }
 
                
@@ -238,6 +245,20 @@ namespace Hunted
                         gameHero.LookAt(Helper.PointOnCircle(ref gameHero.Position, 200, Helper.V2ToAngle(new Vector2(input.CurrentGamePadStates[0].ThumbSticks.Left.X, -input.CurrentGamePadStates[0].ThumbSticks.Left.Y)) + MathHelper.PiOver2));
                     }
                 }
+
+                crosshairPos = new Vector2(input.CurrentMouseState.X, input.CurrentMouseState.Y);
+
+                Vector2 keyboardStick = Vector2.Zero;
+                if (input.CurrentKeyboardStates[0].IsKeyDown(Keys.W)) keyboardStick.Y = -1f;
+                if (input.CurrentKeyboardStates[0].IsKeyDown(Keys.S)) keyboardStick.Y = 1f;
+                if (input.CurrentKeyboardStates[0].IsKeyDown(Keys.A)) keyboardStick.X = -1f;
+                if (input.CurrentKeyboardStates[0].IsKeyDown(Keys.D)) keyboardStick.X = 1f;
+                if (keyboardStick.Length() > 0f) gameHero.Move(keyboardStick);
+
+                gameHero.LookAt(Helper.PointOnCircle(ref gameHero.Position, 200, Helper.V2ToAngle((gameHero.Position - gameCamera.Position - new Vector2(gameCamera.Width/2, gameCamera.Height/2)) + crosshairPos) + MathHelper.PiOver2));
+
+
+                
             }
 
             lastKeyboardState = keyboardState;
@@ -304,6 +325,14 @@ namespace Hunted
             // If the game is transitioning on or off, fade it out to black.
             if (TransitionPosition >= 0f)
                 ScreenManager.FadeBackBufferToBlack(1f - TransitionAlpha);
+
+            if (IsActive)
+            {
+                spriteBatch.Begin();
+                //gameHUD.Draw(spriteBatch);
+                spriteBatch.Draw(crosshairTex, crosshairPos, null, Color.White, 0f, new Vector2(crosshairTex.Width, crosshairTex.Height) / 2, 1f, SpriteEffects.None, 1);
+                spriteBatch.End();
+            }
         }
 
         

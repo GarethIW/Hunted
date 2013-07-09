@@ -69,11 +69,11 @@ namespace TiledLib
             ScreenLights = new RenderTarget2D(gd, gd.Viewport.Width, gd.Viewport.Height);
             ScreenGround = new RenderTarget2D(gd, gd.Viewport.Width, gd.Viewport.Height);
 
-            BeamStencils.Add(BeamStencilType.Wide, content.Load<Texture2D>("beamwide"));
-            BeamStencils.Add(BeamStencilType.Narrow, content.Load<Texture2D>("beamnarrow"));
+            BeamStencils.Add(BeamStencilType.Wide, content.Load<Texture2D>("lights/beamwide"));
+            BeamStencils.Add(BeamStencilType.Narrow, content.Load<Texture2D>("lights/beamnarrow"));
 
-            SpotStencils.Add(SpotStencilType.Full, Tuple.Create<Texture2D, Texture2D, RenderTarget2D>(content.Load<Texture2D>("spotbg"), content.Load<Texture2D>("spotfg"), new RenderTarget2D(gd, content.Load<Texture2D>("spotbg").Width, content.Load<Texture2D>("spotbg").Height)));
-            SpotStencils.Add(SpotStencilType.Half, Tuple.Create<Texture2D, Texture2D, RenderTarget2D>(content.Load<Texture2D>("spotbg"), content.Load<Texture2D>("spothalf"), new RenderTarget2D(gd, content.Load<Texture2D>("spotbg").Width, content.Load<Texture2D>("spotbg").Height)));
+            SpotStencils.Add(SpotStencilType.Full, Tuple.Create<Texture2D, Texture2D, RenderTarget2D>(content.Load<Texture2D>("lights/spotbg"), content.Load<Texture2D>("lights/spotfg"), new RenderTarget2D(gd, content.Load<Texture2D>("lights/spotbg").Width, content.Load<Texture2D>("lights/spotbg").Height)));
+            SpotStencils.Add(SpotStencilType.Half, Tuple.Create<Texture2D, Texture2D, RenderTarget2D>(content.Load<Texture2D>("lights/spotbg"), content.Load<Texture2D>("lights/spothalf"), new RenderTarget2D(gd, content.Load<Texture2D>("lights/spotbg").Width, content.Load<Texture2D>("lights/spotbg").Height)));
 
             spotBS = new BlendState()
             {

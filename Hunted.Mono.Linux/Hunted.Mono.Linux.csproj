@@ -41,11 +41,20 @@
     <Compile Include="..\Hunted\Compound.cs">
       <Link>Compound.cs</Link>
     </Compile>
+    <Compile Include="..\hunted\dude\Dude.cs">
+      <Link>Dude\Dude.cs</Link>
+    </Compile>
+    <Compile Include="..\hunted\dude\HeroDude.cs">
+      <Link>Dude\HeroDude.cs</Link>
+    </Compile>
     <Compile Include="..\Hunted\Game.cs">
       <Link>Game.cs</Link>
     </Compile>
     <Compile Include="..\Hunted\GameManager.cs">
       <Link>GameManager.cs</Link>
+    </Compile>
+    <Compile Include="..\Hunted\Helper.cs">
+      <Link>Helper.cs</Link>
     </Compile>
     <Compile Include="..\Hunted\ParticleController.cs">
       <Link>ParticleController.cs</Link>
@@ -98,6 +107,9 @@
     <Compile Include="..\hunted\screens\PlayerIndexEventArgs.cs">
       <Link>Screens\PlayerIndexEventArgs.cs</Link>
     </Compile>
+    <Compile Include="..\Hunted\SpriteAnimation.cs">
+      <Link>SpriteAnimation.cs</Link>
+    </Compile>
     <Compile Include="..\Hunted\TerrainGeneration.cs">
       <Link>TerrainGeneration.cs</Link>
     </Compile>
@@ -143,6 +155,75 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Content\sfx\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\hunted\bin\x86\debug\content\lights\beamnarrow.xnb">
+      <Link>Content\lights\beamnarrow.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\hunted\bin\x86\debug\content\lights\beamwide.xnb">
+      <Link>Content\lights\beamwide.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\hunted\bin\x86\debug\content\lights\spotbg.xnb">
+      <Link>Content\lights\spotbg.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\hunted\bin\x86\debug\content\lights\spotfg.xnb">
+      <Link>Content\lights\spotfg.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\hunted\bin\x86\debug\content\lights\spothalf.xnb">
+      <Link>Content\lights\spothalf.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\hunted\bin\x86\debug\content\map\map.xnb">
+      <Link>Content\map\map.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\hunted\bin\x86\debug\content\map\ts1.xnb">
+      <Link>Content\map\ts1.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\hunted\bin\x86\debug\content\map\ts2.xnb">
+      <Link>Content\map\ts2.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\dude.xnb">
+      <Link>Content\dude.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\2xmultiblend.mgfxo">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\reductioneffect.mgfxo">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\resolveshadowseffect.mgfxo">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

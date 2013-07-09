@@ -44,6 +44,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\TiledLib\AStar\BreadCrumb.cs">
+      <Link>AStar\BreadCrumb.cs</Link>
+    </Compile>
+    <Compile Include="..\TiledLib\AStar\MinHeap.cs">
+      <Link>AStar\MinHeap.cs</Link>
+    </Compile>
+    <Compile Include="..\TiledLib\AStar\PathFinder.cs">
+      <Link>AStar\PathFinder.cs</Link>
+    </Compile>
+    <Compile Include="..\TiledLib\AStar\Point3D.cs">
+      <Link>AStar\Point3D.cs</Link>
+    </Compile>
+    <Compile Include="..\TiledLib\AStar\World.cs">
+      <Link>AStar\World.cs</Link>
+    </Compile>
     <Compile Include="..\TiledLib\Camera.cs">
       <Link>Camera.cs</Link>
     </Compile>

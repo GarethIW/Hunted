@@ -31,7 +31,7 @@ namespace Hunted
 
         public override void Update(GameTime gameTime, Map gameMap)
         {
-            HeadTorch.Position = Helper.PointOnCircle(ref Position, 40, Rotation - MathHelper.PiOver2);
+            HeadTorch.Position = Helper.PointOnCircle(ref Position, 30, Rotation - MathHelper.PiOver2);
             HeadTorch.Rotation = Rotation - MathHelper.PiOver2;
             base.Update(gameTime, gameMap);
         }

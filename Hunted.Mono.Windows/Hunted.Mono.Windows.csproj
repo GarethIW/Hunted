@@ -41,11 +41,20 @@
     <Compile Include="..\Hunted\Compound.cs">
       <Link>Compound.cs</Link>
     </Compile>
+    <Compile Include="..\Hunted\Dude\Dude.cs">
+      <Link>Dude\Dude.cs</Link>
+    </Compile>
+    <Compile Include="..\Hunted\Dude\HeroDude.cs">
+      <Link>Dude\HeroDude.cs</Link>
+    </Compile>
     <Compile Include="..\Hunted\Game.cs">
       <Link>Game.cs</Link>
     </Compile>
     <Compile Include="..\Hunted\GameManager.cs">
       <Link>GameManager.cs</Link>
+    </Compile>
+    <Compile Include="..\Hunted\Helper.cs">
+      <Link>Helper.cs</Link>
     </Compile>
     <Compile Include="..\Hunted\ParticleController.cs">
       <Link>ParticleController.cs</Link>
@@ -98,6 +107,9 @@
     <Compile Include="..\Hunted\Screens\PlayerIndexEventArgs.cs">
       <Link>Screens\PlayerIndexEventArgs.cs</Link>
     </Compile>
+    <Compile Include="..\Hunted\SpriteAnimation.cs">
+      <Link>SpriteAnimation.cs</Link>
+    </Compile>
     <Compile Include="..\Hunted\TerrainGeneration.cs">
       <Link>TerrainGeneration.cs</Link>
     </Compile>
@@ -139,30 +151,8 @@
       <Link>Content\blank.xnb</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Hunted\bin\x86\Debug\Content\map.xnb">
-      <Link>Content\map.xnb</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\Hunted\bin\x86\Debug\Content\beamnarrow.xnb">
-      <Link>Content\beamnarrow.xnb</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Hunted\bin\x86\Debug\Content\beamwide.xnb">
-      <Link>Content\beamwide.xnb</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\Hunted\bin\x86\Debug\Content\ts1.xnb">
-      <Link>Content\ts1.xnb</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Hunted\bin\x86\Debug\Content\ts2.xnb">
-      <Link>Content\ts2.xnb</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Content\resolveshadowseffect.mgfxo">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -176,18 +166,44 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\Hunted\bin\x86\Debug\Content\spotbg.xnb">
-      <Link>Content\spotbg.xnb</Link>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\lights\beamnarrow.xnb">
+      <Link>Content\lights\beamnarrow.xnb</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Hunted\bin\x86\Debug\Content\spotfg.xnb">
-      <Link>Content\spotfg.xnb</Link>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\lights\beamwide.xnb">
+      <Link>Content\lights\beamwide.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\lights\spotbg.xnb">
+      <Link>Content\lights\spotbg.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\lights\spotfg.xnb">
+      <Link>Content\lights\spotfg.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\lights\spothalf.xnb">
+      <Link>Content\lights\spothalf.xnb</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\Hunted\bin\x86\Debug\Content\spothalf.xnb">
-      <Link>Content\spothalf.xnb</Link>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\map\map.xnb">
+      <Link>Content\map\map.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\map\ts1.xnb">
+      <Link>Content\map\ts1.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\map\ts2.xnb">
+      <Link>Content\map\ts2.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\dude.xnb">
+      <Link>Content\dude.xnb</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
