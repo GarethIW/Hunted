@@ -411,6 +411,9 @@ namespace TiledLib
 
 
                         spriteBatch.Draw(tile.Texture, new Vector2((x * TileWidth), (y * TileHeight)), tile.Source, color==Color.White?lightingEngine.CurrentSunColor:color);
+
+                        //if (!AStarWorld.PositionIsFree(new AStar.Point3D(x, y, 0))) 
+                        //    spriteBatch.Draw(tile.Texture, new Vector2((x * TileWidth), (y * TileHeight)), new Rectangle(0,0,100,100), Color.Red);
                         //}
 
                     }
@@ -715,14 +718,15 @@ namespace TiledLib
             {
                 if (layer.GetType() == typeof(TileLayer))
                 {
-                    if (layer.Name == "Walls")
+                    if (layer.Properties.Contains("Collision"))
                     {
                         TileLayer tl = (TileLayer)layer;
                         for (int y = 0; y < Height; y++)
                         {
                             for (int x = 0; x < Width; x++)
                             {
-                                if (tl.Tiles[x, y] != null) AStarWorld.MarkPosition(new AStar.Point3D(x, y, 0), true);
+                                if (tl.Tiles[x, y] != null) 
+                                    AStarWorld.MarkPosition(new AStar.Point3D(x, y, 0), true);
                             }
                         }
                     }

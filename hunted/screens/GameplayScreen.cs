@@ -101,7 +101,7 @@ namespace Hunted
             gameHero = new HeroDude(new Vector2(50000,50000));
             gameHero.LoadContent(content, ScreenManager.GraphicsDevice, lightingEngine);
 
-            TerrainGeneration.GenerateTerrain(gameMap, lightingEngine, ScreenManager.GraphicsDevice);
+            ThreadPool.QueueUserWorkItem(new WaitCallback(GenerateTerrainAsync));
 
             gameCamera = new Camera(ScreenManager.GraphicsDevice.Viewport, gameMap);
             gameCamera.ClampRect = new Rectangle(0, 0, gameMap.Width * gameMap.TileWidth, gameMap.Height * gameMap.TileHeight);
@@ -150,7 +150,7 @@ namespace Hunted
         {
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
 
-            if (IsActive)
+            if (IsActive && !TerrainGeneration.Generating)
             {
                 ScreenManager.Game.IsMouseVisible = false;
 
@@ -222,7 +222,7 @@ namespace Hunted
         
             if(IsActive)
             {
-                if (keyboardState.IsKeyDown(Keys.Space) && !lastKeyboardState.IsKeyDown(Keys.Space)) TerrainGeneration.GenerateTerrain(gameMap, lightingEngine, ScreenManager.GraphicsDevice);
+                if (keyboardState.IsKeyDown(Keys.Space) && !lastKeyboardState.IsKeyDown(Keys.Space)) ThreadPool.QueueUserWorkItem(new WaitCallback(GenerateTerrainAsync));
 
                 if (input.MouseDragging)
                 {
@@ -242,13 +242,13 @@ namespace Hunted
                 }
                 if (input.CurrentGamePadStates[0].ThumbSticks.Right.Length() > 0.2f)
                 {
-                    gameHero.LookAt(Helper.PointOnCircle(ref gameHero.Position, 200, Helper.V2ToAngle(new Vector2(input.CurrentGamePadStates[0].ThumbSticks.Right.X, -input.CurrentGamePadStates[0].ThumbSticks.Right.Y)) + MathHelper.PiOver2));
+                    gameHero.LookAt(Helper.PointOnCircle(ref gameHero.Position, 200, Helper.V2ToAngle(new Vector2(input.CurrentGamePadStates[0].ThumbSticks.Right.X, -input.CurrentGamePadStates[0].ThumbSticks.Right.Y))));
                 }
                 else
                 {
                     if (input.CurrentGamePadStates[0].ThumbSticks.Left.Length() > 0.2f)
                     {
-                        gameHero.LookAt(Helper.PointOnCircle(ref gameHero.Position, 200, Helper.V2ToAngle(new Vector2(input.CurrentGamePadStates[0].ThumbSticks.Left.X, -input.CurrentGamePadStates[0].ThumbSticks.Left.Y)) + MathHelper.PiOver2));
+                        gameHero.LookAt(Helper.PointOnCircle(ref gameHero.Position, 200, Helper.V2ToAngle(new Vector2(input.CurrentGamePadStates[0].ThumbSticks.Left.X, -input.CurrentGamePadStates[0].ThumbSticks.Left.Y))));
                     }
                 }
 
@@ -261,7 +261,7 @@ namespace Hunted
                 if (input.CurrentKeyboardStates[0].IsKeyDown(Keys.D)) keyboardStick.X = 1f;
                 if (keyboardStick.Length() > 0f) gameHero.Move(keyboardStick);
 
-                gameHero.LookAt(Helper.PointOnCircle(ref gameHero.Position, 200, Helper.V2ToAngle((gameHero.Position - gameCamera.Position - new Vector2(gameCamera.Width/2, gameCamera.Height/2)) + crosshairPos) + MathHelper.PiOver2));
+                gameHero.LookAt(Helper.PointOnCircle(ref gameHero.Position, 200, Helper.V2ToAngle((gameHero.Position - gameCamera.Position - new Vector2(gameCamera.Width/2, gameCamera.Height/2)) + crosshairPos)));
 
 
                 
@@ -277,7 +277,8 @@ namespace Hunted
         /// </summary>
         public override void Draw(GameTime gameTime)
         {
-            
+            if (TerrainGeneration.Generating) return;
+
             // This game has a blue background. Why? Because!
             ScreenManager.GraphicsDevice.Clear(ClearOptions.Target,
                                                Color.Black, 0, 0);
@@ -362,8 +363,11 @@ namespace Hunted
             }
         }
 
-        
 
+        void GenerateTerrainAsync(object si)
+        {
+            TerrainGeneration.GenerateTerrain(gameMap, lightingEngine, ScreenManager.GraphicsDevice);
+        }
        
 
         #endregion

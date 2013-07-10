@@ -47,7 +47,7 @@ namespace Hunted
             // y / x for us, and has the added benefit that it will use the signs of x
             // and y to determine what cartesian quadrant to put the result in.
             // http://msdn2.microsoft.com/en-us/library/system.math.atan2.aspx
-            float desiredAngle = (float)Math.Atan2(y, x);
+            float desiredAngle = (float)Math.Atan2(y, x) + MathHelper.PiOver2;
 
             // so now we know where we WANT to be facing, and where we ARE facing...
             // if we weren't constrained by turnSpeed, this would be easy: we'd just 

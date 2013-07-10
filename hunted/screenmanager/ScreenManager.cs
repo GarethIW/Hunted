@@ -124,7 +124,7 @@ namespace Hunted
             ContentManager content = Game.Content;
 
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            //font = content.Load<SpriteFont>("menufont");
+            font = content.Load<SpriteFont>("font");
             blankTexture = content.Load<Texture2D>("blank");
 
             //texCrosshair = content.Load<Texture2D>("crosshair");
@@ -238,9 +238,13 @@ namespace Hunted
                 screen.Draw(gameTime);
             }
 
-            //spriteBatch.Begin();
+            spriteBatch.Begin();
+            if (TerrainGeneration.Generating)
+            {
+                spriteBatch.DrawString(font, "Generating Terrain: " + TerrainGeneration.PercentComplete + "%", Vector2.One * 20f, Color.White);
+            }
             //spriteBatch.Draw(texCrosshair, new Vector2(input.CurrentMouseState.X, input.CurrentMouseState.Y), null, Color.White, 0f, new Vector2(23,23), 1f, SpriteEffects.None, 1);
-            //spriteBatch.End();
+            spriteBatch.End();
         }
 
 

@@ -39,7 +39,7 @@ namespace Hunted
             foreach (AIDude e in Enemies.Where(en => (gameHero.Position - en.Position).Length() < 4000f))
             {
                 count++;
-                e.Update(gameTime, gameMap);
+                e.Update(gameTime, gameMap, gameHero);
             }
 
             // Spawn some new enemies

@@ -100,6 +100,8 @@ namespace Hunted
             sb.Draw(spriteSheet, Position, Animations["arms"].CellRect, Color.Black, Rotation, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
         }
 
+        public virtual void Collided() { }
+
         void DoCollisions(Map gameMap)
         {
             bool LCollision = false;
@@ -139,7 +141,11 @@ namespace Hunted
             if (Speed.X < 0f && LCollision) Speed.X = 0f;
             if (Speed.Y > 0f && DCollision) Speed.Y = 0f;
             if (Speed.Y < 0f && UCollision) Speed.Y = 0f;
+
+            if (UCollision || DCollision || LCollision || RCollision) Collided();
         }
+
+
     }
 
     

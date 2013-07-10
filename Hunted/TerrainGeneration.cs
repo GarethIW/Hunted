@@ -4,12 +4,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using TiledLib;
 
 namespace Hunted
 {
     public static class TerrainGeneration
     {
+        public static bool Generating = false;
+        public static int PercentComplete;
+
         const int TILESHEET_WIDTH = 10;
         
         const int SAND = 14;
@@ -74,6 +78,11 @@ namespace Hunted
 
         public static void GenerateTerrain(Map map, LightingEngine lightingEngine, GraphicsDevice gd)
         {
+            Generating = true;
+            PercentComplete = 0;
+
+            Thread.Sleep(1000);
+
             List<Compound> compounds = new List<Compound>();
 
             TileLayer terrainLayer = map.GetLayer("Terrain") as TileLayer;
@@ -90,7 +99,8 @@ namespace Hunted
                     wallLayer.Tiles[x, y] = null;
                 }
             }
-            
+
+            PercentComplete = 5;
 
             // Inital terrain
             float[][] noise = PerlinNoise.GeneratePerlinNoise(map.Width, map.Height, 8);
@@ -104,6 +114,8 @@ namespace Hunted
                     else
                         terrainLayer.Tiles[x, y] = map.Tiles[GRASS];
             }
+
+            PercentComplete = 20;
 
             // Remove stray tiles
             for (int y = 0; y < map.Width; y++)
@@ -124,6 +136,8 @@ namespace Hunted
                 }
             }
 
+            PercentComplete = 30;
+
             // Trees
             float[][] treeNoise = PerlinNoise.GeneratePerlinNoise(map.Width, map.Height, 4);
 
@@ -136,6 +150,8 @@ namespace Hunted
                             wallLayer.Tiles[x, y] = map.Tiles[TREE];
                 }
             }
+
+            PercentComplete = 35;
 
             // Detail tiling!
             for (int y = 0; y < map.Width; y++)
@@ -256,10 +272,14 @@ namespace Hunted
                     }
                 }
             }
-            
+
+            PercentComplete = 60;
+
             // Compounds
             CreateCompounds(map, terrainLayer, wallLayer, compounds, noise, 0.65f, 20000f, 20, lightingEngine, gd);
             CreateCompounds(map, terrainLayer, wallLayer, compounds, noise, 0.75f, 12000f, 30, lightingEngine, gd);
+
+            PercentComplete = 75;
 
             // Alt tiles
             for (int y = 0; y < map.Width; y++)
@@ -289,6 +309,13 @@ namespace Hunted
                     }
                 }
             }
+
+            PercentComplete = 90;
+
+            map.GetAStarData();
+
+            PercentComplete = 100;
+            Generating = false;
         }
 
         private static bool TryDrawBigTree(Map map, TileLayer wallLayer, int x, int y)
@@ -640,7 +667,7 @@ namespace Hunted
                 }
             }
 
-            map.GetAStarData();
+            
 
         }
 
