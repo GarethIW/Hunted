@@ -8,6 +8,8 @@ namespace Hunted
 {
     public static class Helper
     {
+        public static Random Random = new Random();
+
         public static float AngleBetween(Vector2 v1, Vector2 v2)
         {
             v1.Normalize();
@@ -87,6 +89,18 @@ namespace Hunted
             float endX = (C.X + (R * ((float)Math.Cos((float)A))));
             float endY = (C.Y + (R * ((float)Math.Sin((float)A))));
             return new Vector2(endX, endY);
+        }
+
+        public static Vector2 RandomPointInCircle(Vector2 position, float minradius, float maxradius)
+        {
+            float randomRadius = minradius + ((maxradius-minradius) * (float)Math.Sqrt(Random.NextDouble()));
+
+            double randomAngle = Random.NextDouble() * MathHelper.TwoPi;
+
+            float x = randomRadius * (float)Math.Cos(randomAngle);
+            float y = randomRadius * (float)Math.Sin(randomAngle);
+
+            return new Vector2(position.X + x, position.Y + y);
         }
 
         public static Vector2 AngleToVector(float angle, float length)

@@ -619,12 +619,14 @@ namespace TiledLib
             return false;
         }
 
-        public bool CheckTileCollision(Vector2 position, int layer)
+        public bool CheckTileCollision(Vector2 position)
         {
-            
+            for (int i = 0; i < Layers.Count; i++)
+            {
+                if (!Layers[i].Properties.Contains("Collision"))
+                    continue;
 
-                TileLayer tileLayer = GetLayer(layer.ToString()) as TileLayer;
-                if (tileLayer == null) return false;
+                TileLayer tileLayer = Layers[i] as TileLayer;
 
                 position.X = (int)position.X;
                 position.Y = (int)position.Y;
@@ -636,13 +638,13 @@ namespace TiledLib
 
                 Tile collisionTile = tileLayer.Tiles[(int)tilePosition.X, (int)tilePosition.Y];
 
-                if (collisionTile == null)
-                    return false;
+                if (collisionTile != null)
+                    return true;
 
-                if (collisionTile.Properties.Contains("Portal"))
-                    return false;
-                
-                return true;
+            }
+
+            return false;
+
         }
 
         public Rectangle? CheckTileCollisionIntersect(Vector2 position, Rectangle rect, int layer)

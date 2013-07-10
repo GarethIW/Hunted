@@ -9,16 +9,16 @@ using TiledLib;
 
 namespace Hunted
 {
-    class AIDude : Dude
+    public class AIDude : Dude
     {
         public AIDude(Vector2 pos) : base(pos)
         {
-
+            Rotation = (float)Helper.Random.NextDouble() * MathHelper.TwoPi;
         }
 
-        public void LoadContent(ContentManager content, GraphicsDevice gd, LightingEngine le)
+        public void LoadContent(Texture2D sheet, GraphicsDevice gd, LightingEngine le)
         {
-            spriteSheet = content.Load<Texture2D>("dude");
+            spriteSheet = sheet;
             Initialize(gd, le);
         }
 

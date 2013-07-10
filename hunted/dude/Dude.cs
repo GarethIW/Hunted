@@ -9,7 +9,7 @@ using TiledLib;
 
 namespace Hunted
 {
-    class Dude
+    public class Dude
     {
         public Vector2 Position;
         public Vector2 Speed;
@@ -76,21 +76,28 @@ namespace Hunted
 
         public virtual void Draw(SpriteBatch sb, LightingEngine lightingEngine)
         {
-            for (int i = 1; i < 20; i += 2)
-            {
-                Vector2 pos = Position + new Vector2(lightingEngine.CurrentShadowVect.X * i, lightingEngine.CurrentShadowVect.Y * i);
-
-                sb.Draw(spriteSheet, pos, Animations["arms"].CellRect, Color.Black * 0.03f, Rotation, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
-            }
-
             // Feet
             sb.Draw(spriteSheet, Position, Animations["feet"].CellRect, lightingEngine.CurrentSunColor, Rotation, new Vector2(100,100)/2, 1f, SpriteEffects.None, 1);
             // Arms
             sb.Draw(spriteSheet, Position, Animations["arms"].CellRect, lightingEngine.CurrentSunColor, Rotation, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
             // Head
             sb.Draw(spriteSheet, Position, new Rectangle(0, 200, 100, 100), lightingEngine.CurrentSunColor, Rotation, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
+        }
 
+        public virtual void DrawShadows(SpriteBatch sb, LightingEngine lightingEngine)
+        {
+            for (int i = 1; i < 20; i += 2)
+            {
+                Vector2 pos = Position + new Vector2(lightingEngine.CurrentShadowVect.X * i, lightingEngine.CurrentShadowVect.Y * i);
 
+                sb.Draw(spriteSheet, pos, Animations["arms"].CellRect, Color.Black * 0.03f, Rotation, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
+            }
+        }
+
+        public virtual void DrawLightBlock(SpriteBatch sb)
+        {
+            // Arms
+            sb.Draw(spriteSheet, Position, Animations["arms"].CellRect, Color.Black, Rotation, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
         }
 
         void DoCollisions(Map gameMap)

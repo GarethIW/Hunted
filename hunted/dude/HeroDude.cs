@@ -9,7 +9,7 @@ using TiledLib;
 
 namespace Hunted
 {
-    class HeroDude : Dude
+    public class HeroDude : Dude
     {
         public HeroDude(Vector2 pos) : base(pos)
         {
@@ -31,9 +31,11 @@ namespace Hunted
 
         public override void Update(GameTime gameTime, Map gameMap)
         {
+            base.Update(gameTime, gameMap);
+
             HeadTorch.Position = Helper.PointOnCircle(ref Position, 30, Rotation - MathHelper.PiOver2);
             HeadTorch.Rotation = Rotation - MathHelper.PiOver2;
-            base.Update(gameTime, gameMap);
+            
         }
 
         public override void Draw(SpriteBatch sb, LightingEngine lightingEngine)

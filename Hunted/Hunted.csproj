@@ -82,6 +82,7 @@
     <Compile Include="Dude\AIDude.cs" />
     <Compile Include="Dude\HeroDude.cs" />
     <Compile Include="Dude\Dude.cs" />
+    <Compile Include="EnemyController.cs" />
     <Compile Include="GameManager.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="ParticleController.cs" />
