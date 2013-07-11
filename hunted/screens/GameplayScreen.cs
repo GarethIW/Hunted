@@ -50,7 +50,7 @@ namespace Hunted
 
         //iledLib.LightSource cameraLightSource = new LightSource();
 
-        DateTime TimeOfDay = new DateTime(2013,1,1,0,0,0);
+        DateTime TimeOfDay = new DateTime(2013,1,1,8,0,0);
 
         double mapUpdate = 0;
 
@@ -154,7 +154,7 @@ namespace Hunted
             {
                 ScreenManager.Game.IsMouseVisible = false;
 
-                TimeOfDay = TimeOfDay.AddMinutes(gameTime.ElapsedGameTime.TotalSeconds * 50);
+                TimeOfDay = TimeOfDay.AddMinutes(gameTime.ElapsedGameTime.TotalSeconds * 10);
 
                 lightingEngine.Update(gameTime, TimeOfDay, ScreenManager.SpriteBatch, ScreenManager.GraphicsDevice);
 
