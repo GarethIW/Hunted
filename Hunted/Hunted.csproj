@@ -79,6 +79,7 @@
   <ItemGroup>
     <Compile Include="AudioController.cs" />
     <Compile Include="Compound.cs" />
+    <Compile Include="Dude\Weapons\Knife.cs" />
     <Compile Include="Dude\Weapons\Pistol.cs" />
     <Compile Include="Dude\Weapons\Weapon.cs" />
     <Compile Include="ProjectileController.cs" />

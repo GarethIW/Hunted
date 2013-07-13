@@ -35,16 +35,19 @@ namespace Hunted.Weapons
                 return false;
             }
 
-            if (triggerHeld && !isAuto) return false;
+            if (triggerHeld && !isAuto && (owner.GetType() == typeof(HeroDude))) return false;
             triggerHeld = true;
 
             if (clipAmmo <= 0) return false;
 
-            coolDown += gameTime.ElapsedGameTime.TotalMilliseconds;
+            if (isAuto || (owner.GetType() == typeof(AIDude)))
+            {
+                coolDown += gameTime.ElapsedGameTime.TotalMilliseconds;
 
-            if (coolDown < coolDownTarget) return false;
+                if (coolDown < coolDownTarget) return false;
 
-            coolDown = 0;
+                coolDown = 0;
+            }
 
             return true;
         }

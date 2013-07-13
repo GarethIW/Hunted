@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Hunted.Weapons;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -20,6 +21,8 @@ namespace Hunted
         {
             spriteSheet = content.Load<Texture2D>("dude");
             Initialize(gd, le);
+
+            Weapons.Add(new Pistol(this));
         }
 
         internal void Initialize(GraphicsDevice gd, LightingEngine le)

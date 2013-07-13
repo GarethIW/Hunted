@@ -13,7 +13,7 @@ namespace Hunted.Weapons
         {
             clipAmmo = 30;
             isAuto = false;
-            coolDown = 100;
+            coolDownTarget = 500;
         }
 
         public override bool Use(GameTime gameTime, bool trigger)

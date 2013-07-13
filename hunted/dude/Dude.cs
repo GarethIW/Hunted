@@ -43,7 +43,7 @@ namespace Hunted
             Animations.Add("feet", new SpriteAnimation(2, 100, 0, new Rectangle(0,0,100,100), false));
             Animations.Add("arms", new SpriteAnimation(2, 100, 1, new Rectangle(0,0,100,100), true));
 
-            Weapons.Add(new Pistol(this));
+            
         }
 
         public virtual void Update(GameTime gameTime, Map gameMap)

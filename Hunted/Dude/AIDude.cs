@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Hunted.Weapons;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -37,6 +38,13 @@ namespace Hunted
         {
             spriteSheet = sheet;
             Initialize(gd, le);
+
+            Weapons.Add(new Knife(this));
+            if (Helper.Random.Next(2) == 1)
+            {
+                Weapons.Add(new Pistol(this));
+                SelectedWeapon = 1;
+            }
         }
 
         internal void Initialize(GraphicsDevice gd, LightingEngine le)
@@ -53,7 +61,7 @@ namespace Hunted
             {
                 Vector2 dir = Target - Position;
                 Move(dir);
-                LookAt(Target);
+                if(State==AIState.Patrolling) LookAt(Target);
             }
             else
             {
@@ -88,6 +96,12 @@ namespace Hunted
                     break;
                 case AIState.Chasing:
                     Target = gameHero.Position;
+                    LookAt(gameHero.Position);
+                    if (Weapons[SelectedWeapon].GetType() != typeof(Knife) && (gameHero.Position - Position).Length() < 350f && CheckLineOfSight(gameHero.Position, gameMap))
+                    {
+                        Target = Position;
+                        State = AIState.Attacking;
+                    }
                     break;                    
                 case AIState.FollowingPath:
                     if (Target == Position)
@@ -106,6 +120,26 @@ namespace Hunted
                             else State = AIState.Patrolling;
                         }
                     }
+                    break;
+                case AIState.Attacking:
+                    LookAt(gameHero.Position);
+                    Attack(gameTime, true);
+                    if (Weapons[SelectedWeapon].GetType() != typeof(Knife))
+                    {
+                        if ((gameHero.Position - Position).Length() > 350f) State = AIState.Chasing;
+
+                        if (Helper.Random.Next(100) == 1)
+                        {
+                            Vector2 potentialTarget = Helper.RandomPointInCircle(Position, 100, 500);
+                            if (!gameMap.CheckCollision(potentialTarget)) Target = potentialTarget;
+                        }
+                    }
+                    else
+                    {
+                        Target = gameHero.Position;
+                        if ((gameHero.Position - Position).Length() < 60f) Target = Position;
+                    }
+
                     break;
             }
                    
