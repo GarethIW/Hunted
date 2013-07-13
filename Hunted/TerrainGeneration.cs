@@ -22,7 +22,7 @@ namespace Hunted
         const int GRASS = 47;
         const int GRASS_ALT1 = 15;
         const int GRASS_ALT2 = 29;
-        const int CONCRETE = 101;
+        const int CONCRETE = 112;
         const int CARPARK = 108;
 
         const int SAND_EDGE_UP = 22;
@@ -55,15 +55,17 @@ namespace Hunted
         const int GRASS_CORNER_OUTSIDE_BL = 56;
         const int GRASS_CORNER_OUTSIDE_BR = 58;
 
-        const int WALL_HORIZ = 106;
-        const int WALL_VERT = 107;
-        const int WALL_TL = 102;
+        const int WALL_EDGE_UP = 102;
+        const int WALL_EDGE_DOWN = 122;
+        const int WALL_EDGE_LEFT = 111;
+        const int WALL_EDGE_RIGHT = 113;
+        const int WALL_TL = 101;
         const int WALL_TR = 103;
-        const int WALL_BL = 105;
-        const int WALL_BR = 104;
+        const int WALL_BL = 121;
+        const int WALL_BR = 123;
 
         const int TREE = 31;
-        static int[] TREES = new int[] { 31, 32, 41, 51, 93, 94, 95, 96, 97, 98, 99, 100 };
+        static int[] TREES = new int[] { 31, 41, 51, 93, 94, 95, 96, 97, 98, 99, 100 };
         static List<Rectangle> BIG_TREES = new List<Rectangle>() {
             new Rectangle(2,4,4,3),
             new Rectangle(1,7,2,2),
@@ -408,13 +410,13 @@ namespace Hunted
 
                                 for (int xx = innerBounds.Left + 1; xx <= innerBounds.Right - 1; xx++)
                                 {
-                                    wallLayer.Tiles[xx, innerBounds.Top] = map.Tiles[WALL_HORIZ];
-                                    wallLayer.Tiles[xx, innerBounds.Bottom] = map.Tiles[WALL_HORIZ];
+                                    wallLayer.Tiles[xx, innerBounds.Top] = map.Tiles[WALL_EDGE_UP];
+                                    wallLayer.Tiles[xx, innerBounds.Bottom] = map.Tiles[WALL_EDGE_DOWN];
                                 } 
                                 for (int yy = innerBounds.Top + 1; yy <= innerBounds.Bottom - 1; yy++)
                                 {
-                                    wallLayer.Tiles[innerBounds.Left,yy] = map.Tiles[WALL_VERT];
-                                    wallLayer.Tiles[innerBounds.Right,yy] = map.Tiles[WALL_VERT];
+                                    wallLayer.Tiles[innerBounds.Left, yy] = map.Tiles[WALL_EDGE_LEFT];
+                                    wallLayer.Tiles[innerBounds.Right,yy] = map.Tiles[WALL_EDGE_RIGHT];
                                 }
 
                                 newCompound.Bounds = bounds;
@@ -481,9 +483,9 @@ namespace Hunted
                                     {
                                         lightSpacing = 0;
                                     
-                                        if (GetTileIndex(map, wallLayer, xx, innerBounds.Top) == WALL_HORIZ &&
-                                            GetTileIndex(map, wallLayer, xx-2, innerBounds.Top) == WALL_HORIZ &&
-                                            GetTileIndex(map, wallLayer, xx+2, innerBounds.Top) == WALL_HORIZ)
+                                        if (GetTileIndex(map, wallLayer, xx, innerBounds.Top) == WALL_EDGE_UP &&
+                                            GetTileIndex(map, wallLayer, xx - 2, innerBounds.Top) == WALL_EDGE_UP &&
+                                            GetTileIndex(map, wallLayer, xx + 2, innerBounds.Top) == WALL_EDGE_UP)
                                         {
                                             LightSource ls = new LightSource(gd, 300, LightAreaQuality.Low, Color.White, BeamStencilType.None, SpotStencilType.Half);
                                             ls.Rotation = MathHelper.PiOver2;
@@ -491,9 +493,9 @@ namespace Hunted
                                             lightingEngine.LightSources.Add(ls);
                                         }
 
-                                        if (GetTileIndex(map, wallLayer, xx, innerBounds.Bottom) == WALL_HORIZ &&
-                                            GetTileIndex(map, wallLayer, xx-2, innerBounds.Bottom) == WALL_HORIZ &&
-                                            GetTileIndex(map, wallLayer, xx+2, innerBounds.Bottom) == WALL_HORIZ)
+                                        if (GetTileIndex(map, wallLayer, xx, innerBounds.Bottom) == WALL_EDGE_DOWN &&
+                                            GetTileIndex(map, wallLayer, xx - 2, innerBounds.Bottom) == WALL_EDGE_DOWN &&
+                                            GetTileIndex(map, wallLayer, xx + 2, innerBounds.Bottom) == WALL_EDGE_DOWN)
                                         {
                                             LightSource ls = new LightSource(gd, 300, LightAreaQuality.Low, Color.White, BeamStencilType.None, SpotStencilType.Half);
                                             ls.Rotation = MathHelper.PiOver2 + MathHelper.Pi;
@@ -510,9 +512,9 @@ namespace Hunted
                                     {
                                         lightSpacing = 0;
 
-                                        if (GetTileIndex(map, wallLayer, innerBounds.Left, yy) == WALL_VERT &&
-                                            GetTileIndex(map, wallLayer, innerBounds.Left, yy - 2) == WALL_VERT &&
-                                            GetTileIndex(map, wallLayer, innerBounds.Left, yy + 2) == WALL_VERT)
+                                        if (GetTileIndex(map, wallLayer, innerBounds.Left, yy) == WALL_EDGE_LEFT &&
+                                            GetTileIndex(map, wallLayer, innerBounds.Left, yy - 2) == WALL_EDGE_LEFT &&
+                                            GetTileIndex(map, wallLayer, innerBounds.Left, yy + 2) == WALL_EDGE_LEFT)
                                         {
                                             LightSource ls = new LightSource(gd, 300, LightAreaQuality.Low, Color.White, BeamStencilType.None, SpotStencilType.Half);
                                             //ls.Rotation = MathHelper.PiOver2;
@@ -520,9 +522,9 @@ namespace Hunted
                                             lightingEngine.LightSources.Add(ls);
                                         }
 
-                                        if (GetTileIndex(map, wallLayer, innerBounds.Right, yy) == WALL_VERT &&
-                                           GetTileIndex(map, wallLayer, innerBounds.Right, yy - 2) == WALL_VERT &&
-                                           GetTileIndex(map, wallLayer, innerBounds.Right, yy + 2) == WALL_VERT)
+                                        if (GetTileIndex(map, wallLayer, innerBounds.Right, yy) == WALL_EDGE_RIGHT &&
+                                           GetTileIndex(map, wallLayer, innerBounds.Right, yy - 2) == WALL_EDGE_RIGHT &&
+                                           GetTileIndex(map, wallLayer, innerBounds.Right, yy + 2) == WALL_EDGE_RIGHT)
                                         {
                                             LightSource ls = new LightSource(gd, 300, LightAreaQuality.Low, Color.White, BeamStencilType.None, SpotStencilType.Half);
                                             ls.Rotation = MathHelper.Pi;
@@ -627,13 +629,13 @@ namespace Hunted
 
                     for (int xx = rect.Left + 1; xx <= rect.Right - 1; xx++)
                     {
-                        wallLayer.Tiles[xx, rect.Top] = map.Tiles[WALL_HORIZ];
-                        wallLayer.Tiles[xx, rect.Bottom] = map.Tiles[WALL_HORIZ];
+                        wallLayer.Tiles[xx, rect.Top] = map.Tiles[WALL_EDGE_UP];
+                        wallLayer.Tiles[xx, rect.Bottom] = map.Tiles[WALL_EDGE_DOWN];
                     } 
                     for (int yy = rect.Top + 1; yy <= rect.Bottom - 1; yy++)
                     {
-                        wallLayer.Tiles[rect.Left,yy] = map.Tiles[WALL_VERT];
-                        wallLayer.Tiles[rect.Right,yy] = map.Tiles[WALL_VERT];
+                        wallLayer.Tiles[rect.Left,yy] = map.Tiles[WALL_EDGE_LEFT];
+                        wallLayer.Tiles[rect.Right,yy] = map.Tiles[WALL_EDGE_RIGHT];
                     }
 
                     // Exits
