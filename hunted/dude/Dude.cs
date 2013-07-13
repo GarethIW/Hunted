@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Hunted.Weapons;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -23,6 +24,9 @@ namespace Hunted
 
         internal Dictionary<string, SpriteAnimation> Animations = new Dictionary<string, SpriteAnimation>();
 
+        internal List<Weapon> Weapons = new List<Weapon>();
+        internal int SelectedWeapon = 0;
+
         public Dude(Vector2 pos)
         {
             Position = pos;
@@ -38,6 +42,8 @@ namespace Hunted
         {
             Animations.Add("feet", new SpriteAnimation(2, 100, 0, new Rectangle(0,0,100,100), false));
             Animations.Add("arms", new SpriteAnimation(2, 100, 1, new Rectangle(0,0,100,100), true));
+
+            Weapons.Add(new Pistol(this));
         }
 
         public virtual void Update(GameTime gameTime, Map gameMap)
@@ -74,8 +80,13 @@ namespace Hunted
             Rotation = Helper.TurnToFace(Position, target, Rotation, 1f, 0.25f);
         }
 
-        public virtual void Draw(SpriteBatch sb, LightingEngine lightingEngine)
+        public virtual void Attack(GameTime gameTime, bool trigger)
         {
+            Weapons[SelectedWeapon].Use(gameTime, trigger);
+        }
+
+        public virtual void Draw(SpriteBatch sb, LightingEngine lightingEngine)
+        {  
             // Feet
             sb.Draw(spriteSheet, Position, Animations["feet"].CellRect, lightingEngine.CurrentSunColor, Rotation, new Vector2(100,100)/2, 1f, SpriteEffects.None, 1);
             // Arms
@@ -83,7 +94,7 @@ namespace Hunted
             // Head
             sb.Draw(spriteSheet, Position, new Rectangle(0, 200, 100, 100), lightingEngine.CurrentSunColor, Rotation, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
         }
-
+        
         public virtual void DrawShadows(SpriteBatch sb, LightingEngine lightingEngine)
         {
             for (int i = 1; i < 20; i += 2)

@@ -38,6 +38,8 @@ namespace Hunted
         HeroDude gameHero;
 
         EnemyController enemyController;
+        ParticleController particleController;
+        ProjectileController projectileController;
 
         LightingEngine lightingEngine = new LightingEngine();
 
@@ -93,6 +95,10 @@ namespace Hunted
 
             enemyController = new EnemyController();
             enemyController.LoadContent(content, ScreenManager.GraphicsDevice, lightingEngine);
+            particleController = new ParticleController();
+            particleController.LoadContent(content);
+            projectileController = new ProjectileController();
+            projectileController.LoadContent(content);
 
             gameMap = content.Load<Map>("map/map");
 
@@ -161,6 +167,8 @@ namespace Hunted
                 gameMap.Update(gameTime);
 
                 enemyController.Update(gameTime, gameMap, gameHero);
+                projectileController.Update(gameTime, gameMap);
+                particleController.Update(gameTime, gameMap);
 
                 gameHero.Update(gameTime, gameMap);
                 //lightSource1.Position = new Vector2(1000, 1000);
@@ -199,7 +207,7 @@ namespace Hunted
         /// Lets the game respond to player input. Unlike the Update method,
         /// this will only be called when the gameplay screen is active.
         /// </summary>
-        public override void HandleInput(InputState input)
+        public override void HandleInput(GameTime gameTime, InputState input)
         {
             if (input == null)
                 throw new ArgumentNullException("input");
@@ -260,6 +268,7 @@ namespace Hunted
                 if (input.CurrentKeyboardStates[0].IsKeyDown(Keys.A)) keyboardStick.X = -1f;
                 if (input.CurrentKeyboardStates[0].IsKeyDown(Keys.D)) keyboardStick.X = 1f;
                 if (keyboardStick.Length() > 0f) gameHero.Move(keyboardStick);
+                gameHero.Attack(gameTime, input.CurrentMouseState.LeftButton == ButtonState.Pressed);
 
                 gameHero.LookAt(Helper.PointOnCircle(ref gameHero.Position, 200, Helper.V2ToAngle((gameHero.Position - gameCamera.Position - new Vector2(gameCamera.Width/2, gameCamera.Height/2)) + crosshairPos)));
 
@@ -329,16 +338,20 @@ namespace Hunted
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
             gameHero.DrawShadows(spriteBatch, lightingEngine);
             enemyController.DrawShadows(spriteBatch, lightingEngine, gameHero);
+            particleController.Draw(spriteBatch);
             gameHero.Draw(spriteBatch, lightingEngine);
             enemyController.Draw(spriteBatch, lightingEngine, gameHero);
             gameMap.DrawShadows(spriteBatch, "Wall", gameCamera, lightingEngine);
             gameMap.DrawLayer(spriteBatch, "Wall", gameCamera, lightingEngine, Color.White);
+            projectileController.Draw(spriteBatch);
             spriteBatch.End();
 
             //spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
             //gameMap.DrawLayer(spriteBatch, "Terrain", gameCamera, lightingEngine, Color.White);
             //gameMap.DrawShadows(spriteBatch, "Wall", gameCamera, lightingEngine);
             //spriteBatch.End();
+
+
 
             lightingEngine.DrawSpots(spriteBatch, gameCamera, gameMap);
            

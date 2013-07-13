@@ -78,13 +78,13 @@ namespace Hunted
             content.Unload();
         }
 
-        public override void HandleInput(InputState input)
+        public override void HandleInput(GameTime gameTime, InputState input)
         {
             PlayerIndex pi;
             if(input.TapPosition.HasValue || input.IsMenuCancel(null, out pi) || input.IsNewButtonPress(Buttons.Back, null, out pi))
                 ExitScreen();
 
-            base.HandleInput(input);
+            base.HandleInput(gameTime, input);
         }
 
 

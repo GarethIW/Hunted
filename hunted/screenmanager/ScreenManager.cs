@@ -193,7 +193,7 @@ namespace Hunted
                     // give it a chance to handle input.
                     if (!otherScreenHasFocus)
                     {
-                        screen.HandleInput(input);
+                        screen.HandleInput(gameTime, input);
 
                         otherScreenHasFocus = true;
                     }

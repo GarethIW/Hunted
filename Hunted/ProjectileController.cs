@@ -13,52 +13,55 @@ using TiledLib;
 
 namespace Hunted
 {
-    public enum SpecialParticle
+    public enum ProjectileType
     {
-        None,
-        Blood
+        Pistol,
+        SMG,
+        Shot,
+        Grenade,
+        Rocket
     }
 
-    public class Particle
+    public class Projectile
     {
-        public SpecialParticle Special;
+        public ProjectileType Type;
+        public Dude Owner;
+        public float Damage;
+
         public Vector2 Position;
         public Vector2 Velocity;
         public bool Active;
         public bool CanCollide;
-        public float Alpha;
         public double Life;
         public float RotationSpeed;
         public float Rotation;
-        public float Scale;
-        public Color Color;
         public Rectangle SourceRect; 
     }
 
-    public class ParticleController
+    public class ProjectileController
     {
-        public static ParticleController Instance;
+        public static ProjectileController Instance;
 
-        public List<Particle> Particles;
+        public List<Projectile> Projectiles;
         public Random Rand = new Random();
 
-        public Texture2D _texParticles;
+        public Texture2D _texProjectiles;
 
-        public ParticleController()
+        public ProjectileController()
         {
             Instance = this;
 
-            Particles = new List<Particle>();
+            Projectiles = new List<Projectile>();
         }
 
         public void LoadContent(ContentManager content)
         {
-            _texParticles = content.Load<Texture2D>("particles");
+            _texProjectiles = content.Load<Texture2D>("projectiles");
         }
 
         public void Update(GameTime gameTime, Map gameMap)
         {
-            foreach (Particle p in Particles.Where(part => part.Active))
+            foreach (Projectile p in Projectiles.Where(part => part.Active))
             {
                 p.Life -= gameTime.ElapsedGameTime.TotalMilliseconds;
                 p.Position += p.Velocity;
@@ -72,57 +75,60 @@ namespace Hunted
 
                 if (p.Life <= 0)
                 {
-                    p.Alpha -= 0.01f;
-                    if (p.Alpha < 0.05f) p.Active = false;
-                }
-
-                switch (p.Special)
-                {
-                    case SpecialParticle.Blood:
-                        if (p.Scale > 0.25f) p.Scale -= 0.01f;
-                        break;
+                    p.Active = false;
                 }
             }
 
-            Particles.RemoveAll(part => !part.Active);
+            Projectiles.RemoveAll(part => !part.Active);
         }
 
         public void Draw(SpriteBatch sb)
         {
-         
 
-            foreach (Particle p in Particles.Where(part => part.Active))
+
+            foreach (Projectile p in Projectiles.Where(part => part.Active))
             {
-                sb.Draw(_texParticles, 
+                sb.Draw(_texProjectiles, 
                         p.Position,
-                        p.SourceRect, p.Color * p.Alpha, p.Rotation, new Vector2(p.SourceRect.Width / 2, p.SourceRect.Height / 2), p.Scale, SpriteEffects.None, 1);
+                        p.SourceRect, Color.White, p.Rotation, new Vector2(p.SourceRect.Width / 2, p.SourceRect.Height / 2), 1f, SpriteEffects.None, 1);
             }
 
           
         }
 
-        public void Add(Vector2 spawnPos, Vector2 velocity, float life, bool canCollide, Rectangle sourcerect, float rot, Color col, SpecialParticle special)
+        public void Add(ProjectileType type, Dude owner, Vector2 position, Vector2 direction)
         {
-            Particle p = new Particle();
-            p.Special = special;
+            direction.Normalize();
+
+            switch (type)
+            {
+                case ProjectileType.Pistol:
+                    Add(position, direction * 20f, 2000, true, new Rectangle(0, 0, 2, 4), Helper.V2ToAngle(direction) + MathHelper.PiOver2, 50f, owner, type);
+                    break;
+            }
+        }
+
+        public void Add(Vector2 spawnPos, Vector2 velocity, float life, bool canCollide, Rectangle sourcerect, float rot, float damage, Dude owner, ProjectileType type)
+        {
+            Projectile p = new Projectile();
+            p.Type = type;
+            p.Owner = owner;
+            p.Damage = damage;
             p.Position = spawnPos;
             p.Velocity = velocity;
             p.Life = life;
             p.CanCollide = canCollide;
             p.SourceRect = sourcerect;
-            p.Alpha = 1f;
             p.Active = true;
-            p.RotationSpeed = rot;
-            p.Color = col;
+            //p.RotationSpeed = rot;
             p.Rotation = rot;
-            p.Scale = 1f;
-            Particles.Add(p);
+            Projectiles.Add(p);
         }
 
 
         internal void Reset()
         {
-            Particles.Clear();
+            Projectiles.Clear();
         }
     }
 }

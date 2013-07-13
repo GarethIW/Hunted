@@ -79,6 +79,9 @@
   <ItemGroup>
     <Compile Include="AudioController.cs" />
     <Compile Include="Compound.cs" />
+    <Compile Include="Dude\Weapons\Pistol.cs" />
+    <Compile Include="Dude\Weapons\Weapon.cs" />
+    <Compile Include="ProjectileController.cs" />
     <Compile Include="Dude\AIDude.cs" />
     <Compile Include="Dude\HeroDude.cs" />
     <Compile Include="Dude\Dude.cs" />

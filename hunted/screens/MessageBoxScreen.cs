@@ -104,7 +104,7 @@ namespace Hunted
         /// <summary>
         /// Responds to user input, accepting or cancelling the message box.
         /// </summary>
-        public override void HandleInput(InputState input)
+        public override void HandleInput(GameTime gameTime, InputState input)
         {
             PlayerIndex playerIndex;
 
