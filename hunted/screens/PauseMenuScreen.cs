@@ -37,17 +37,20 @@ namespace Hunted
             MenuEntry resumeGameMenuEntry;
             resumeGameMenuEntry = new MenuEntry("Resume");
 
-            MenuEntry optionsMenuEntry = new MenuEntry("Options");
+            MenuEntry saveMenuEntry = new MenuEntry("Save");
+            MenuEntry loadMenuEntry = new MenuEntry("Load");
             MenuEntry exitMenuEntry = new MenuEntry("Exit to Title");
 
             // Hook up menu event handlers.
             resumeGameMenuEntry.Selected += ResumeGameMenuEntrySelected;
-            optionsMenuEntry.Selected += OptionsMenuEntrySelected;
+            saveMenuEntry.Selected += SaveMenuEntrySelected;
+            loadMenuEntry.Selected += LoadMenuEntrySelected;
             exitMenuEntry.Selected += ExitMenuEntrySelected;
 
             // Add entries to the menu.
             MenuEntries.Add(resumeGameMenuEntry);
-            //MenuEntries.Add(optionsMenuEntry);
+            MenuEntries.Add(saveMenuEntry);
+            MenuEntries.Add(loadMenuEntry);
             MenuEntries.Add(exitMenuEntry);
 
             base.LoadContent();
@@ -71,7 +74,13 @@ namespace Hunted
         /// <summary>
         /// Event handler for when the Options menu entry is selected.
         /// </summary>
-        void OptionsMenuEntrySelected(object sender, PlayerIndexEventArgs e)
+
+        void SaveMenuEntrySelected(object sender, PlayerIndexEventArgs e)
+        {
+            //ScreenManager.AddScreen(new OptionsMenuScreen(), e.PlayerIndex);
+        }
+
+        void LoadMenuEntrySelected(object sender, PlayerIndexEventArgs e)
         {
             //ScreenManager.AddScreen(new OptionsMenuScreen(), e.PlayerIndex);
         }

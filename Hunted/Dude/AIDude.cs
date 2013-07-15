@@ -97,7 +97,7 @@ namespace Hunted
                 case AIState.Chasing:
                     Target = gameHero.Position;
                     LookAt(gameHero.Position);
-                    if (Weapons[SelectedWeapon].GetType() != typeof(Knife) && (gameHero.Position - Position).Length() < 350f && CheckLineOfSight(gameHero.Position, gameMap))
+                    if ((gameHero.Position - Position).Length() < 350f && CheckLineOfSight(gameHero.Position, gameMap))
                     {
                         Target = Position;
                         State = AIState.Attacking;
@@ -137,7 +137,7 @@ namespace Hunted
                     else
                     {
                         Target = gameHero.Position;
-                        if ((gameHero.Position - Position).Length() < 60f) Target = Position;
+                        if ((gameHero.Position - Position).Length() < 80f) Target = Position;
                     }
 
                     break;

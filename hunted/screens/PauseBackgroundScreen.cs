@@ -54,7 +54,7 @@ namespace Hunted
         public override void LoadContent()
         {
             if (content == null)
-                content = new ContentManager(ScreenManager.Game.Services, "Hunted.Content");
+                content = new ContentManager(ScreenManager.Game.Services, "Content");
 
             texBG = content.Load<Texture2D>("blank");
             //texLogo = content.Load<Texture2D>("paused");

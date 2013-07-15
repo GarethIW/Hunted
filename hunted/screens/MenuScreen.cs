@@ -71,6 +71,12 @@ namespace Hunted
             TransitionOffTime = TimeSpan.FromSeconds(0.5);
         }
 
+        public override void LoadContent()
+        {
+            ScreenManager.Game.IsMouseVisible = true;
+            base.LoadContent();
+        }
+
 
         #endregion
 
@@ -180,6 +186,12 @@ namespace Hunted
         }
 
 
+        public override void UnloadContent()
+        {
+            ScreenManager.Game.IsMouseVisible = false;
+            base.UnloadContent();
+        }
+
         #endregion
 
         #region Update and Draw
@@ -197,7 +209,7 @@ namespace Hunted
             float transitionOffset = (float)Math.Pow(TransitionPosition, 2);
 
             // start at Y = 175; each X value is generated per entry
-            Vector2 position = new Vector2(0f, ScreenManager.GraphicsDevice.Viewport.Height/3 + 140f);
+            Vector2 position = new Vector2(0f, (ScreenManager.GraphicsDevice.Viewport.Height/2) + 50f);
 
             // update each menu entry's location in turn
             for (int i = 0; i < menuEntries.Count; i++)
@@ -205,7 +217,7 @@ namespace Hunted
                 MenuEntry menuEntry = menuEntries[i];
                 
                 // each entry is to be centered horizontally
-                position.X = (ScreenManager.GraphicsDevice.Viewport.Width - scoresMargin) / 2;// -menuEntry.GetWidth(this) / 2;
+                position.X = -400f + (420f * TransitionAlpha);
 
                 menuEntry.Zoom = 1f;
 
