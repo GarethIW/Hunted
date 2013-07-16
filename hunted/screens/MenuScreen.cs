@@ -234,8 +234,8 @@ namespace Hunted
                 MenuEntry menuEntry = menuEntries[i];
                 
                 // each entry is to be centered horizontally
-                position.X = -400f + (420f * TransitionAlpha);
-
+                position.X = -(400f - ((i*40f))) + (420f * TransitionAlpha);
+                if (position.X > 20f) position.X = 20f;
                 menuEntry.Zoom = 1f;
 
                 //if (ScreenState == ScreenState.TransitionOn)

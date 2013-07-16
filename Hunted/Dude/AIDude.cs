@@ -61,7 +61,8 @@ namespace Hunted
             {
                 Vector2 dir = Target - Position;
                 Move(dir);
-                if(State==AIState.Patrolling) LookAt(Target);
+                //if(State==AIState.Patrolling) 
+                if(State!=AIState.Attacking) LookAt(Target);
             }
             else
             {
@@ -117,8 +118,13 @@ namespace Hunted
                         {
                             chasePath = chasePath.next;
                             if (chasePath != null) Target = new Vector2((chasePath.position.X * gameMap.TileWidth) + (gameMap.TileWidth / 2), (chasePath.position.Y * gameMap.TileHeight) + (gameMap.TileHeight / 2));
-                            else State = AIState.Patrolling;
+                            else State = AIState.Chasing;
                         }
+                    }
+                    if (CheckLineOfSight(gameHero.Position, gameMap))
+                    {
+                        Target = Position; // Stop dead in tracks
+                        State = AIState.Chasing; // Begin chasing player
                     }
                     break;
                 case AIState.Attacking:
@@ -126,7 +132,11 @@ namespace Hunted
                     Attack(gameTime, true);
                     if (Weapons[SelectedWeapon].GetType() != typeof(Knife))
                     {
-                        if ((gameHero.Position - Position).Length() > 350f) State = AIState.Chasing;
+                        if ((gameHero.Position - Position).Length() > 400f)
+                        {
+                            Target = gameHero.Position;
+                            State = AIState.Chasing;
+                        }
 
                         if (Helper.Random.Next(100) == 1)
                         {
@@ -165,6 +175,11 @@ namespace Hunted
                     break;
                 case AIState.FollowingPath:
                     Target = Position;
+                    regeneratePath = true;
+                    break;
+                case AIState.Attacking:
+                    Target = Position;
+                    State = AIState.FollowingPath;
                     regeneratePath = true;
                     break;
             }

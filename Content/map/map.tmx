@@ -74,6 +74,7 @@
   <tile id="0">
    <properties>
     <property name="Anim" value="Water11"/>
+    <property name="CollisionSet" value="True"/>
    </properties>
   </tile>
   <tile id="1">

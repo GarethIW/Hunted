@@ -15,7 +15,9 @@ namespace Hunted
         public static int PercentComplete;
 
         const int TILESHEET_WIDTH = 10;
-        
+
+        const int PAGE = 130;
+
         const int SAND = 14;
         const int SAND_ALT = 17;
         const int WATER = 12;
@@ -55,14 +57,31 @@ namespace Hunted
         const int GRASS_CORNER_OUTSIDE_BL = 56;
         const int GRASS_CORNER_OUTSIDE_BR = 58;
 
-        const int WALL_EDGE_UP = 102;
-        const int WALL_EDGE_DOWN = 122;
-        const int WALL_EDGE_LEFT = 111;
-        const int WALL_EDGE_RIGHT = 113;
-        const int WALL_TL = 101;
-        const int WALL_TR = 103;
-        const int WALL_BL = 121;
-        const int WALL_BR = 123;
+        const int MUD = 14 + PAGE;
+
+        const int MUD_EDGE_UP = 37 + PAGE;
+        const int MUD_EDGE_DOWN = 57 + PAGE;
+        const int MUD_EDGE_LEFT = 46 + PAGE;
+        const int MUD_EDGE_RIGHT = 48 + PAGE;
+
+        const int MUD_CORNER_INSIDE_TL = 39 + PAGE;
+        const int MUD_CORNER_INSIDE_TR = 40 + PAGE;
+        const int MUD_CORNER_INSIDE_BL = 49 + PAGE;
+        const int MUD_CORNER_INSIDE_BR = 50 + PAGE;
+
+        const int MUD_CORNER_OUTSIDE_TL = 36 + PAGE;
+        const int MUD_CORNER_OUTSIDE_TR = 38 + PAGE;
+        const int MUD_CORNER_OUTSIDE_BL = 56 + PAGE;
+        const int MUD_CORNER_OUTSIDE_BR = 58 + PAGE;
+
+        const int WALL_EDGE_UP = 32 + PAGE;
+        const int WALL_EDGE_DOWN = 52 + PAGE;
+        const int WALL_EDGE_LEFT = 41 + PAGE;
+        const int WALL_EDGE_RIGHT = 43 + PAGE;
+        const int WALL_TL = 31 + PAGE;
+        const int WALL_TR = 33 + PAGE;
+        const int WALL_BL = 51 + PAGE;
+        const int WALL_BR = 53 + PAGE;
 
         const int TREE = 31;
         static int[] TREES = new int[] { 31, 41, 51, 93, 94, 95, 96, 97, 98, 99, 100 };
@@ -394,7 +413,7 @@ namespace Hunted
                                     {
                                         wallLayer.Tiles[xx, yy] = null;
                                         if (xx > bounds.Left + 2 && xx < bounds.Right - 2 && yy > bounds.Top + 2 && yy < bounds.Bottom - 2)
-                                            terrainLayer.Tiles[xx, yy] = map.Tiles[CONCRETE];
+                                            terrainLayer.Tiles[xx, yy] = map.Tiles[MUD];
                                     }
                                 }
 
