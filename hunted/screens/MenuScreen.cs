@@ -14,6 +14,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Content;
 #endregion
 
 namespace Hunted
@@ -34,6 +35,10 @@ namespace Hunted
         string menuTitle;
 
         float scoresMargin;
+
+        Texture2D logoTex;
+
+        ContentManager content;
 
         #endregion
 
@@ -73,7 +78,13 @@ namespace Hunted
 
         public override void LoadContent()
         {
+            if (content == null)
+                content = new ContentManager(ScreenManager.Game.Services, "Content");
+
             ScreenManager.Game.IsMouseVisible = true;
+
+            logoTex = content.Load<Texture2D>("logo");
+
             base.LoadContent();
         }
 
@@ -104,10 +115,16 @@ namespace Hunted
         {
             // we cancel the current menu screen if the user presses the back button
             PlayerIndex player;
-            if (input.IsNewButtonPress(Buttons.Back, ControllingPlayer, out player))
+            if (input.IsNewButtonPress(Buttons.Back, ControllingPlayer, out player) || input.IsMenuCancel(null, out player))
             {
                 OnCancel(player);
             }
+
+            if (input.IsMenuUp(null)) selectedEntry -= 1;
+            if (input.IsMenuDown(null)) selectedEntry += 1;
+            if (input.IsMenuSelect(null, out player)) OnSelectEntry(selectedEntry, player);
+            if (selectedEntry < 0) selectedEntry = menuEntries.Count - 1;
+            if (selectedEntry >= menuEntries.Count) selectedEntry = 0;
 
             // look for any taps that occurred and select any entries that were tapped
             foreach (GestureSample gesture in input.Gestures)
@@ -209,7 +226,7 @@ namespace Hunted
             float transitionOffset = (float)Math.Pow(TransitionPosition, 2);
 
             // start at Y = 175; each X value is generated per entry
-            Vector2 position = new Vector2(0f, (ScreenManager.GraphicsDevice.Viewport.Height/2) + 50f);
+            Vector2 position = new Vector2(0f, (ScreenManager.GraphicsDevice.Viewport.Height/2) + 12f);
 
             // update each menu entry's location in turn
             for (int i = 0; i < menuEntries.Count; i++)
@@ -264,7 +281,11 @@ namespace Hunted
             SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
             SpriteFont font = ScreenManager.Font;
 
+            Vector2 logopos = new Vector2(0f, (ScreenManager.GraphicsDevice.Viewport.Height/2));
+
             spriteBatch.Begin();
+
+            spriteBatch.Draw(logoTex, logopos + new Vector2(12, -(TransitionAlpha * (float)logoTex.Height)), new Rectangle(0, (int)(logoTex.Height - (TransitionAlpha * (float)logoTex.Height)), logoTex.Width, (int)((TransitionAlpha * (float)logoTex.Height))), Color.White);
 
             // Draw each menu entry in turn.
             for (int i = 0; i < menuEntries.Count; i++)
