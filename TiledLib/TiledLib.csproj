@@ -65,6 +65,7 @@
     <Compile Include="AStar\Point3D.cs" />
     <Compile Include="AStar\World.cs" />
     <Compile Include="Camera.cs" />
+    <Compile Include="Compound.cs" />
     <Compile Include="Layer.cs" />
     <Compile Include="Lighting.cs" />
     <Compile Include="Light\LightsFX.cs" />

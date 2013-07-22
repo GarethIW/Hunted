@@ -19,9 +19,16 @@ namespace Hunted
         Blood
     }
 
+    public enum ParticleBlendMode
+    {
+        Alpha,
+        Additive
+    }
+
     public class Particle
     {
         public SpecialParticle Special;
+        public ParticleBlendMode BlendMode;
         public Vector2 Position;
         public Vector2 Velocity;
         public bool Active;
@@ -79,7 +86,14 @@ namespace Hunted
                 switch (p.Special)
                 {
                     case SpecialParticle.Blood:
-                        if (p.Scale > 0.25f) p.Scale -= 0.01f;
+                        if (p.Scale > 1f) p.Scale -= 0.1f;
+                        p.Velocity *= 0.9f;
+                        if(p.Scale<=1f)
+                        //if (p.Velocity.Length() < 0.05f)
+                        {
+                            p.Velocity = Vector2.Zero;
+                            p.RotationSpeed = 0f;
+                        }
                         break;
                 }
             }
@@ -87,42 +101,50 @@ namespace Hunted
             Particles.RemoveAll(part => !part.Active);
         }
 
-        public void Draw(SpriteBatch sb)
+        public void Draw(SpriteBatch sb, ParticleBlendMode blend, LightingEngine le)
         {
-         
-
-            foreach (Particle p in Particles.Where(part => part.Active))
+            foreach (Particle p in Particles.Where(part => part.Active && part.BlendMode==blend))
             {
                 sb.Draw(_texParticles, 
                         p.Position,
-                        p.SourceRect, p.Color * p.Alpha, p.Rotation, new Vector2(p.SourceRect.Width / 2, p.SourceRect.Height / 2), p.Scale, SpriteEffects.None, 1);
+                        p.SourceRect, le.CurrentSunColor * p.Alpha, p.Rotation, new Vector2(p.SourceRect.Width / 2, p.SourceRect.Height / 2), p.Scale, SpriteEffects.None, 1);
             }
-
-          
+        }
+        internal void Reset()
+        {
+            Particles.Clear();
         }
 
-        public void Add(Vector2 spawnPos, Vector2 velocity, float life, bool canCollide, Rectangle sourcerect, float rot, Color col, SpecialParticle special)
+
+        public void Add(Vector2 spawnPos, Vector2 velocity, float life, bool canCollide, Rectangle sourcerect, float rot, float scale, Color col, float a, SpecialParticle special, ParticleBlendMode blend)
         {
             Particle p = new Particle();
             p.Special = special;
+            p.BlendMode = blend;
             p.Position = spawnPos;
             p.Velocity = velocity;
             p.Life = life;
             p.CanCollide = canCollide;
             p.SourceRect = sourcerect;
-            p.Alpha = 1f;
+            p.Alpha = a;
             p.Active = true;
             p.RotationSpeed = rot;
             p.Color = col;
             p.Rotation = rot;
-            p.Scale = 1f;
+            p.Scale = scale;
             Particles.Add(p);
         }
 
-
-        internal void Reset()
+        internal void AddGSW(Projectile p)
         {
-            Particles.Clear();
+            for (int i = 0; i < Helper.Random.Next(10); i++)
+            {
+                Vector2 dir = p.Velocity;
+                float a = Helper.V2ToAngle(dir);
+                a += -0.1f + ((float)Helper.Random.NextDouble() * 0.2f);
+                dir = Helper.AngleToVector(a, 10f + ((float)Helper.Random.NextDouble() * 10f));
+                Add(p.Position, dir, 10000f, true, new Rectangle(0, 0, 7, 7), -0.01f + ((float)Helper.Random.NextDouble() * 0.02f), 3f, Color.White, 0.5f, SpecialParticle.Blood, ParticleBlendMode.Alpha);
+            }
         }
     }
 }

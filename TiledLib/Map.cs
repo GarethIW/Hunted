@@ -64,6 +64,10 @@ namespace TiledLib
 
         public AStar.World AStarWorld;
 
+        public Vector2 HeroSpawn;
+
+        public List<Compound> Compounds;
+
         //private Layer collisionLayer;
 
         public int AnimFrame = 0;
@@ -238,35 +242,39 @@ namespace TiledLib
         /// </summary>
         /// <param name="spriteBatch">The SpriteBatch to use to render the map.</param>
         /// <param name="gameCamera">The camera to use for positioning.</param>
-        public void DrawAsMap(SpriteBatch spriteBatch, int scale)
+        public void DrawAsMap(SpriteBatch spriteBatch, float scale, bool[,] fog)
         {
-            foreach (var l in Layers)
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, null, null, null, Matrix.CreateScale(scale));
+            
+
+            for (int y = 0; y < Height; y++)
             {
-                if (!l.Visible)
-                    continue;
-
-                TileLayer tileLayer = l as TileLayer;
-                if (tileLayer != null)
+                for (int x = 0;x<Width ; x++)
                 {
-
-                    for (int y = 0; y < Height; y++)
+                    if (fog[x, y])
                     {
-                        for (int x = 0;x<Width ; x++)
+                        foreach (var l in Layers)
                         {
-                            if (x >= 0 && x < tileLayer.Width && y >= 0 && y < tileLayer.Height)
+                            if (!l.Visible)
+                                continue;
+
+                            TileLayer tileLayer = l as TileLayer;
+                            if (tileLayer != null)
                             {
                                 Tile tile = tileLayer.Tiles[x, y];
 
-                                if (tile != null && tile.Texture != null)
+                                if (tile != null)
                                 {
-                                    spriteBatch.Draw(tile.Texture, new Rectangle(x * (int)(TileWidth / scale), y * (int)(TileHeight / scale), (int)(TileWidth / scale), (int)(TileHeight / scale)), tile.Source, Color.White);
+                                    spriteBatch.Draw(tile.Texture, new Vector2(x * TileWidth, y * TileHeight), tile.Source, Color.White);
                                 }
-                            }
 
+
+                            }
                         }
                     }
                 }
             }
+            spriteBatch.End();
         }
 
         /// <summary>

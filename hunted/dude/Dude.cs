@@ -16,6 +16,13 @@ namespace Hunted
         public Vector2 Speed;
         public float Rotation;
 
+        public bool Active;
+        public bool Dead;
+
+        public float Health;
+
+        public int Ammo;
+
         public LightSource HeadTorch;
 
         internal float maxSpeed = 5f;
@@ -112,6 +119,12 @@ namespace Hunted
         }
 
         public virtual void Collided() { }
+
+        public virtual void HitByProjectile(Projectile p)
+        {
+            Health -= p.Damage;
+            ParticleController.Instance.AddGSW(p);
+        }
 
         void DoCollisions(Map gameMap)
         {

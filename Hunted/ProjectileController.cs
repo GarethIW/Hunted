@@ -59,7 +59,7 @@ namespace Hunted
             _texProjectiles = content.Load<Texture2D>("projectiles");
         }
 
-        public void Update(GameTime gameTime, Map gameMap)
+        public void Update(GameTime gameTime, Map gameMap, HeroDude gameHero)
         {
             foreach (Projectile p in Projectiles.Where(part => part.Active))
             {
@@ -76,6 +76,27 @@ namespace Hunted
                 if (p.Life <= 0)
                 {
                     p.Active = false;
+                }
+
+                if (p.Owner.GetType() == typeof(HeroDude))
+                {
+                    foreach (AIDude d in EnemyController.Instance.Enemies.Where(dude => dude.Active))
+                    {
+                        if ((d.Position - p.Position).Length() < 60f)
+                        {
+                            d.HitByProjectile(p);
+                            p.Active = false;
+                        }
+                    }
+                }
+
+                if (p.Owner.GetType() == typeof(AIDude))
+                {
+                    if ((gameHero.Position - p.Position).Length() < 60f)
+                    {
+                        gameHero.HitByProjectile(p);
+                        p.Active = false;
+                    }
                 }
             }
 
@@ -103,7 +124,7 @@ namespace Hunted
             switch (type)
             {
                 case ProjectileType.Pistol:
-                    Add(position, direction * 20f, 2000, true, new Rectangle(0, 0, 2, 4), Helper.V2ToAngle(direction) + MathHelper.PiOver2, 50f, owner, type);
+                    Add(position, direction * 20f, 2000, true, new Rectangle(0, 0, 2, 4), Helper.V2ToAngle(direction) + MathHelper.PiOver2, 5f, owner, type);
                     break;
             }
         }

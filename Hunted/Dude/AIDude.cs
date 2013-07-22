@@ -32,6 +32,9 @@ namespace Hunted
         {
             Target = pos;
             Rotation = (float)Helper.Random.NextDouble() * MathHelper.TwoPi;
+            Active = true;
+            Dead = false;
+            Health = 100f;
         }
 
         public void LoadContent(Texture2D sheet, GraphicsDevice gd, LightingEngine le)
@@ -216,6 +219,8 @@ namespace Hunted
 
             return false;
         }
+
+        
     }
 
     

@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Hunted
+namespace TiledLib
 {
-    class Compound
+    public class Compound
     {
         public Vector2 Position;
         public Rectangle Bounds;
@@ -22,7 +22,7 @@ namespace Hunted
         Carpark
     }
 
-    class Building
+    public class Building
     {
         public BuildingType Type;
         public Rectangle Rect;

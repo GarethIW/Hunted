@@ -78,10 +78,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AudioController.cs" />
-    <Compile Include="Compound.cs" />
+    <Compile Include="ItemController.cs" />
     <Compile Include="Dude\Weapons\Knife.cs" />
     <Compile Include="Dude\Weapons\Pistol.cs" />
     <Compile Include="Dude\Weapons\Weapon.cs" />
+    <Compile Include="Hud.cs" />
+    <Compile Include="Items\Item.cs" />
     <Compile Include="ProjectileController.cs" />
     <Compile Include="Dude\AIDude.cs" />
     <Compile Include="Dude\HeroDude.cs" />
@@ -99,6 +101,7 @@
     <Compile Include="ScreenManager\ScreenManager.cs" />
     <Compile Include="Screens\AboutScreen.cs" />
     <Compile Include="Screens\BackgroundScreen.cs" />
+    <Compile Include="Screens\MapScreen.cs" />
     <Compile Include="Screens\GameplayScreen.cs" />
     <Compile Include="Screens\LoadingScreen.cs" />
     <Compile Include="Screens\MainMenuScreen.cs" />

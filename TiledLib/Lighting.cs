@@ -25,7 +25,7 @@ namespace TiledLib
         BlendState spotBS;
 
         Color[] sunColors = new Color[] {
-            new Color(0.3f,0.3f,0.3f), new Color(0.3f,0.3f,0.3f),  new Color(0.4f,0.3f,0.3f), new Color(0.5f,0.3f,0.3f), new Color(0.7f,0.5f,0.4f), new Color(0.8f,0.6f,0.5f),
+            new Color(0.3f,0.3f,0.3f), new Color(0.3f,0.3f,0.3f), new Color(0.3f,0.3f,0.3f),  new Color(0.3f,0.3f,0.3f), new Color(0.4f,0.3f,0.3f), new Color(0.7f,0.5f,0.4f), 
             new Color(0.9f,0.7f,0.7f), new Color(1f,9f,9f), new Color(1f,1f,1f), new Color(1f,1f,1f), new Color(1f,1f,1f), new Color(1f,1f,1f),
             new Color(1f,1f,1f), new Color(1f,1f,1f), new Color(1f,1f,1f), new Color(1f,1f,1f), new Color(1f,1f,1f), new Color(1f,9f,9f),
             new Color(0.9f,0.7f,0.6f), new Color(0.8f,0.6f,0.5f), new Color(0.6f,0.5f,0.3f), new Color(0.4f,0.3f,0.3f), new Color(0.3f,0.3f,0.3f), new Color(0.3f,0.3f,0.3f)

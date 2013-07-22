@@ -333,10 +333,44 @@ namespace Hunted
 
             PercentComplete = 90;
 
+            Rectangle spawnRect = new Rectangle((map.Width / 2) - 5, (map.Height / 2) - 5, 10, 10);
+            bool foundspawn = false;
+            while (!foundspawn)
+            {
+                map.HeroSpawn = TryFindSpawn(spawnRect.Left, spawnRect.Top, map, terrainLayer, out foundspawn);
+                if (!foundspawn) map.HeroSpawn = TryFindSpawn(spawnRect.Right, spawnRect.Top, map, terrainLayer, out foundspawn);
+                if (!foundspawn) map.HeroSpawn = TryFindSpawn(spawnRect.Left, spawnRect.Bottom, map, terrainLayer, out foundspawn);
+                if (!foundspawn) map.HeroSpawn = TryFindSpawn(spawnRect.Right, spawnRect.Bottom, map, terrainLayer, out foundspawn);
+
+                spawnRect.Inflate(5, 5);
+            }
+
+
             map.GetAStarData();
+            map.Compounds = compounds;
 
             PercentComplete = 100;
             Generating = false;
+        }
+
+        private static Vector2 TryFindSpawn(int x, int y, Map map, TileLayer layer, out bool foundspawn)
+        {
+            Vector2 returnPos = new Vector2(x * map.TileWidth, y * map.TileHeight) + (new Vector2(map.TileWidth, map.TileHeight)/2);
+
+            if (GetTileIndex(map, layer, x, y) == SAND || GetTileIndex(map, layer, x, y) == SAND_ALT)
+            {
+                if(GetTileIndex(map, layer, x-5, y) == WATER ||
+                   GetTileIndex(map, layer, x+5, y) == WATER ||
+                   GetTileIndex(map, layer, x, y-5) == WATER ||
+                   GetTileIndex(map, layer, x, y+5) == WATER)
+                {
+                    foundspawn = true;
+                }
+                else foundspawn = false;
+            }
+            else foundspawn = false;
+
+            return returnPos;
         }
 
         private static bool TryDrawBigTree(Map map, TileLayer wallLayer, int x, int y)

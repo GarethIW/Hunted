@@ -36,10 +36,12 @@ namespace Hunted
         Map gameMap;
         Camera gameCamera;
         HeroDude gameHero;
+        Hud gameHud;
 
         EnemyController enemyController;
         ParticleController particleController;
         ProjectileController projectileController;
+        ItemController itemController;
 
         LightingEngine lightingEngine = new LightingEngine();
 
@@ -53,6 +55,8 @@ namespace Hunted
         //iledLib.LightSource cameraLightSource = new LightSource();
 
         DateTime TimeOfDay = new DateTime(2013,1,1,8,0,0);
+        DateTime StartTime = new DateTime(2013, 1, 1, 0, 0, 0);
+        int gameDay = 1;
 
         double mapUpdate = 0;
 
@@ -99,21 +103,26 @@ namespace Hunted
             particleController.LoadContent(content);
             projectileController = new ProjectileController();
             projectileController.LoadContent(content);
+            itemController = new ItemController();
+            itemController.LoadContent(content, ScreenManager.GraphicsDevice, lightingEngine);
 
             gameMap = content.Load<Map>("map/map");
 
+            gameHud = new Hud();
+            gameHud.LoadContent(content);
+
             mapFog = new bool[gameMap.Width, gameMap.Height];
 
-            gameHero = new HeroDude(new Vector2(50000,50000));
-            gameHero.LoadContent(content, ScreenManager.GraphicsDevice, lightingEngine);
-
             ThreadPool.QueueUserWorkItem(new WaitCallback(GenerateTerrainAsync));
+
+            gameHero = new HeroDude(gameMap.HeroSpawn);
+            gameHero.LoadContent(content, ScreenManager.GraphicsDevice, lightingEngine);
 
             gameCamera = new Camera(ScreenManager.GraphicsDevice.Viewport, gameMap);
             gameCamera.ClampRect = new Rectangle(0, 0, gameMap.Width * gameMap.TileWidth, gameMap.Height * gameMap.TileHeight);
             gameCamera.Zoom = 1f;
             //gameCamera.Position = gameHero.Position - (new Vector2(ScreenManager.GraphicsDevice.Viewport.Width, ScreenManager.GraphicsDevice.Viewport.Height) / 2);
-            gameCamera.Position = new Vector2((gameMap.Width * gameMap.TileWidth), (gameMap.Height * gameMap.TileHeight)) / 2;
+            gameCamera.Position = gameHero.Position;
             gameCamera.Target = gameCamera.Position;
             gameCamera.Update(ScreenManager.GraphicsDevice.Viewport.Bounds);
 
@@ -128,6 +137,8 @@ namespace Hunted
 
             //lightingEngine.LightSources.Add(lightSource1);
             
+            
+
             ScreenManager.Game.ResetElapsedTime();
         }
 
@@ -160,15 +171,17 @@ namespace Hunted
             {
                 ScreenManager.Game.IsMouseVisible = false;
 
-                TimeOfDay = TimeOfDay.AddMinutes(gameTime.ElapsedGameTime.TotalSeconds * 10);
+                TimeOfDay = TimeOfDay.AddMinutes(gameTime.ElapsedGameTime.TotalSeconds);
+                gameDay = 1 + ((TimeOfDay - StartTime).Days);
 
                 lightingEngine.Update(gameTime, TimeOfDay, ScreenManager.SpriteBatch, ScreenManager.GraphicsDevice);
 
                 gameMap.Update(gameTime);
 
                 enemyController.Update(gameTime, gameMap, gameHero);
-                projectileController.Update(gameTime, gameMap);
+                projectileController.Update(gameTime, gameMap, gameHero);
                 particleController.Update(gameTime, gameMap);
+                itemController.Update(gameTime, gameMap, gameHero);
 
                 gameHero.Update(gameTime, gameMap);
                 //lightSource1.Position = new Vector2(1000, 1000);
@@ -193,6 +206,7 @@ namespace Hunted
                     mapUpdate = 0;
                 }
 
+                gameHud.Update(gameTime, gameHero, TimeOfDay, gameDay);
                 
             }
 
@@ -230,6 +244,7 @@ namespace Hunted
         
             if(IsActive)
             {
+                if ((keyboardState.IsKeyDown(Keys.Tab) && !lastKeyboardState.IsKeyDown(Keys.Tab)) || gamePadState.IsButtonDown(Buttons.Back)) ScreenManager.AddScreen(new MapScreen(gameMap, mapFog), null);
                 if (keyboardState.IsKeyDown(Keys.Space) && !lastKeyboardState.IsKeyDown(Keys.Space)) ThreadPool.QueueUserWorkItem(new WaitCallback(GenerateTerrainAsync));
 
                 if (input.MouseDragging)
@@ -270,7 +285,7 @@ namespace Hunted
                 if (keyboardStick.Length() > 0f) gameHero.Move(keyboardStick);
                 gameHero.Attack(gameTime, input.CurrentMouseState.LeftButton == ButtonState.Pressed);
 
-                gameHero.LookAt(Helper.PointOnCircle(ref gameHero.Position, 200, Helper.V2ToAngle((gameHero.Position - gameCamera.Position - new Vector2(gameCamera.Width/2, gameCamera.Height/2)) + crosshairPos)));
+                gameHero.LookAt(gameCamera.Position + (crosshairPos - new Vector2(gameCamera.Width / 2, gameCamera.Height / 2)));//Helper.PointOnCircle(ref gameHero.Position, 200, Helper.V2ToAngle(((gameHero.Position - gameCamera.Position) ) + (crosshairPos- new Vector2(gameCamera.Width / 2, gameCamera.Height / 2)))));
 
 
                 
@@ -338,7 +353,19 @@ namespace Hunted
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
             gameHero.DrawShadows(spriteBatch, lightingEngine);
             enemyController.DrawShadows(spriteBatch, lightingEngine, gameHero);
-            particleController.Draw(spriteBatch);
+            itemController.DrawShadows(spriteBatch, lightingEngine, gameHero);
+            spriteBatch.End();
+
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
+            particleController.Draw(spriteBatch, ParticleBlendMode.Alpha, lightingEngine);
+            spriteBatch.End();
+
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
+            particleController.Draw(spriteBatch, ParticleBlendMode.Additive, lightingEngine);
+            spriteBatch.End();
+
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
+            itemController.Draw(spriteBatch, lightingEngine, gameHero);
             gameHero.Draw(spriteBatch, lightingEngine);
             enemyController.Draw(spriteBatch, lightingEngine, gameHero);
             gameMap.DrawShadows(spriteBatch, "Wall", gameCamera, lightingEngine);
@@ -359,6 +386,7 @@ namespace Hunted
             spriteBatch.Begin();
             //gameHUD.Draw(spriteBatch);
             spriteBatch.Draw(minimapRT, new Vector2(ScreenManager.GraphicsDevice.Viewport.Width - 20 - minimapRT.Width, 20), null, Color.White);
+            gameHud.Draw(spriteBatch);
             spriteBatch.End();
 
             
@@ -380,6 +408,9 @@ namespace Hunted
         void GenerateTerrainAsync(object si)
         {
             TerrainGeneration.GenerateTerrain(gameMap, lightingEngine, ScreenManager.GraphicsDevice);
+            gameHero.Position = gameMap.HeroSpawn;
+            gameCamera.Position = gameHero.Position;
+            gameCamera.Target = gameCamera.Position;
         }
        
 

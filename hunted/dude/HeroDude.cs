@@ -14,7 +14,8 @@ namespace Hunted
     {
         public HeroDude(Vector2 pos) : base(pos)
         {
-
+            Health = 100f;
+            Ammo = 100;
         }
 
         public void LoadContent(ContentManager content, GraphicsDevice gd, LightingEngine le)
@@ -22,7 +23,9 @@ namespace Hunted
             spriteSheet = content.Load<Texture2D>("dude");
             Initialize(gd, le);
 
+            Weapons.Add(new Knife(this));
             Weapons.Add(new Pistol(this));
+            SelectedWeapon = 1;
         }
 
         internal void Initialize(GraphicsDevice gd, LightingEngine le)
