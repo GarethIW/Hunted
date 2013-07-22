@@ -47,8 +47,9 @@ namespace Hunted
 
         internal virtual void Initialize()
         {
-            Animations.Add("feet", new SpriteAnimation(2, 100, 0, new Rectangle(0,0,100,100), false));
+            Animations.Add("feet", new SpriteAnimation(2, 100, 0, new Rectangle(0,0,100,100), true));
             Animations.Add("arms", new SpriteAnimation(2, 100, 1, new Rectangle(0,0,100,100), true));
+            Animations.Add("head", new SpriteAnimation(2, 100, 2, new Rectangle(0, 0, 100, 100), false));
 
             
         }
@@ -62,11 +63,13 @@ namespace Hunted
             {
                 Animations["feet"].Update(gameTime);
                 Animations["arms"].Update(gameTime);
+                Animations["head"].Update(gameTime);
             }
             else
             {
                 Animations["feet"].Reset();
                 Animations["arms"].Reset();
+                Animations["head"].Reset();
             }
 
 
@@ -99,7 +102,7 @@ namespace Hunted
             // Arms
             sb.Draw(spriteSheet, Position, Animations["arms"].CellRect, lightingEngine.CurrentSunColor, Rotation, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
             // Head
-            sb.Draw(spriteSheet, Position, new Rectangle(0, 200, 100, 100), lightingEngine.CurrentSunColor, Rotation, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
+            sb.Draw(spriteSheet, Position, Animations["head"].CellRect, lightingEngine.CurrentSunColor, Rotation, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
         }
         
         public virtual void DrawShadows(SpriteBatch sb, LightingEngine lightingEngine)
