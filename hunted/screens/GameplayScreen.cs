@@ -419,6 +419,7 @@ namespace Hunted
                 {
                     for (int x = c.Bounds.Left; x < c.Bounds.Right; x++)
                     {
+                        if (((TileLayer)gameMap.GetLayer("Wall")).Tiles[x, y] != null) continue;
                         Vector2 pos = new Vector2((x * gameMap.TileWidth) + 50, (y * gameMap.TileHeight) + 50);
                         bool found = false;
                         foreach (AIDude d in enemyController.Enemies)
