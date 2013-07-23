@@ -52,6 +52,8 @@ namespace TiledLib
 
         SpriteBatch spriteBatch;
 
+        
+
         public ShadowMapResolver(GraphicsDevice graphicsDevice, LightsFX lightsFX, int resolverRadius)
         {
             this.graphicsDevice = graphicsDevice;
@@ -128,24 +130,24 @@ namespace TiledLib
             return false;
         }
 
-        public void ResolveShadows(ShadowCasterMap shadowCasterMap, LightSource resultLight, PostEffect postEffect, Vector2 newPosition, Camera gameCamera)
+        public void ResolveShadows(ShadowCasterMap shadowCasterMap, LightSource resultLight, RenderTarget2D printRT, PostEffect postEffect, Vector2 newPosition, Camera gameCamera)
         {
             resultLight.Position = newPosition;
-            this.ResolveShadows(shadowCasterMap, resultLight, postEffect, 1f, gameCamera);
+            this.ResolveShadows(shadowCasterMap, resultLight, printRT, postEffect, 1f, gameCamera);
         }
 
-        public void ResolveShadows(ShadowCasterMap shadowCasterMap, LightSource resultLight, PostEffect postEffect, float distanceMod, Vector2 newPosition, Camera gameCamera)
+        public void ResolveShadows(ShadowCasterMap shadowCasterMap, LightSource resultLight, RenderTarget2D printRT, PostEffect postEffect, float distanceMod, Vector2 newPosition, Camera gameCamera)
         {
             resultLight.Position = newPosition;
-            this.ResolveShadows(shadowCasterMap, resultLight, postEffect, distanceMod, gameCamera);
+            this.ResolveShadows(shadowCasterMap, resultLight, printRT, postEffect, distanceMod, gameCamera);
         }
 
-        public void ResolveShadows(ShadowCasterMap shadowCasterMap, LightSource resultLight, PostEffect postEffect, Camera gameCamera)
+        public void ResolveShadows(ShadowCasterMap shadowCasterMap, LightSource resultLight, RenderTarget2D printRT, PostEffect postEffect, Camera gameCamera)
         {
-            this.ResolveShadows(shadowCasterMap, resultLight, postEffect, 1f, gameCamera);
+            this.ResolveShadows(shadowCasterMap, resultLight, printRT, postEffect, 1f, gameCamera);
         }
 
-        public void ResolveShadows(ShadowCasterMap shadowCasterMap, LightSource resultLight, PostEffect postEffect, float distanceMod, Camera gameCamera)
+        public void ResolveShadows(ShadowCasterMap shadowCasterMap, LightSource resultLight, RenderTarget2D printRT, PostEffect postEffect, float distanceMod, Camera gameCamera)
         {
 
 
@@ -163,7 +165,7 @@ namespace TiledLib
             {
                 case PostEffect.LinearAttenuation:
                     {
-                        this.ExecuteTechniqueDrawShadows(resultLight.PrintedLight, "DrawShadowsLinearAttenuation", this.shadowMapDigested);
+                        this.ExecuteTechniqueDrawShadows(printRT, "DrawShadowsLinearAttenuation", this.shadowMapDigested);
                     }
                     break;
 
@@ -171,7 +173,7 @@ namespace TiledLib
                     {
                         this.ExecuteTechniqueDrawShadows(shadowsRT, "DrawShadowsNoAttenuationPreBlur", this.shadowMapDigested);
                         this.ExecuteTechniqueBlurH(shadowsRT, processedShadowsRT, "BlurHorizontallyLow");
-                        this.ExecuteTechniqueBlurV(processedShadowsRT, resultLight.PrintedLight, "BlurVerticallyLowLinearAttenuation");
+                        this.ExecuteTechniqueBlurV(processedShadowsRT, printRT, "BlurVerticallyLowLinearAttenuation");
                     }
                     break;
 
@@ -179,7 +181,7 @@ namespace TiledLib
                     {
                         this.ExecuteTechniqueDrawShadows(shadowsRT, "DrawShadowsNoAttenuationPreBlur", this.shadowMapDigested);
                         this.ExecuteTechniqueBlurH(shadowsRT, processedShadowsRT, "BlurHorizontallyMid");
-                        this.ExecuteTechniqueBlurV(processedShadowsRT, resultLight.PrintedLight, "BlurVerticallyMidLinearAttenuation");
+                        this.ExecuteTechniqueBlurV(processedShadowsRT, printRT, "BlurVerticallyMidLinearAttenuation");
                     }
                     break;
 
@@ -187,13 +189,13 @@ namespace TiledLib
                     {
                         this.ExecuteTechniqueDrawShadows(shadowsRT, "DrawShadowsNoAttenuationPreBlur", this.shadowMapDigested);
                         this.ExecuteTechniqueBlurH(shadowsRT, processedShadowsRT, "BlurHorizontallyHigh");
-                        this.ExecuteTechniqueBlurV(processedShadowsRT, resultLight.PrintedLight, "BlurVerticallyHighLinearAttenuation");
+                        this.ExecuteTechniqueBlurV(processedShadowsRT, printRT, "BlurVerticallyHighLinearAttenuation");
                     }
                     break;
 
                 case PostEffect.CurveAttenuation:
                     {
-                        this.ExecuteTechniqueDrawShadows(resultLight.PrintedLight, "DrawShadowsCurveAttenuation", this.shadowMapDigested);
+                        this.ExecuteTechniqueDrawShadows(printRT, "DrawShadowsCurveAttenuation", this.shadowMapDigested);
                     }
                     break;
 
@@ -201,7 +203,7 @@ namespace TiledLib
                     {
                         this.ExecuteTechniqueDrawShadows(shadowsRT, "DrawShadowsNoAttenuationPreBlur", this.shadowMapDigested);
                         this.ExecuteTechniqueBlurH(shadowsRT, processedShadowsRT, "BlurHorizontallyLow");
-                        this.ExecuteTechniqueBlurV(processedShadowsRT, resultLight.PrintedLight, "BlurVerticallyLowCurveAttenuation");
+                        this.ExecuteTechniqueBlurV(processedShadowsRT, printRT, "BlurVerticallyLowCurveAttenuation");
                     }
                     break;
 
@@ -209,7 +211,7 @@ namespace TiledLib
                     {
                         this.ExecuteTechniqueDrawShadows(shadowsRT, "DrawShadowsNoAttenuationPreBlur", this.shadowMapDigested);
                         this.ExecuteTechniqueBlurH(shadowsRT, processedShadowsRT, "BlurHorizontallyMid");
-                        this.ExecuteTechniqueBlurV(processedShadowsRT, resultLight.PrintedLight, "BlurVerticallyMidCurveAttenuation");
+                        this.ExecuteTechniqueBlurV(processedShadowsRT, printRT, "BlurVerticallyMidCurveAttenuation");
                     }
                     break;
 
@@ -217,7 +219,7 @@ namespace TiledLib
                     {
                         this.ExecuteTechniqueDrawShadows(shadowsRT, "DrawShadowsNoAttenuationPreBlur", this.shadowMapDigested);
                         this.ExecuteTechniqueBlurH(shadowsRT, processedShadowsRT, "BlurHorizontallyHigh");
-                        this.ExecuteTechniqueBlurV(processedShadowsRT, resultLight.PrintedLight, "BlurVerticallyHighCurveAttenuation");
+                        this.ExecuteTechniqueBlurV(processedShadowsRT, printRT, "BlurVerticallyHighCurveAttenuation");
                     }
                     break;
 
@@ -225,7 +227,7 @@ namespace TiledLib
                     {
                         this.ExecuteTechniqueDrawShadows(shadowsRT, "DrawShadowsNoAttenuationPreBlur", this.shadowMapDigested);
                         this.ExecuteTechniqueBlurH(shadowsRT, processedShadowsRT, "BlurHorizontallyLow");
-                        this.ExecuteTechniqueBlurV(processedShadowsRT, resultLight.PrintedLight, "BlurVerticallyLowNoAttenuation");
+                        this.ExecuteTechniqueBlurV(processedShadowsRT, printRT, "BlurVerticallyLowNoAttenuation");
                     }
                     break;
 
@@ -233,7 +235,7 @@ namespace TiledLib
                     {
                         this.ExecuteTechniqueDrawShadows(shadowsRT, "DrawShadowsNoAttenuationPreBlur", this.shadowMapDigested);
                         this.ExecuteTechniqueBlurH(shadowsRT, processedShadowsRT, "BlurHorizontallyMid");
-                        this.ExecuteTechniqueBlurV(processedShadowsRT, resultLight.PrintedLight, "BlurVerticallyMidNoAttenuation");
+                        this.ExecuteTechniqueBlurV(processedShadowsRT, printRT, "BlurVerticallyMidNoAttenuation");
                     }
                     break;
 
@@ -241,13 +243,13 @@ namespace TiledLib
                     {
                         this.ExecuteTechniqueDrawShadows(shadowsRT, "DrawShadowsNoAttenuationPreBlur", this.shadowMapDigested);
                         this.ExecuteTechniqueBlurH(shadowsRT, processedShadowsRT, "BlurHorizontallyHigh");
-                        this.ExecuteTechniqueBlurV(processedShadowsRT, resultLight.PrintedLight, "BlurVerticallyHighNoAttenuation");
+                        this.ExecuteTechniqueBlurV(processedShadowsRT, printRT, "BlurVerticallyHighNoAttenuation");
                     }
                     break;
 
                 default: //NOFX
                     {
-                        this.ExecuteTechniqueDrawShadows(resultLight.PrintedLight, "DrawShadowsNoAttenuation", this.shadowMapDigested);
+                        this.ExecuteTechniqueDrawShadows(printRT, "DrawShadowsNoAttenuation", this.shadowMapDigested);
                     }
                     break;
             }

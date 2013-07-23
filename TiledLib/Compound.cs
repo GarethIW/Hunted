@@ -12,6 +12,8 @@ namespace TiledLib
         public Rectangle Bounds;
         public Rectangle InnerBounds;
 
+        public bool Discovered = false;
+
         public List<Building> Buildings = new List<Building>();
     }
 

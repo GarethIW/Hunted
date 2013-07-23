@@ -54,7 +54,7 @@ namespace Hunted
 
         //iledLib.LightSource cameraLightSource = new LightSource();
 
-        DateTime TimeOfDay = new DateTime(2013,1,1,8,0,0);
+        DateTime TimeOfDay = new DateTime(2013,1,1,0,0,0);
         DateTime StartTime = new DateTime(2013, 1, 1, 0, 0, 0);
         int gameDay = 1;
 
@@ -171,7 +171,7 @@ namespace Hunted
             {
                 ScreenManager.Game.IsMouseVisible = false;
 
-                TimeOfDay = TimeOfDay.AddMinutes(gameTime.ElapsedGameTime.TotalSeconds);
+                //TimeOfDay = TimeOfDay.AddMinutes(gameTime.ElapsedGameTime.TotalSeconds * 50);
                 gameDay = 1 + ((TimeOfDay - StartTime).Days);
 
                 lightingEngine.Update(gameTime, TimeOfDay, ScreenManager.SpriteBatch, ScreenManager.GraphicsDevice);
@@ -411,6 +411,33 @@ namespace Hunted
             gameHero.Position = gameMap.HeroSpawn;
             gameCamera.Position = gameHero.Position;
             gameCamera.Target = gameCamera.Position;
+
+            // Spawn enemies
+            foreach (Compound c in gameMap.Compounds)
+            {
+                for (int y = c.Bounds.Top; y < c.Bounds.Bottom; y++)
+                {
+                    for (int x = c.Bounds.Left; x < c.Bounds.Right; x++)
+                    {
+                        Vector2 pos = new Vector2((x * gameMap.TileWidth) + 50, (y * gameMap.TileHeight) + 50);
+                        bool found = false;
+                        foreach (AIDude d in enemyController.Enemies)
+                        {
+                            if ((d.Position - pos).Length() < 700) found = true;
+                        }
+
+                        if (!found)
+                        {
+                            AIDude newDude = new AIDude(pos);
+                            newDude.LoadContent(enemyController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine);
+                            enemyController.Enemies.Add(newDude);
+                        }
+
+                    }
+                }
+            }
+
+            TerrainGeneration.Generating = false;
         }
        
 

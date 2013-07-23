@@ -113,7 +113,7 @@ namespace Hunted
                         if (chasePath == null || regeneratePath)
                         {
                             regeneratePath = false;
-                            chasePath = PathFinder.FindPath(gameMap.AStarWorld, new Point3D((int)(Position.X / gameMap.TileWidth), (int)(Position.Y / gameMap.TileHeight), 0), new Point3D((int)(gameHero.Position.X / gameMap.TileWidth), (int)(gameHero.Position.Y / gameMap.TileHeight), 0));
+                            //chasePath = PathFinder.FindPath(gameMap.AStarWorld, new Point3D((int)(Position.X / gameMap.TileWidth), (int)(Position.Y / gameMap.TileHeight), 0), new Point3D((int)(gameHero.Position.X / gameMap.TileWidth), (int)(gameHero.Position.Y / gameMap.TileHeight), 0));
                             if (chasePath != null) Target = new Vector2((chasePath.position.X * gameMap.TileWidth) + (gameMap.TileWidth / 2), (chasePath.position.Y * gameMap.TileHeight) + (gameMap.TileHeight / 2));
                             else State = AIState.Patrolling;
                         }
@@ -192,7 +192,7 @@ namespace Hunted
 
         public override void Draw(SpriteBatch sb, LightingEngine lightingEngine)
         {
-            DrawChasePath(sb, chasePath);
+            //DrawChasePath(sb, chasePath);
             base.Draw(sb, lightingEngine);
         }
 

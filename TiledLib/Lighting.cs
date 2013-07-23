@@ -19,6 +19,9 @@ namespace TiledLib
         public RenderTarget2D ScreenLights;
         public RenderTarget2D ScreenGround;
 
+        RenderTarget2D[] PrintedLight = new RenderTarget2D[100];
+        RenderTarget2D[] BeamLight = new RenderTarget2D[100];
+
         public Dictionary<BeamStencilType, Texture2D> BeamStencils = new Dictionary<BeamStencilType, Texture2D>();
         public Dictionary<SpotStencilType, Tuple<Texture2D, Texture2D, RenderTarget2D>> SpotStencils = new Dictionary<SpotStencilType, Tuple<Texture2D, Texture2D, RenderTarget2D>>();
 
@@ -52,6 +55,11 @@ namespace TiledLib
 
         public void LoadContent(ContentManager content, GraphicsDevice gd, SpriteBatch sb)
         {
+            for (int i = 0; i < PrintedLight.Length; i++)
+            {
+                PrintedLight[i] = new RenderTarget2D(gd, 750, 750);
+                BeamLight[i] = new RenderTarget2D(gd, 750, 750);
+            }
 #if OPENGL
             LFX = new LightsFX(
                 content.Load<Effect>("resolveShadowsEffect.mgfxo"),
@@ -109,27 +117,51 @@ namespace TiledLib
 
         public void DrawPhase1(SpriteBatch spriteBatch, Camera gameCamera)
         {
+            int rtnum = 0;
 
             foreach (LightSource ls in LightSources.Where(src => src.SpotStencil==null))
             {
-                if (!(ls.Position.X > (gameCamera.Position.X - (gameCamera.Width*2)) && ls.Position.X < (gameCamera.Position.X + (gameCamera.Width*2)) &&
-                   ls.Position.Y > (gameCamera.Position.Y - (gameCamera.Height*2)) && ls.Position.Y < (gameCamera.Position.Y + (gameCamera.Height*2)))) continue;
+                if (!(ls.Position.X > (gameCamera.Position.X - (gameCamera.Width)) && ls.Position.X < (gameCamera.Position.X + (gameCamera.Width)) &&
+                   ls.Position.Y > (gameCamera.Position.Y - (gameCamera.Height)) && ls.Position.Y < (gameCamera.Position.Y + (gameCamera.Height)))) continue;
 
-                ShadowmapResolver.ResolveShadows(ShadowMap, ls, PostEffect.LinearAttenuation_BlurHigh, gameCamera);
+                ShadowmapResolver.ResolveShadows(ShadowMap, ls, PrintedLight[rtnum], PostEffect.LinearAttenuation_BlurHigh, gameCamera);
 
-                spriteBatch.GraphicsDevice.SetRenderTarget(ls.BeamLight);
+                spriteBatch.GraphicsDevice.SetRenderTarget(BeamLight[rtnum]);
 
                 spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque);
-                spriteBatch.Draw(ls.PrintedLight, Vector2.Zero, null, Color.White);
+                spriteBatch.Draw(PrintedLight[rtnum], Vector2.Zero, null, Color.White);
                 spriteBatch.End();
-
                 if (ls.BeamStencil != null)
                 {
                     spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null);
                     spriteBatch.Draw(ls.BeamStencil, ls.RenderTargetSize / 2, null, Color.White, ls.Rotation, new Vector2(ls.BeamStencil.Width / 2, ls.BeamStencil.Height / 2), (ls.RenderRadius * 2) / ls.BeamStencil.Width, SpriteEffects.None, 1);
                     spriteBatch.End();
                 }
+
+                rtnum++;
+                if (rtnum == PrintedLight.Length) break;
             }
+
+            //spriteBatch.GraphicsDevice.SetRenderTarget(BeamLight);
+
+            //foreach (LightSource ls in LightSources.Where(src => src.SpotStencil == null))
+            //{
+            //    if (!(ls.Position.X > (gameCamera.Position.X - (gameCamera.Width * 2)) && ls.Position.X < (gameCamera.Position.X + (gameCamera.Width * 2)) &&
+            //       ls.Position.Y > (gameCamera.Position.Y - (gameCamera.Height * 2)) && ls.Position.Y < (gameCamera.Position.Y + (gameCamera.Height * 2)))) continue;
+
+            //    spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque);
+            //    spriteBatch.Draw(PrintedLight, Vector2.Zero, null, Color.White);
+            //    spriteBatch.End();
+
+            //    if (ls.BeamStencil != null)
+            //    {
+            //        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null);
+            //        spriteBatch.Draw(ls.BeamStencil, ls.RenderTargetSize / 2, null, Color.White, ls.Rotation, new Vector2(ls.BeamStencil.Width / 2, ls.BeamStencil.Height / 2), (ls.RenderRadius * 2) / ls.BeamStencil.Width, SpriteEffects.None, 1);
+            //        spriteBatch.End();
+            //    }
+            //}
+
+            rtnum = 0;
 
             spriteBatch.GraphicsDevice.SetRenderTarget(ScreenLights);
             {
@@ -141,10 +173,15 @@ namespace TiledLib
                         if (!(ls.Position.X > (gameCamera.Position.X - (gameCamera.Width)) && ls.Position.X < (gameCamera.Position.X + (gameCamera.Width)) &&
                             ls.Position.Y > (gameCamera.Position.Y - (gameCamera.Height)) && ls.Position.Y < (gameCamera.Position.Y + (gameCamera.Height)))) continue;
 
-                        ls.Draw(spriteBatch);
+                        ls.Draw(spriteBatch, BeamLight[rtnum]);
+
+                        rtnum++;
+                        if (rtnum == PrintedLight.Length) break;
                     }
                 }
                 spriteBatch.End();
+
+                
             }
 
             spriteBatch.GraphicsDevice.SetRenderTarget(ScreenGround);
@@ -166,7 +203,7 @@ namespace TiledLib
                 if (!(ls.Position.X > (gameCamera.Position.X - (gameCamera.Width)) && ls.Position.X < (gameCamera.Position.X + (gameCamera.Width)) &&
                       ls.Position.Y > (gameCamera.Position.Y - (gameCamera.Height)) && ls.Position.Y < (gameCamera.Position.Y + (gameCamera.Height)))) continue;
 
-                ls.Draw(spriteBatch);
+                ls.Draw(spriteBatch, BeamLight[0]);
                 //ls.Draw(spriteBatch);
 
             }

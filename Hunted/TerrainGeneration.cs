@@ -350,7 +350,7 @@ namespace Hunted
             map.Compounds = compounds;
 
             PercentComplete = 100;
-            Generating = false;
+            //Generating = false;
         }
 
         private static Vector2 TryFindSpawn(int x, int y, Map map, TileLayer layer, out bool foundspawn)

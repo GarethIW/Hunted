@@ -53,6 +53,8 @@ namespace Hunted
                     Enemies.Add(newDude);
                 }
             }
+
+            Enemies.RemoveAll(e => !e.Active);
         }
 
         public void Draw(SpriteBatch sb, LightingEngine lightingEngine, HeroDude gameHero)

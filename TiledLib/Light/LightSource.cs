@@ -35,8 +35,6 @@ namespace TiledLib
     {
         private GraphicsDevice graphics;
 
-        public RenderTarget2D PrintedLight;
-        public RenderTarget2D BeamLight;
         public Vector2 Position { get; set; }
         public Vector2 RenderTargetSize { get; set; }
         public Vector2 Size { get; set; }
@@ -82,8 +80,8 @@ namespace TiledLib
             this.Size = new Vector2(baseSize);
             baseSize *= this.qualityRatio;
             this.RenderTargetSize = new Vector2(baseSize);
-            PrintedLight = new RenderTarget2D(graphics, (int)baseSize, (int)baseSize);
-            BeamLight = new RenderTarget2D(graphics, (int)baseSize, (int)baseSize);
+            //PrintedLight = new RenderTarget2D(graphics, (int)baseSize, (int)baseSize);
+            //BeamLight = new RenderTarget2D(graphics, (int)baseSize, (int)baseSize);
             this.Color = color;
             if (bst != BeamStencilType.None) BeamStencil = LightingEngine.Instance.BeamStencils[bst];
             if (sst != SpotStencilType.None) SpotStencil = LightingEngine.Instance.SpotStencils[sst].Item3;
@@ -112,12 +110,12 @@ namespace TiledLib
             return new Vector2(shadowmapRelativeZeroX, shadowmapRelativeZeroY);
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public void Draw(SpriteBatch spriteBatch, RenderTarget2D beamRT)
         {
             if (SpotStencil == null)
             {
                 int size = (int)(this.Radius * 2f);
-                spriteBatch.Draw(this.BeamLight, new Rectangle((int)this.PrintPosition.X, (int)this.PrintPosition.Y, size, size), this.Color);
+                spriteBatch.Draw(beamRT, new Rectangle((int)this.PrintPosition.X, (int)this.PrintPosition.Y, size, size), this.Color);
             }
             else
             {
@@ -130,19 +128,19 @@ namespace TiledLib
             }
         }
 
-        public void Draw(SpriteBatch spriteBatch, byte opacity)
+        public void Draw(SpriteBatch spriteBatch, byte opacity, RenderTarget2D printRT)
         {
             Color colorA = this.Color;
             colorA.A = opacity;
             int size = (int)(this.Radius * 2f);
-            spriteBatch.Draw(this.PrintedLight, new Rectangle((int)this.PrintPosition.X, (int)this.PrintPosition.Y, size, size), colorA);
+            spriteBatch.Draw(printRT, new Rectangle((int)this.PrintPosition.X, (int)this.PrintPosition.Y, size, size), colorA);
         }
 
-        public void Draw(SpriteBatch spriteBatch, Color color, byte opacity)
+        public void Draw(SpriteBatch spriteBatch, Color color, byte opacity, RenderTarget2D printRT)
         {
             color.A = opacity;
             int size = (int)(this.Radius * 2f);
-            spriteBatch.Draw(this.PrintedLight, new Rectangle((int)this.PrintPosition.X, (int)this.PrintPosition.Y, size, size), color);
+            spriteBatch.Draw(printRT, new Rectangle((int)this.PrintPosition.X, (int)this.PrintPosition.Y, size, size), color);
         }
     }
 }
