@@ -54,7 +54,7 @@ namespace Hunted
 
         //iledLib.LightSource cameraLightSource = new LightSource();
 
-        DateTime TimeOfDay = new DateTime(2013,1,1,0,0,0);
+        DateTime TimeOfDay = new DateTime(2013,1,1,8,0,0);
         DateTime StartTime = new DateTime(2013, 1, 1, 0, 0, 0);
         int gameDay = 1;
 
@@ -171,7 +171,7 @@ namespace Hunted
             {
                 ScreenManager.Game.IsMouseVisible = false;
 
-                //TimeOfDay = TimeOfDay.AddMinutes(gameTime.ElapsedGameTime.TotalSeconds * 50);
+                TimeOfDay = TimeOfDay.AddMinutes(gameTime.ElapsedGameTime.TotalSeconds);
                 gameDay = 1 + ((TimeOfDay - StartTime).Days);
 
                 lightingEngine.Update(gameTime, TimeOfDay, ScreenManager.SpriteBatch, ScreenManager.GraphicsDevice);
@@ -431,6 +431,7 @@ namespace Hunted
                         {
                             AIDude newDude = new AIDude(pos);
                             newDude.LoadContent(enemyController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine);
+                            newDude.Health = 10 + Helper.Random.Next(30);
                             enemyController.Enemies.Add(newDude);
                         }
 

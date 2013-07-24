@@ -50,6 +50,7 @@ namespace Hunted
                 {
                     AIDude newDude = new AIDude(pos);
                     newDude.LoadContent(SpriteSheet, graphicsDevice, lightingEngine);
+                    newDude.Health = 10 + Helper.Random.Next(30);
                     Enemies.Add(newDude);
                 }
             }

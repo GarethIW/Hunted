@@ -38,7 +38,11 @@ namespace Hunted.Weapons
             if (triggerHeld && !isAuto && (owner.GetType() == typeof(HeroDude))) return false;
             triggerHeld = true;
 
-            if (clipAmmo <= 0) return false;
+            //if (clipAmmo <= 0) return false;
+            if (owner.Ammo <= 0 && owner.GetType() == typeof(HeroDude)) return false;
+
+            //if (owner.GetType() == typeof(HeroDude)) clipAmmo--;
+            if (owner.GetType() == typeof(HeroDude)) owner.Ammo--;
 
             if (isAuto || (owner.GetType() == typeof(AIDude)))
             {

@@ -19,8 +19,8 @@ namespace TiledLib
         public RenderTarget2D ScreenLights;
         public RenderTarget2D ScreenGround;
 
-        RenderTarget2D[] PrintedLight = new RenderTarget2D[100];
-        RenderTarget2D[] BeamLight = new RenderTarget2D[100];
+        RenderTarget2D[] PrintedLight = new RenderTarget2D[20];
+        RenderTarget2D[] BeamLight = new RenderTarget2D[20];
 
         public Dictionary<BeamStencilType, Texture2D> BeamStencils = new Dictionary<BeamStencilType, Texture2D>();
         public Dictionary<SpotStencilType, Tuple<Texture2D, Texture2D, RenderTarget2D>> SpotStencils = new Dictionary<SpotStencilType, Tuple<Texture2D, Texture2D, RenderTarget2D>>();
@@ -119,7 +119,7 @@ namespace TiledLib
         {
             int rtnum = 0;
 
-            foreach (LightSource ls in LightSources.Where(src => src.SpotStencil==null))
+            foreach (LightSource ls in LightSources.Where(src => src.SpotStencil==null).OrderBy(src => (src.Position - gameCamera.Position).Length()))
             {
                 if (!(ls.Position.X > (gameCamera.Position.X - (gameCamera.Width)) && ls.Position.X < (gameCamera.Position.X + (gameCamera.Width)) &&
                    ls.Position.Y > (gameCamera.Position.Y - (gameCamera.Height)) && ls.Position.Y < (gameCamera.Position.Y + (gameCamera.Height)))) continue;
@@ -168,7 +168,7 @@ namespace TiledLib
                 spriteBatch.GraphicsDevice.Clear(Color.Black);
                 spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
                 {
-                    foreach (LightSource ls in LightSources.Where(src => src.SpotStencil == null))
+                    foreach (LightSource ls in LightSources.Where(src => src.SpotStencil == null).OrderBy(src => (src.Position - gameCamera.Position).Length()))
                     {
                         if (!(ls.Position.X > (gameCamera.Position.X - (gameCamera.Width)) && ls.Position.X < (gameCamera.Position.X + (gameCamera.Width)) &&
                             ls.Position.Y > (gameCamera.Position.Y - (gameCamera.Height)) && ls.Position.Y < (gameCamera.Position.Y + (gameCamera.Height)))) continue;

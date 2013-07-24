@@ -46,7 +46,9 @@ namespace Hunted
 
             showAmmo = gameHero.SelectedWeapon > 0;
 
+//            ammo = gameHero.Weapons[gameHero.SelectedWeapon].clipAmmo;
             ammo = gameHero.Ammo;
+
 
             timeOfDay = timeofday;
             day = gameDay;

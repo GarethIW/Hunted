@@ -155,9 +155,13 @@ namespace Hunted
 
                     break;
             }
-                   
 
-            
+
+            if (Health <= 0 && !Dead)
+            {
+                Dead = true;
+                Active = false;
+            }
 
             base.Update(gameTime, gameMap);
 
@@ -218,6 +222,13 @@ namespace Hunted
             }
 
             return false;
+        }
+
+        public override void HitByProjectile(Projectile p)
+        {
+            base.HitByProjectile(p);
+
+            State = AIState.Chasing;
         }
 
         
