@@ -742,6 +742,29 @@ namespace TiledLib
             }
         }
 
-        
+
+
+        public List<Compound> FindNearestCompounds(Vector2 vector2)
+        {
+            return Compounds.OrderBy(com => (com.Position - vector2).Length()).ToList();
+        }
+
+        public void DiscoverCompound(Compound c, bool[,] mapFog)
+        {
+            float rad = c.Bounds.Width * TileWidth;
+            if (c.Bounds.Height * TileHeight > rad) rad = c.Bounds.Height * TileHeight;
+
+            rad /= 1.5f;
+
+            for (float a = 0.0f; a < MathHelper.TwoPi; a += 0.01f)
+            {
+                for (float r = 0.0f; r < rad; r += 50f)
+                {
+                    Vector2 p = c.Position + (new Vector2((float)Math.Cos(a), (float)Math.Sin(a)) * r);
+                    if(p.X>=0f && p.X<(Width * TileWidth) && p.Y>=0f && p.Y<(Width * TileWidth))
+                        mapFog[(int)(p.X / TileWidth), (int)(p.Y / TileHeight)] = true;
+                }
+            }
+        }
     }
 }

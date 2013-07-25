@@ -81,5 +81,18 @@ namespace Hunted
                 e.DrawShadows(sb, lightingEngine);
             }
         }
+
+        internal void DiscoverGeneral(Vector2 vector2)
+        {
+            foreach (AIDude e in Enemies.Where(en => en.IsGeneral).OrderBy(en => (en.Position - vector2).Length()))
+            {
+                if (!e.Discovered)
+                {
+                    e.Discovered = true;
+                    break;
+                }
+                else break;
+            }
+        }
     }
 }

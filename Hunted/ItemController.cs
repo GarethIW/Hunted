@@ -40,7 +40,7 @@ namespace Hunted
             lightingEngine = le;
         }
 
-        public void Update(GameTime gameTime, Map gameMap, HeroDude gameHero)
+        public void Update(GameTime gameTime, Map gameMap, HeroDude gameHero, bool[,] mapFog)
         {
             int count = 0;
             foreach (Item i in Items.Where(it => (gameHero.Position - it.Position).Length() < 4000f))
@@ -48,9 +48,9 @@ namespace Hunted
                 count++;
                 i.Update(gameTime);
 
-                if ((gameHero.Position - i.Position).Length() < 4000f)
+                if ((gameHero.Position - i.Position).Length() < 50f)
                 {
-                    Pickup(i, gameHero);
+                    Pickup(i, gameHero, gameMap, mapFog);
                 }
             }
 
@@ -58,7 +58,12 @@ namespace Hunted
             
         }
 
-        void Pickup(Item i, HeroDude gameHero)
+        public void Spawn(ItemType type, Vector2 pos)
+        {
+            Items.Add(new Item(type, pos));
+        }
+
+        void Pickup(Item i, HeroDude gameHero, Map gameMap, bool[,] mapFog)
         {
             switch (i.Type)
             {
@@ -66,11 +71,31 @@ namespace Hunted
                     gameHero.Health += 25f;
                     break;
                 case ItemType.Ammo:
-                    gameHero.Ammo += 5 + Helper.Random.Next(10);
+                    gameHero.Ammo += 10 + Helper.Random.Next(15);
                     break;
                 case ItemType.CompoundMap:
+                    List<Compound> c = gameMap.FindNearestCompounds(gameHero.Position);
+                    if (c[0].Discovered == false)
+                    {
+                        c[0].Discovered = true;
+                        gameMap.DiscoverCompound(c[0], mapFog);
+                    }
+                    else 
+                    {
+                        foreach (Compound nc in c)
+                        {
+                            if (nc.Discovered == false)
+                            {
+                                nc.Discovered = true;
+                                gameMap.DiscoverCompound(nc, mapFog);
+                                break;
+                            }
+                        }
+                    }
+
                     break;
                 case ItemType.GeneralMap:
+                    EnemyController.Instance.DiscoverGeneral(i.Position);
                     break;
             }
 

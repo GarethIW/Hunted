@@ -74,6 +74,9 @@ namespace Hunted
 
 
             Speed = Vector2.Zero;
+
+            Health = MathHelper.Clamp(Health, 0f, 100f);
+            Ammo = (int)MathHelper.Clamp(Ammo, 0, 100);
         }
 
         public virtual void Move(Vector2 amount)

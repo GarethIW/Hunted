@@ -17,6 +17,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using TiledLib;
+using System.Collections.Generic;
 #endregion
 
 namespace Hunted
@@ -63,6 +64,7 @@ namespace Hunted
         //LightSource lightSource1;
 
         Texture2D crosshairTex;
+        Texture2D mapIcons;
         Vector2 crosshairPos;
 
         #endregion
@@ -132,6 +134,7 @@ namespace Hunted
             minimapRT = new RenderTarget2D(ScreenManager.GraphicsDevice, 200, 200);
 
             crosshairTex = content.Load<Texture2D>("crosshair");
+            mapIcons = content.Load<Texture2D>("mapicons");
 
             //lightSource1 = new LightSource(ScreenManager.GraphicsDevice, 600, LightAreaQuality.Low, new Color(1f, 1f, 1f), BeamStencilType.Wide, SpotStencilType.None);
 
@@ -181,7 +184,7 @@ namespace Hunted
                 enemyController.Update(gameTime, gameMap, gameHero);
                 projectileController.Update(gameTime, gameMap, gameHero);
                 particleController.Update(gameTime, gameMap);
-                itemController.Update(gameTime, gameMap, gameHero);
+                itemController.Update(gameTime, gameMap, gameHero, mapFog);
 
                 gameHero.Update(gameTime, gameMap);
                 //lightSource1.Position = new Vector2(1000, 1000);
@@ -244,7 +247,7 @@ namespace Hunted
         
             if(IsActive)
             {
-                if ((keyboardState.IsKeyDown(Keys.Tab) && !lastKeyboardState.IsKeyDown(Keys.Tab)) || gamePadState.IsButtonDown(Buttons.Back)) ScreenManager.AddScreen(new MapScreen(gameMap, mapFog), null);
+                if ((keyboardState.IsKeyDown(Keys.Tab) && !lastKeyboardState.IsKeyDown(Keys.Tab)) || gamePadState.IsButtonDown(Buttons.Back)) ScreenManager.AddScreen(new MapScreen(gameMap, mapFog, gameHero, mapIcons), null);
                 if (keyboardState.IsKeyDown(Keys.Space) && !lastKeyboardState.IsKeyDown(Keys.Space)) ThreadPool.QueueUserWorkItem(new WaitCallback(GenerateTerrainAsync));
 
                 if (input.MouseDragging)
@@ -412,9 +415,14 @@ namespace Hunted
             gameCamera.Position = gameHero.Position;
             gameCamera.Target = gameCamera.Position;
 
+            
+            List<Compound> possibleComps = new List<Compound>();
+
             // Spawn enemies
             foreach (Compound c in gameMap.Compounds)
             {
+                if (c.Buildings.Count > 0) possibleComps.Add(c);
+
                 for (int y = c.Bounds.Top; y < c.Bounds.Bottom; y++)
                 {
                     for (int x = c.Bounds.Left; x < c.Bounds.Right; x++)
@@ -432,11 +440,27 @@ namespace Hunted
                             AIDude newDude = new AIDude(pos);
                             newDude.LoadContent(enemyController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine);
                             newDude.Health = 10 + Helper.Random.Next(30);
+                            newDude.BelongsToCompound = true;
                             enemyController.Enemies.Add(newDude);
                         }
 
                     }
                 }
+            }
+
+            // Spawn Generals
+            for (int i = 0; i < 3; i++)
+            {
+                Compound c = possibleComps[Helper.Random.Next(possibleComps.Count)];
+                Building b = c.Buildings[Helper.Random.Next(c.Buildings.Count)];
+                Vector2 pos = (new Vector2(b.Rect.Center.X, b.Rect.Center.Y) * new Vector2(gameMap.TileWidth, gameMap.TileHeight)) + new Vector2(50, 50);
+                AIDude newDude = new AIDude(pos);
+                newDude.LoadContent(enemyController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine);
+                newDude.Health = 50 + Helper.Random.Next(30);
+                newDude.BelongsToCompound = true;
+                newDude.IsGeneral = true;
+                enemyController.Enemies.Add(newDude);
+                possibleComps.Remove(c);
             }
 
             TerrainGeneration.Generating = false;

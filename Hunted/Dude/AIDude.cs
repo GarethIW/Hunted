@@ -25,6 +25,10 @@ namespace Hunted
         public AIState State;
         public Vector2 Target;
 
+        public bool BelongsToCompound = false;
+        public bool IsGeneral = false;
+        public bool Discovered = false;
+
         BreadCrumb chasePath;
         bool regeneratePath = false;
 
@@ -161,12 +165,54 @@ namespace Hunted
             {
                 Dead = true;
                 Active = false;
+                SpawnDrops(gameMap);
+                LightingEngine.Instance.RemoveSource(HeadTorch);
             }
 
             base.Update(gameTime, gameMap);
 
             HeadTorch.Position = Helper.PointOnCircle(ref Position, 30, Rotation - MathHelper.PiOver2);
             HeadTorch.Rotation = Rotation - MathHelper.PiOver2;
+        }
+
+        private void SpawnDrops(Map gameMap)
+        {
+            int drop = Helper.Random.Next(65);
+            if (drop < 10) return;
+            if (drop >= 10 && drop < 35)
+            {
+                if (Helper.Random.Next(2) == 0)
+                {
+                    List<Compound> c = gameMap.FindNearestCompounds(Position);
+                    if (c[0].Discovered == false) ItemController.Instance.Spawn(ItemType.CompoundMap, Position);
+                    else if (BelongsToCompound)
+                    {
+                        for(int i =1;i<2;i++)
+                        {
+                            if (c[i].Discovered == false)
+                            {
+                                ItemController.Instance.Spawn(ItemType.CompoundMap, Position);
+                                break;
+                            }
+                        }
+                    }
+                    else ItemController.Instance.Spawn(ItemType.Health, Position);
+                }
+                else ItemController.Instance.Spawn(ItemType.Health, Position);
+            }
+            if (drop >= 35 && drop < 58) ItemController.Instance.Spawn(ItemType.Ammo, Position);
+            if (drop >= 58 && BelongsToCompound)
+            {
+                foreach (AIDude e in EnemyController.Instance.Enemies.Where(en => en.IsGeneral).OrderBy(en => (en.Position - Position).Length()))
+                {
+                    if (!e.Discovered)
+                    {
+                        ItemController.Instance.Spawn(ItemType.GeneralMap, Position);
+                        break;
+                    }
+                    else break;
+                }
+            }
         }
 
         public override void Collided()
@@ -198,6 +244,10 @@ namespace Hunted
         {
             //DrawChasePath(sb, chasePath);
             base.Draw(sb, lightingEngine);
+
+            // Head
+            if(IsGeneral)
+                sb.Draw(spriteSheet, Position, Animations["head"].CellRect, Color.Red, Rotation, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
         }
 
         void DrawChasePath(SpriteBatch sb, BreadCrumb p)

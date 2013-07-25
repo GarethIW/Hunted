@@ -9,6 +9,8 @@
 
 #region Using Statements
 using System;
+using System.Linq;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -30,11 +32,15 @@ namespace Hunted
         ContentManager content;
         Texture2D texBG;
         Texture2D texLogo;
+        Texture2D mapIcons;
 
         RenderTarget2D mapRT;
 
         Map gameMap;
         bool[,] mapFog;
+        HeroDude gameHero;
+
+        float scale;
 
         #endregion
 
@@ -44,13 +50,15 @@ namespace Hunted
         /// <summary>
         /// Constructor.
         /// </summary>
-        public MapScreen(Map map, bool[,] fog)
+        public MapScreen(Map map, bool[,] fog, HeroDude hero, Texture2D icons)
         {
             TransitionOnTime = TimeSpan.FromSeconds(0.5);
             TransitionOffTime = TimeSpan.FromSeconds(0.5);
 
             gameMap = map;
             mapFog = fog;
+            mapIcons = icons;
+            gameHero = hero;
 
             IsPopup = true;
         }
@@ -71,9 +79,10 @@ namespace Hunted
             texBG = content.Load<Texture2D>("blank");
 
             mapRT = new RenderTarget2D(ScreenManager.GraphicsDevice, 600, 600);
+            scale = (mapRT.Width/(float)(gameMap.Width*gameMap.TileWidth));
             ScreenManager.GraphicsDevice.SetRenderTarget(mapRT);
             ScreenManager.GraphicsDevice.Clear(Color.Black);
-            gameMap.DrawAsMap(ScreenManager.SpriteBatch, (600f/(float)(gameMap.Width*gameMap.TileWidth)), mapFog);
+            gameMap.DrawAsMap(ScreenManager.SpriteBatch, scale , mapFog);
             ScreenManager.GraphicsDevice.SetRenderTarget(null);
             //texLogo = content.Load<Texture2D>("paused");
             ScreenManager.Game.ResetElapsedTime();
@@ -137,6 +146,14 @@ namespace Hunted
 
             //spriteBatch.Draw(texLogo, new Vector2(viewport.Width/2, viewport.Height/3), null,
               //               Color.White * TransitionAlpha, 0f, new Vector2(texLogo.Width/2, texLogo.Height/2), 1f + (TransitionPosition * 10f), SpriteEffects.None, 1);
+
+            Vector2 topLeft = ((new Vector2(viewport.Width, viewport.Height) / 2) + new Vector2(0, viewport.Height * TransitionPosition)) - (new Vector2(mapRT.Width, mapRT.Height) / 2);
+            foreach (AIDude e in EnemyController.Instance.Enemies.Where(en => en.Discovered && en.IsGeneral).ToList())
+            {
+                spriteBatch.Draw(mapIcons, topLeft + (e.Position * scale), new Rectangle(12, 0, 12, 13), Color.White, 0f, new Vector2(6, 6), 1f, SpriteEffects.None, 1);
+            }
+
+            spriteBatch.Draw(mapIcons, topLeft+(gameHero.Position * scale), new Rectangle(0, 0, 12, 13), Color.White, gameHero.Rotation - MathHelper.PiOver2, new Vector2(6, 6), 1f, SpriteEffects.None, 1);
 
             spriteBatch.End();
         }

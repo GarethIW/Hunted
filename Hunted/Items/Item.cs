@@ -24,7 +24,7 @@ namespace Hunted
 
         public Item(ItemType type, Vector2 pos)
         {
-            type = Type;
+            Type = type;
             Position = pos;
             Active = true;
             Rotation = (float)Helper.Random.NextDouble() * MathHelper.Pi;

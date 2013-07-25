@@ -222,6 +222,12 @@ namespace TiledLib
             CurrentSunColor = Color.Lerp(sunColors[currenthour], sunColors[nexthour], lerpAmount);
             CurrentShadowVect = Vector2.Lerp(shadowVects[currenthour], shadowVects[nexthour], lerpAmount);
         }
+
+        public void RemoveSource(LightSource ls)
+        {
+            LightSources.Remove(ls);
+            ls = null;
+        }
     }
 
 
