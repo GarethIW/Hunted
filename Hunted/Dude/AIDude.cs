@@ -205,7 +205,7 @@ namespace Hunted
             {
                 foreach (AIDude e in EnemyController.Instance.Enemies.Where(en => en.IsGeneral).OrderBy(en => (en.Position - Position).Length()))
                 {
-                    if (!e.Discovered)
+                    if (!e.Discovered && (e.Position - Position).Length()<20000)
                     {
                         ItemController.Instance.Spawn(ItemType.GeneralMap, Position);
                         break;

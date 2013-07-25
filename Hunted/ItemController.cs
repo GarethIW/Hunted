@@ -88,6 +88,8 @@ namespace Hunted
                             {
                                 nc.Discovered = true;
                                 gameMap.DiscoverCompound(nc, mapFog);
+                                Hud.Instance.Ticker.AddLine("> An enemy compound has been revealed!");
+                                Hud.Instance.Ticker.AddLine("(Tab/Back for map)");
                                 break;
                             }
                         }

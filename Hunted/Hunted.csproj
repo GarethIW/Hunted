@@ -114,6 +114,7 @@
     <Compile Include="Screens\PlayerIndexEventArgs.cs" />
     <Compile Include="SpriteAnimation.cs" />
     <Compile Include="TerrainGeneration.cs" />
+    <Compile Include="TickerText.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />

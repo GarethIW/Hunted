@@ -10,6 +10,8 @@ namespace Hunted
 {
     public class Hud
     {
+        public static Hud Instance;
+
         float heroHealth;
         float heroHealthTarget;
 
@@ -25,11 +27,13 @@ namespace Hunted
         Texture2D hudTex;
         SpriteFont hudFont;
 
+        public TickerText Ticker;
 
 
         public Hud()
         {
-
+            Instance = this;
+            Ticker = new TickerText();
         }
 
         public void LoadContent(ContentManager content)
@@ -52,6 +56,8 @@ namespace Hunted
 
             timeOfDay = timeofday;
             day = gameDay;
+
+            Ticker.Update(gameTime);
         }
 
         public void Draw(SpriteBatch sb)
@@ -71,6 +77,8 @@ namespace Hunted
                 sb.Draw(hudTex, new Vector2(18, 18 + 26), new Rectangle(0, 26, 310, 25), Color.White);
                 sb.Draw(hudTex, new Vector2(20, 20 + 26), new Rectangle(0, 71, ammo*3, 16), Color.White);
             }
+
+            Ticker.Draw(sb, hudFont, new Vector2(20, 70));
         }
     }
 }

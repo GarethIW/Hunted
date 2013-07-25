@@ -89,6 +89,8 @@ namespace Hunted
                 if (!e.Discovered)
                 {
                     e.Discovered = true;
+                    Hud.Instance.Ticker.AddLine("> A general's location has been revealed!");
+                    Hud.Instance.Ticker.AddLine("(Tab/Back for map)");
                     break;
                 }
                 else break;

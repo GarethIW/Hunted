@@ -389,6 +389,7 @@ namespace Hunted
             spriteBatch.Begin();
             //gameHUD.Draw(spriteBatch);
             spriteBatch.Draw(minimapRT, new Vector2(ScreenManager.GraphicsDevice.Viewport.Width - 20 - minimapRT.Width, 20), null, Color.White);
+            spriteBatch.Draw(mapIcons, new Vector2(ScreenManager.GraphicsDevice.Viewport.Width - 20 - (minimapRT.Width/2), 20 + (minimapRT.Height/2)), new Rectangle(0, 0, 12, 13), Color.White, gameHero.Rotation - MathHelper.PiOver2, new Vector2(6, 6), 1f, SpriteEffects.None, 1);
             gameHud.Draw(spriteBatch);
             spriteBatch.End();
 
@@ -462,6 +463,8 @@ namespace Hunted
                 enemyController.Enemies.Add(newDude);
                 possibleComps.Remove(c);
             }
+
+            gameHud.Ticker.AddLine("> Explore area and eliminate resistance");
 
             TerrainGeneration.Generating = false;
         }
