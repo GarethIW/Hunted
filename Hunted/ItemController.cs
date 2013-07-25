@@ -77,8 +77,8 @@ namespace Hunted
                     List<Compound> c = gameMap.FindNearestCompounds(gameHero.Position);
                     if (c[0].Discovered == false)
                     {
-                        c[0].Discovered = true;
                         gameMap.DiscoverCompound(c[0], mapFog);
+                        if(!c[0].Bounds.Contains(Helper.VtoP(i.Position/100))) Hud.Instance.Ticker.AddLine("> An enemy compound has been revealed! (Tab/Back for map)");
                     }
                     else 
                     {
@@ -86,10 +86,8 @@ namespace Hunted
                         {
                             if (nc.Discovered == false)
                             {
-                                nc.Discovered = true;
                                 gameMap.DiscoverCompound(nc, mapFog);
-                                Hud.Instance.Ticker.AddLine("> An enemy compound has been revealed!");
-                                Hud.Instance.Ticker.AddLine("(Tab/Back for map)");
+                                if (!nc.Bounds.Contains(Helper.VtoP(i.Position / 100))) Hud.Instance.Ticker.AddLine("> An enemy compound has been revealed! (Tab/Back for map)");
                                 break;
                             }
                         }

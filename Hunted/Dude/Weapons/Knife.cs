@@ -13,7 +13,7 @@ namespace Hunted.Weapons
         {
             clipAmmo = 1;
             isAuto = true;
-            coolDown = 500;
+            coolDownTarget = 500;
         }
 
         public override bool Use(GameTime gameTime, bool trigger)
@@ -21,6 +21,9 @@ namespace Hunted.Weapons
             if (!base.Use(gameTime, trigger)) return false;
 
            // ProjectileController.Instance.Add(ProjectileType.Pistol, owner, Helper.PointOnCircle(ref owner.Position, 40, owner.Rotation - MathHelper.PiOver2), owner.Position - Helper.PointOnCircle(ref owner.Position, 100, owner.Rotation + MathHelper.PiOver2));
+
+            ProjectileController.Instance.Add(ProjectileType.Knife, owner, Helper.PointOnCircle(ref owner.Position, 75, owner.Rotation - MathHelper.PiOver2), Vector2.Zero);
+
 
             return true;
         }

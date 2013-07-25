@@ -128,8 +128,15 @@ namespace Hunted
 
         public virtual void HitByProjectile(Projectile p)
         {
-            Health -= p.Damage;
-            ParticleController.Instance.AddGSW(p);
+            Health -= (p.Owner.GetType() == typeof(HeroDude)) ? p.Damage : p.Damage / 2;
+            if (p.Type != ProjectileType.Knife)
+            {
+                ParticleController.Instance.AddGSW(p);
+            }
+            else
+            {
+                ParticleController.Instance.AddKnifeWound(p);
+            }
         }
 
         void DoCollisions(Map gameMap)

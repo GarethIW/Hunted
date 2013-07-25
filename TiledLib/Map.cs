@@ -765,6 +765,9 @@ namespace TiledLib
                         mapFog[(int)(p.X / TileWidth), (int)(p.Y / TileHeight)] = true;
                 }
             }
+
+            c.Discovered = true;
+            
         }
     }
 }

@@ -250,6 +250,14 @@ namespace Hunted
                 if ((keyboardState.IsKeyDown(Keys.Tab) && !lastKeyboardState.IsKeyDown(Keys.Tab)) || gamePadState.IsButtonDown(Buttons.Back)) ScreenManager.AddScreen(new MapScreen(gameMap, mapFog, gameHero, mapIcons), null);
                 if (keyboardState.IsKeyDown(Keys.Space) && !lastKeyboardState.IsKeyDown(Keys.Space)) ThreadPool.QueueUserWorkItem(new WaitCallback(GenerateTerrainAsync));
 
+                if (keyboardState.IsKeyDown(Keys.D1) && !lastKeyboardState.IsKeyDown(Keys.D1)) gameHero.SelectWeapon(0, false);
+                if (keyboardState.IsKeyDown(Keys.D2) && !lastKeyboardState.IsKeyDown(Keys.D2)) gameHero.SelectWeapon(1, false);
+
+                if (input.IsNewButtonPress(Buttons.Y, null, out player)) gameHero.SelectWeapon(1, true);
+                if (input.IsNewButtonPress(Buttons.RightShoulder, null, out player) || input.IsNewButtonPress(Buttons.DPadDown, null, out player)) gameHero.SelectWeapon(1, true);
+                if (input.IsNewButtonPress(Buttons.LeftShoulder, null, out player) || input.IsNewButtonPress(Buttons.DPadUp, null, out player)) gameHero.SelectWeapon(-1, true);
+
+
                 if (input.MouseDragging)
                 {
                     gameCamera.Target -= (input.MouseDelta/gameCamera.Zoom);
@@ -388,7 +396,7 @@ namespace Hunted
 
             spriteBatch.Begin();
             //gameHUD.Draw(spriteBatch);
-            spriteBatch.Draw(minimapRT, new Vector2(ScreenManager.GraphicsDevice.Viewport.Width - 20 - minimapRT.Width, 20), null, Color.White);
+            spriteBatch.Draw(minimapRT, new Vector2(ScreenManager.GraphicsDevice.Viewport.Width - 20 - minimapRT.Width, 20), null, Color.White * 0.75f);
             spriteBatch.Draw(mapIcons, new Vector2(ScreenManager.GraphicsDevice.Viewport.Width - 20 - (minimapRT.Width/2), 20 + (minimapRT.Height/2)), new Rectangle(0, 0, 12, 13), Color.White, gameHero.Rotation - MathHelper.PiOver2, new Vector2(6, 6), 1f, SpriteEffects.None, 1);
             gameHud.Draw(spriteBatch);
             spriteBatch.End();
@@ -403,7 +411,7 @@ namespace Hunted
             {
                 spriteBatch.Begin();
                 //gameHUD.Draw(spriteBatch);
-                spriteBatch.Draw(crosshairTex, crosshairPos, null, Color.White, 0f, new Vector2(crosshairTex.Width, crosshairTex.Height) / 2, 1f, SpriteEffects.None, 1);
+                spriteBatch.Draw(crosshairTex, crosshairPos, new Rectangle(gameHero.SelectedWeapon==0?48:0,0,48,48), Color.White, 0f, new Vector2(crosshairTex.Width/4, crosshairTex.Height), 1f, SpriteEffects.None, 1);
                 spriteBatch.End();
             }
         }

@@ -15,6 +15,7 @@ namespace Hunted
 {
     public enum ProjectileType
     {
+        Knife,
         Pistol,
         SMG,
         Shot,
@@ -123,6 +124,9 @@ namespace Hunted
 
             switch (type)
             {
+                case ProjectileType.Knife:
+                    Add(position, Vector2.Zero, 10, true, new Rectangle(8, 0, 1, 1), 0f, 15f, owner, type);
+                    break;
                 case ProjectileType.Pistol:
                     Add(position, direction * 20f, 2000, true, new Rectangle(0, 0, 2, 4), Helper.V2ToAngle(direction) + MathHelper.PiOver2, 5f, owner, type);
                     break;

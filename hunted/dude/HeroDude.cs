@@ -49,7 +49,18 @@ namespace Hunted
             base.Draw(sb, lightingEngine);
         }
 
-       
+
+
+        internal void SelectWeapon(int weapon, bool increment)
+        {
+            if (increment)
+            {
+                SelectedWeapon += weapon;
+                if (SelectedWeapon == Weapons.Count) SelectedWeapon = 0;
+                if (SelectedWeapon == -1) SelectedWeapon = Weapons.Count - 1;
+            }
+            else SelectedWeapon = weapon;
+        }
     }
 
     
