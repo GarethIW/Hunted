@@ -71,6 +71,7 @@ namespace Hunted
                     gameHero.Health += 25f;
                     break;
                 case ItemType.Ammo:
+                    AudioController.PlaySFX("ammo", 1f, 0f, 0f, i.Position);
                     gameHero.Ammo += 10 + Helper.Random.Next(15);
                     break;
                 case ItemType.CompoundMap:

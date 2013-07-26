@@ -61,7 +61,7 @@ namespace Hunted
             base.Initialize();
         }
 
-        public void Update(GameTime gameTime, Map gameMap, HeroDude gameHero, bool[,] mapFog)
+        public void Update(GameTime gameTime, Map gameMap, HeroDude gameHero, bool[,] mapFog, Camera gameCamera)
         {
             // Moving
             if ((Position - Target).Length() > 10f)
@@ -136,7 +136,7 @@ namespace Hunted
                     break;
                 case AIState.Attacking:
                     LookAt(gameHero.Position);
-                    Attack(gameTime, true);
+                    Attack(gameTime, true, gameCamera);
                     if (Weapons[SelectedWeapon].GetType() != typeof(Knife))
                     {
                         if ((gameHero.Position - Position).Length() > 400f)

@@ -59,6 +59,8 @@ namespace Hunted
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            AudioController.LoadContent(Content);
+
             screenManager.AddScreen(new GameplayScreen(), null);
         }
 

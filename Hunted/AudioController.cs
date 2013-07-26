@@ -9,6 +9,7 @@ using System.IO;
 using System.Diagnostics;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
+using TiledLib;
 
 
 namespace Hunted
@@ -35,7 +36,21 @@ namespace Hunted
         {
             effects = new Dictionary<string, SoundEffect>();
 
-            //effects.Add("alert", content.Load<SoundEffect>("sfx/alert"));
+            effects.Add("explode", content.Load<SoundEffect>("audio/sfx/explode"));
+            effects.Add("hit", content.Load<SoundEffect>("audio/sfx/hit"));
+            effects.Add("machinegun", content.Load<SoundEffect>("audio/sfx/machinegun"));
+            effects.Add("mortar", content.Load<SoundEffect>("audio/sfx/mortar"));
+            effects.Add("pistol", content.Load<SoundEffect>("audio/sfx/pistol"));
+            effects.Add("shotgun", content.Load<SoundEffect>("audio/sfx/shotgun"));
+            effects.Add("smg", content.Load<SoundEffect>("audio/sfx/smg"));
+            effects.Add("sniper", content.Load<SoundEffect>("audio/sfx/sniper"));
+            effects.Add("sword", content.Load<SoundEffect>("audio/sfx/sword"));
+            effects.Add("fstep-grass", content.Load<SoundEffect>("audio/sfx/fstep-grass"));
+            effects.Add("fstep-sand", content.Load<SoundEffect>("audio/sfx/fstep-sand"));
+            effects.Add("fstep-dirt", content.Load<SoundEffect>("audio/sfx/fstep-dirt"));
+            effects.Add("fstep-concrete", content.Load<SoundEffect>("audio/sfx/fstep-concrete"));
+            effects.Add("ammo", content.Load<SoundEffect>("audio/sfx/ammo"));
+            effects.Add("ticker", content.Load<SoundEffect>("audio/sfx/typewriter"));
            
 
 
@@ -123,9 +138,13 @@ namespace Hunted
 
         internal static void PlaySFX(string name, float volume, float minpitch, float maxpitch, Vector2 Position)
         {
-            Vector2 screenPos = Vector2.Transform(Position, GameManager.Camera.CameraMatrix);
-            float pan = MathHelper.Clamp((screenPos.X - (GameManager.Camera.Width / 2)) / (GameManager.Camera.Width/2), -1f,1f);
-            effects[name].Play(volume * sfxvolume, minpitch + ((float)randomNumber.NextDouble() * (maxpitch - minpitch)), pan);
+            Vector2 screenPos = Vector2.Transform(Position, Camera.Instance.CameraMatrix);
+            float dist = (Camera.Instance.Position - Position).Length();
+            if (dist < 2000f)
+            {
+                float pan = MathHelper.Clamp((screenPos.X - (Camera.Instance.Width / 2)) / (Camera.Instance.Width / 2), -1f, 1f);
+                effects[name].Play(((1f/2000f) * (2000f-dist)) * volume * sfxvolume, minpitch + ((float)randomNumber.NextDouble() * (maxpitch - minpitch)), pan);
+            }
         }
 
 

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using TiledLib;
 
 namespace Hunted.Weapons
 {
@@ -27,7 +28,7 @@ namespace Hunted.Weapons
             coolDown = 0;
         }
 
-        public virtual bool Use(GameTime gameTime, bool trigger)
+        public virtual bool Use(GameTime gameTime, bool trigger, Camera gameCamera)
         {
             if (!trigger)
             {

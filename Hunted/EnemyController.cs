@@ -33,13 +33,13 @@ namespace Hunted
             lightingEngine = le;
         }
 
-        public void Update(GameTime gameTime, Map gameMap, HeroDude gameHero, bool[,] mapFog)
+        public void Update(GameTime gameTime, Map gameMap, HeroDude gameHero, bool[,] mapFog, Camera gameCamera)
         {
             int count = 0;
             foreach (AIDude e in Enemies.Where(en => (gameHero.Position - en.Position).Length() < 4000f))
             {
                 count++;
-                e.Update(gameTime, gameMap, gameHero, mapFog);
+                e.Update(gameTime, gameMap, gameHero, mapFog, gameCamera);
             }
 
             // Spawn some new enemies

@@ -10,7 +10,6 @@ namespace Hunted
 {
     public static class GameManager
     {
-        public static Map Map;
         public static Camera Camera;
 
         public static SpriteFont Font;

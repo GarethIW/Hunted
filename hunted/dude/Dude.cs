@@ -67,6 +67,13 @@ namespace Hunted
                 Animations["feet"].Update(gameTime);
                 Animations["arms"].Update(gameTime);
                 Animations["head"].Update(gameTime);
+
+                if (Animations["feet"].CurrentFrame == 0)
+                {
+                    // Footsteps
+                    Tile t = ((TileLayer)gameMap.GetLayer("Terrain")).Tiles[(int)(Position.X / gameMap.TileWidth), (int)(Position.Y / gameMap.TileWidth)];
+                    if (t.Properties.Contains("fstep")) AudioController.PlaySFX("fstep-" + t.Properties["fstep"], 0.1f, -0.3f, 0.3f, Position);
+                }
             }
             else
             {
@@ -96,9 +103,9 @@ namespace Hunted
             Rotation = Helper.TurnToFace(Position, target, Rotation, 1f, 0.25f);
         }
 
-        public virtual void Attack(GameTime gameTime, bool trigger)
+        public virtual void Attack(GameTime gameTime, bool trigger, Camera gameCamera)
         {
-            Weapons[SelectedWeapon].Use(gameTime, trigger);
+            Weapons[SelectedWeapon].Use(gameTime, trigger, gameCamera);
         }
 
         public virtual void Draw(SpriteBatch sb, LightingEngine lightingEngine)
@@ -132,6 +139,7 @@ namespace Hunted
         public virtual void HitByProjectile(Projectile p)
         {
             Health -= (p.Owner.GetType() == typeof(HeroDude)) ? p.Damage : p.Damage / 2;
+            AudioController.PlaySFX("hit", 0.5f, -0.4f, 0.4f, Position);
             if (p.Type != ProjectileType.Knife)
             {
                 ParticleController.Instance.AddGSW(p);

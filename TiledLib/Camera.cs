@@ -10,6 +10,7 @@ namespace TiledLib
 {
     public class Camera
     {
+        public static Camera Instance;
         public Vector2 Position;
         public int Width;
         public int Height;
@@ -30,6 +31,7 @@ namespace TiledLib
         /// <param name="map">Game Map</param>
         public Camera(Viewport vp, Map map)
         {
+            Instance = this;
             Position = new Vector2(0, 0);
             Width = vp.Width;
             Height = vp.Height;

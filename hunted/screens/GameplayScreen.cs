@@ -181,7 +181,7 @@ namespace Hunted
 
                 gameMap.Update(gameTime);
 
-                enemyController.Update(gameTime, gameMap, gameHero, mapFog);
+                enemyController.Update(gameTime, gameMap, gameHero, mapFog, gameCamera);
                 projectileController.Update(gameTime, gameMap, gameHero);
                 particleController.Update(gameTime, gameMap);
                 itemController.Update(gameTime, gameMap, gameHero, mapFog);
@@ -294,7 +294,7 @@ namespace Hunted
                 if (input.CurrentKeyboardStates[0].IsKeyDown(Keys.A)) keyboardStick.X = -1f;
                 if (input.CurrentKeyboardStates[0].IsKeyDown(Keys.D)) keyboardStick.X = 1f;
                 if (keyboardStick.Length() > 0f) gameHero.Move(keyboardStick);
-                gameHero.Attack(gameTime, input.CurrentMouseState.LeftButton == ButtonState.Pressed);
+                gameHero.Attack(gameTime, input.CurrentMouseState.LeftButton == ButtonState.Pressed, gameCamera);
 
                 gameHero.LookAt(gameCamera.Position + (crosshairPos - new Vector2(gameCamera.Width / 2, gameCamera.Height / 2)));//Helper.PointOnCircle(ref gameHero.Position, 200, Helper.V2ToAngle(((gameHero.Position - gameCamera.Position) ) + (crosshairPos- new Vector2(gameCamera.Width / 2, gameCamera.Height / 2)))));
 
@@ -430,7 +430,12 @@ namespace Hunted
             // Spawn enemies
             foreach (Compound c in gameMap.Compounds)
             {
-                if (c.Buildings.Count > 0) possibleComps.Add(c);
+                if (c.Buildings.Count > 0)
+                {
+                    int bnum = c.Buildings.Count;
+                    foreach (Building b in c.Buildings) if (b.Type != BuildingType.Building) bnum--;
+                    if(bnum>0) possibleComps.Add(c);
+                }
 
                 for (int y = c.Bounds.Top; y < c.Bounds.Bottom; y++)
                 {
@@ -460,16 +465,31 @@ namespace Hunted
             // Spawn Generals
             for (int i = 0; i < 3; i++)
             {
-                Compound c = possibleComps[Helper.Random.Next(possibleComps.Count)];
-                Building b = c.Buildings[Helper.Random.Next(c.Buildings.Count)];
-                Vector2 pos = (new Vector2(b.Rect.Center.X, b.Rect.Center.Y) * new Vector2(gameMap.TileWidth, gameMap.TileHeight)) + new Vector2(50, 50);
-                AIDude newDude = new AIDude(pos);
-                newDude.LoadContent(enemyController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine);
-                newDude.Health = 50 + Helper.Random.Next(30);
-                newDude.BelongsToCompound = true;
-                newDude.IsGeneral = true;
-                enemyController.Enemies.Add(newDude);
-                possibleComps.Remove(c);
+
+                while (true)
+                {
+                    Compound c = possibleComps[Helper.Random.Next(possibleComps.Count)];
+                    bool found = false;
+                    foreach (AIDude d in enemyController.Enemies.Where(en => en.IsGeneral)) if ((d.Position - c.Position).Length() <= 20000) found = true;
+                    if (!found)
+                    {
+                        Building b;
+                        while (true)
+                        {
+                            b = c.Buildings[Helper.Random.Next(c.Buildings.Count)];
+                            if (b.Type == BuildingType.Building) break;
+                        }
+                        Vector2 pos = (new Vector2(b.Rect.Center.X, b.Rect.Center.Y) * new Vector2(gameMap.TileWidth, gameMap.TileHeight)) + new Vector2(50, 50);
+                        AIDude newDude = new AIDude(pos);
+                        newDude.LoadContent(enemyController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine);
+                        newDude.Health = 50 + Helper.Random.Next(30);
+                        newDude.BelongsToCompound = true;
+                        newDude.IsGeneral = true;
+                        enemyController.Enemies.Add(newDude);
+                        possibleComps.Remove(c);
+                        break;
+                    }
+                }
             }
 
             gameHud.Ticker.AddLine("> Explore area and eliminate resistance");

@@ -67,7 +67,7 @@ namespace Hunted
                     {
                         l.CurrentChar++;
                         l.CurrentText.Append(l.Text[l.CurrentChar]);
-                        //Audio.Audio.TickerBlip();
+                        AudioController.PlaySFX("ticker", -0.5f, 0f);
                         animTime = 0;
                     }
                     if (l.CurrentChar == l.Text.Length - 1)
