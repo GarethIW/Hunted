@@ -61,7 +61,7 @@ namespace Hunted
             base.Initialize();
         }
 
-        public void Update(GameTime gameTime, Map gameMap, HeroDude gameHero)
+        public void Update(GameTime gameTime, Map gameMap, HeroDude gameHero, bool[,] mapFog)
         {
             // Moving
             if ((Position - Target).Length() > 10f)
@@ -169,7 +169,16 @@ namespace Hunted
                 LightingEngine.Instance.RemoveSource(HeadTorch);
             }
 
-            base.Update(gameTime, gameMap);
+            if (IsGeneral)
+            {
+                if ((gameHero.Position - Position).Length() < 720f && !Discovered)
+                {
+                    Discovered = true;
+                    Hud.Instance.Ticker.AddLine("> You have found a General!");
+                }
+            }
+
+            base.Update(gameTime, gameMap, mapFog);
 
             HeadTorch.Position = Helper.PointOnCircle(ref Position, 30, Rotation - MathHelper.PiOver2);
             HeadTorch.Rotation = Rotation - MathHelper.PiOver2;
@@ -178,8 +187,8 @@ namespace Hunted
         private void SpawnDrops(Map gameMap)
         {
             int drop = Helper.Random.Next(65);
-            if (drop < 10) return;
-            if (drop >= 10 && drop < 35)
+            if (drop < 5) return;
+            if (drop >= 5 && drop < 35)
             {
                 if (Helper.Random.Next(2) == 0)
                 {
@@ -187,20 +196,46 @@ namespace Hunted
                     if (c[0].Discovered == false) ItemController.Instance.Spawn(ItemType.CompoundMap, Position);
                     else if (BelongsToCompound)
                     {
-                        for(int i =1;i<2;i++)
+                        bool found = false;
+                        for(int i =1;i<=2;i++)
                         {
                             if (c[i].Discovered == false)
                             {
                                 ItemController.Instance.Spawn(ItemType.CompoundMap, Position);
+                                found = true;
                                 break;
                             }
                         }
+                        if(!found) ItemController.Instance.Spawn(ItemType.Ammo, Position);
                     }
                     else ItemController.Instance.Spawn(ItemType.Health, Position);
                 }
                 else ItemController.Instance.Spawn(ItemType.Health, Position);
             }
-            if (drop >= 35 && drop < 58) ItemController.Instance.Spawn(ItemType.Ammo, Position);
+            if (drop >= 35 && drop < 58)
+            {
+                if (Helper.Random.Next(2) == 0)
+                {
+                    List<Compound> c = gameMap.FindNearestCompounds(Position);
+                    if (c[0].Discovered == false) ItemController.Instance.Spawn(ItemType.CompoundMap, Position);
+                    else if (BelongsToCompound)
+                    {
+                        bool found = false;
+                        for (int i = 1; i <= 2; i++)
+                        {
+                            if (c[i].Discovered == false)
+                            {
+                                ItemController.Instance.Spawn(ItemType.CompoundMap, Position);
+                                found = true;
+                                break;
+                            }
+                        }
+                        if(!found) ItemController.Instance.Spawn(ItemType.Ammo, Position);
+                    }
+                    else ItemController.Instance.Spawn(ItemType.Ammo, Position);
+                }
+                else ItemController.Instance.Spawn(ItemType.Ammo, Position);
+            }
             if (drop >= 58 && BelongsToCompound)
             {
                 foreach (AIDude e in EnemyController.Instance.Enemies.Where(en => en.IsGeneral).OrderBy(en => (en.Position - Position).Length()))

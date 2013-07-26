@@ -23,7 +23,7 @@ namespace Hunted.Weapons
            // ProjectileController.Instance.Add(ProjectileType.Pistol, owner, Helper.PointOnCircle(ref owner.Position, 40, owner.Rotation - MathHelper.PiOver2), owner.Position - Helper.PointOnCircle(ref owner.Position, 100, owner.Rotation + MathHelper.PiOver2));
 
             ProjectileController.Instance.Add(ProjectileType.Knife, owner, Helper.PointOnCircle(ref owner.Position, 75, owner.Rotation - MathHelper.PiOver2), Vector2.Zero);
-
+            ProjectileController.Instance.Add(ProjectileType.Knife, owner, Helper.PointOnCircle(ref owner.Position, 15, owner.Rotation - MathHelper.PiOver2), Vector2.Zero);
 
             return true;
         }

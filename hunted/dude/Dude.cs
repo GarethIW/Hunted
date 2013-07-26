@@ -54,10 +54,13 @@ namespace Hunted
             
         }
 
-        public virtual void Update(GameTime gameTime, Map gameMap)
+        public virtual void Update(GameTime gameTime, Map gameMap, bool[,] mapFog)
         {
             DoCollisions(gameMap);
             Position += Speed;
+
+            Position.X = MathHelper.Clamp(Position.X, 50, (gameMap.Width * gameMap.TileWidth) -50);
+            Position.Y = MathHelper.Clamp(Position.Y, 50, (gameMap.Height * gameMap.TileHeight) -50);
 
             if (Speed.Length() > 0f)
             {

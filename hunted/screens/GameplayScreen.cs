@@ -181,12 +181,12 @@ namespace Hunted
 
                 gameMap.Update(gameTime);
 
-                enemyController.Update(gameTime, gameMap, gameHero);
+                enemyController.Update(gameTime, gameMap, gameHero, mapFog);
                 projectileController.Update(gameTime, gameMap, gameHero);
                 particleController.Update(gameTime, gameMap);
                 itemController.Update(gameTime, gameMap, gameHero, mapFog);
 
-                gameHero.Update(gameTime, gameMap);
+                gameHero.Update(gameTime, gameMap, mapFog);
                 //lightSource1.Position = new Vector2(1000, 1000);
 
                 //cameraLightSource.Position = gameCamera.Position;

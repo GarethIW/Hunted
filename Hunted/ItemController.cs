@@ -79,6 +79,7 @@ namespace Hunted
                     {
                         gameMap.DiscoverCompound(c[0], mapFog);
                         if(!c[0].Bounds.Contains(Helper.VtoP(i.Position/100))) Hud.Instance.Ticker.AddLine("> An enemy compound has been revealed! (Tab/Back for map)");
+                        else Hud.Instance.Ticker.AddLine("> This compound has been revealed!");
                     }
                     else 
                     {
@@ -88,6 +89,7 @@ namespace Hunted
                             {
                                 gameMap.DiscoverCompound(nc, mapFog);
                                 if (!nc.Bounds.Contains(Helper.VtoP(i.Position / 100))) Hud.Instance.Ticker.AddLine("> An enemy compound has been revealed! (Tab/Back for map)");
+                                else Hud.Instance.Ticker.AddLine("> This compound has been revealed!");
                                 break;
                             }
                         }

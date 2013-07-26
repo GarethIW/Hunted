@@ -33,13 +33,13 @@ namespace Hunted
             lightingEngine = le;
         }
 
-        public void Update(GameTime gameTime, Map gameMap, HeroDude gameHero)
+        public void Update(GameTime gameTime, Map gameMap, HeroDude gameHero, bool[,] mapFog)
         {
             int count = 0;
             foreach (AIDude e in Enemies.Where(en => (gameHero.Position - en.Position).Length() < 4000f))
             {
                 count++;
-                e.Update(gameTime, gameMap, gameHero);
+                e.Update(gameTime, gameMap, gameHero, mapFog);
             }
 
             // Spawn some new enemies
@@ -89,8 +89,7 @@ namespace Hunted
                 if (!e.Discovered)
                 {
                     e.Discovered = true;
-                    Hud.Instance.Ticker.AddLine("> A general's location has been revealed!");
-                    Hud.Instance.Ticker.AddLine("(Tab/Back for map)");
+                    Hud.Instance.Ticker.AddLine("> A general's location has been revealed! (Tab/Back for map)");
                     break;
                 }
                 else break;

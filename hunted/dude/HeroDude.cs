@@ -35,13 +35,21 @@ namespace Hunted
             base.Initialize();
         }
 
-        public override void Update(GameTime gameTime, Map gameMap)
+        public override void Update(GameTime gameTime, Map gameMap, bool[,] mapFog)
         {
-            base.Update(gameTime, gameMap);
+            base.Update(gameTime, gameMap, mapFog);
 
             HeadTorch.Position = Helper.PointOnCircle(ref Position, 30, Rotation - MathHelper.PiOver2);
             HeadTorch.Rotation = Rotation - MathHelper.PiOver2;
-            
+
+            foreach (Compound c in gameMap.Compounds)
+            {
+                if (!c.Discovered && (c.Position-Position).Length()<1000f)
+                {
+                    gameMap.DiscoverCompound(c, mapFog);
+                    Hud.Instance.Ticker.AddLine("> This compound has been revealed!");
+                }
+            }
         }
 
         public override void Draw(SpriteBatch sb, LightingEngine lightingEngine)

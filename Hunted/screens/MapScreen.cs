@@ -42,6 +42,8 @@ namespace Hunted
 
         float scale;
 
+        SpriteFont font;
+
         #endregion
 
         #region Initialization
@@ -77,6 +79,7 @@ namespace Hunted
                 content = new ContentManager(ScreenManager.Game.Services, "Content");
 
             texBG = content.Load<Texture2D>("blank");
+            font = content.Load<SpriteFont>("hudfont");
 
             mapRT = new RenderTarget2D(ScreenManager.GraphicsDevice, 600, 600);
             scale = (mapRT.Width/(float)(gameMap.Width*gameMap.TileWidth));
@@ -154,6 +157,11 @@ namespace Hunted
             }
 
             spriteBatch.Draw(mapIcons, topLeft+(gameHero.Position * scale), new Rectangle(0, 0, 12, 13), Color.White, gameHero.Rotation - MathHelper.PiOver2, new Vector2(6, 6), 1f, SpriteEffects.None, 1);
+
+            spriteBatch.DrawString(font, "Compounds Discovered: " + gameMap.Compounds.Count(c => c.Discovered) + "/" + gameMap.Compounds.Count, topLeft + new Vector2(0, -30) + new Vector2(1,1), Color.Black * 0.4f * TransitionAlpha);
+            spriteBatch.DrawString(font, "Generals Eliminated: " + (3 - EnemyController.Instance.Enemies.Count(e => e.IsGeneral)) + "/" +(3), topLeft + new Vector2(0, -50) + new Vector2(1, 1), Color.Black * 0.4f * TransitionAlpha);
+            spriteBatch.DrawString(font, "Compounds Discovered: " + gameMap.Compounds.Count(c => c.Discovered) + "/" + gameMap.Compounds.Count, topLeft + new Vector2(0, -30), Color.White * TransitionAlpha);
+            spriteBatch.DrawString(font, "Generals Eliminated: " + (3 - EnemyController.Instance.Enemies.Count(e => e.IsGeneral)) + "/" + (3), topLeft + new Vector2(0, -50), Color.White * TransitionAlpha);
 
             spriteBatch.End();
         }
