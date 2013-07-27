@@ -10,7 +10,7 @@ using TiledLib;
 
 namespace Hunted
 {
-    public class Dude
+    public class Vehicle
     {
         public Vector2 Position;
         public Vector2 Speed;
@@ -21,11 +21,9 @@ namespace Hunted
 
         public float Health;
 
-        public int Ammo;
+        public List<LightSource> Lights;
 
-        public LightSource HeadTorch;
-
-        internal float maxSpeed = 5f;
+        internal float maxSpeed = 12f;
 
         internal Texture2D spriteSheet;
 
@@ -34,7 +32,7 @@ namespace Hunted
         internal List<Weapon> Weapons = new List<Weapon>();
         internal int SelectedWeapon = 0;
 
-        public Dude(Vector2 pos)
+        public Vehicle(Vector2 pos)
         {
             Position = pos;
         }
@@ -47,14 +45,11 @@ namespace Hunted
 
         internal virtual void Initialize()
         {
-            Animations.Add("feet", new SpriteAnimation(2, 100, 0, new Rectangle(0,0,100,100), true));
-            Animations.Add("arms", new SpriteAnimation(2, 100, 1, new Rectangle(0,0,100,100), true));
-            Animations.Add("head", new SpriteAnimation(2, 100, 2, new Rectangle(0, 0, 100, 100), false));
-
+            
             
         }
 
-        public virtual void Update(GameTime gameTime, Map gameMap, bool[,] mapFog)
+        public virtual void Update(GameTime gameTime, Map gameMap)
         {
             DoCollisions(gameMap);
             Position += Speed;
@@ -64,29 +59,17 @@ namespace Hunted
 
             if (Speed.Length() > 0f)
             {
-                Animations["feet"].Update(gameTime);
-                Animations["arms"].Update(gameTime);
-                Animations["head"].Update(gameTime);
-
-                if (Animations["feet"].CurrentFrame == 0)
-                {
-                    // Footsteps
-                    Tile t = ((TileLayer)gameMap.GetLayer("Terrain")).Tiles[(int)(Position.X / gameMap.TileWidth), (int)(Position.Y / gameMap.TileWidth)];
-                    if (t.Properties.Contains("fstep")) AudioController.PlaySFX("fstep-" + t.Properties["fstep"], 0.1f, -0.3f, 0.3f, Position);
-                }
+               
             }
             else
             {
-                Animations["feet"].Reset();
-                Animations["arms"].Reset();
-                Animations["head"].Reset();
+               
             }
 
 
             Speed = Vector2.Zero;
 
             Health = MathHelper.Clamp(Health, 0f, 100f);
-            Ammo = (int)MathHelper.Clamp(Ammo, 0, 100);
         }
 
         public virtual void Move(Vector2 amount)
@@ -110,28 +93,24 @@ namespace Hunted
 
         public virtual void Draw(SpriteBatch sb, LightingEngine lightingEngine)
         {  
-            // Feet
-            sb.Draw(spriteSheet, Position, Animations["feet"].CellRect, lightingEngine.CurrentSunColor, Rotation, new Vector2(100,100)/2, 1f, SpriteEffects.None, 1);
-            // Arms
-            sb.Draw(spriteSheet, Position, Animations["arms"].CellRect, lightingEngine.CurrentSunColor, Rotation, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
-            // Head
-            sb.Draw(spriteSheet, Position, Animations["head"].CellRect, lightingEngine.CurrentSunColor, Rotation, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
+            //sb.Draw(spriteSheet, Position, , lightingEngine.CurrentSunColor, Rotation, new Vector2(100,100)/2, 1f, SpriteEffects.None, 1);
+            
         }
         
         public virtual void DrawShadows(SpriteBatch sb, LightingEngine lightingEngine)
         {
-            for (int i = 1; i < 20; i += 2)
-            {
-                Vector2 pos = Position + new Vector2(lightingEngine.CurrentShadowVect.X * i, lightingEngine.CurrentShadowVect.Y * i);
+            //for (int i = 1; i < 20; i += 2)
+            //{
+            //    Vector2 pos = Position + new Vector2(lightingEngine.CurrentShadowVect.X * i, lightingEngine.CurrentShadowVect.Y * i);
 
-                sb.Draw(spriteSheet, pos, Animations["arms"].CellRect, Color.Black * 0.03f, Rotation, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
-            }
+            //    sb.Draw(spriteSheet, pos, Animations["arms"].CellRect, Color.Black * 0.03f, Rotation, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
+            //}
         }
 
         public virtual void DrawLightBlock(SpriteBatch sb)
         {
             // Arms
-            sb.Draw(spriteSheet, Position, Animations["arms"].CellRect, Color.Black, Rotation, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
+            //sb.Draw(spriteSheet, Position, Animations["arms"].CellRect, Color.Black, Rotation, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
         }
 
         public virtual void Collided() { }
