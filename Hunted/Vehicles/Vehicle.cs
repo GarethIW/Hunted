@@ -23,6 +23,8 @@ namespace Hunted
 
         public List<LightSource> Lights;
 
+        public List<Vector2> CollisionVerts = new List<Vector2>();
+
         internal float maxSpeed = 12f;
 
         internal Texture2D spriteSheet;
@@ -35,6 +37,7 @@ namespace Hunted
         public Vehicle(Vector2 pos)
         {
             Position = pos;
+            Active = true;
         }
 
         

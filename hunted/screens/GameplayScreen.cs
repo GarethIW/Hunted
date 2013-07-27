@@ -43,6 +43,7 @@ namespace Hunted
         ParticleController particleController;
         ProjectileController projectileController;
         ItemController itemController;
+        VehicleController vehicleController;
 
         LightingEngine lightingEngine = new LightingEngine();
 
@@ -107,6 +108,8 @@ namespace Hunted
             projectileController.LoadContent(content);
             itemController = new ItemController();
             itemController.LoadContent(content, ScreenManager.GraphicsDevice, lightingEngine);
+            vehicleController = new VehicleController();
+            vehicleController.LoadContent(content, ScreenManager.GraphicsDevice, lightingEngine);
 
             gameMap = content.Load<Map>("map/map");
 
@@ -185,6 +188,7 @@ namespace Hunted
                 projectileController.Update(gameTime, gameMap, gameHero);
                 particleController.Update(gameTime, gameMap);
                 itemController.Update(gameTime, gameMap, gameHero, mapFog);
+                vehicleController.Update(gameTime, gameMap, gameHero);
 
                 gameHero.Update(gameTime, gameMap, mapFog);
                 //lightSource1.Position = new Vector2(1000, 1000);
@@ -346,6 +350,7 @@ namespace Hunted
                 gameMap.DrawLayer(spriteBatch, "Wall", gameCamera, lightingEngine, Color.LightGray);
                 gameHero.DrawLightBlock(spriteBatch);
                 enemyController.DrawLightBlock(spriteBatch, gameHero);
+                vehicleController.DrawLightBlock(spriteBatch, gameHero);
                 spriteBatch.End();
             }
             LightingEngine.Instance.ShadowMap.EndGeneratingShadowCasterMap();
@@ -362,9 +367,10 @@ namespace Hunted
            
             // We re-print the elements not affected by the light (in this case the shadow casters)
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
-            gameHero.DrawShadows(spriteBatch, lightingEngine);
-            enemyController.DrawShadows(spriteBatch, lightingEngine, gameHero);
             itemController.DrawShadows(spriteBatch, lightingEngine, gameHero);
+            enemyController.DrawShadows(spriteBatch, lightingEngine, gameHero);
+            vehicleController.DrawShadows(spriteBatch, lightingEngine, gameHero);
+            gameHero.DrawShadows(spriteBatch, lightingEngine);
             spriteBatch.End();
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
@@ -377,8 +383,9 @@ namespace Hunted
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
             itemController.Draw(spriteBatch, lightingEngine, gameHero);
-            gameHero.Draw(spriteBatch, lightingEngine);
             enemyController.Draw(spriteBatch, lightingEngine, gameHero);
+            vehicleController.Draw(spriteBatch, lightingEngine, gameHero);
+            gameHero.Draw(spriteBatch, lightingEngine);
             gameMap.DrawShadows(spriteBatch, "Wall", gameCamera, lightingEngine);
             gameMap.DrawLayer(spriteBatch, "Wall", gameCamera, lightingEngine, Color.White);
             projectileController.Draw(spriteBatch);
@@ -488,6 +495,21 @@ namespace Hunted
                         enemyController.Enemies.Add(newDude);
                         possibleComps.Remove(c);
                         break;
+                    }
+                }
+            }
+
+            // Spawn vehicles
+            foreach (Compound c in gameMap.Compounds)
+            {
+                foreach (Building b in c.Buildings)
+                {
+                    if (b.Type == BuildingType.Carpark)
+                    {
+                        Jeep j = new Jeep((new Vector2(b.Rect.Center.X, b.Rect.Center.Y) * new Vector2(gameMap.TileWidth, gameMap.TileHeight)) + new Vector2(50, 50));
+                        j.Rotation = (float)Helper.Random.NextDouble() * MathHelper.TwoPi;
+                        j.LoadContent(vehicleController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine);
+                        vehicleController.Vehicles.Add(j);
                     }
                 }
             }

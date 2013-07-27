@@ -125,5 +125,28 @@ namespace Hunted
         {
             return new Point((int)v.X, (int)v.Y);
         }
+
+        public static bool IsPointInShape(Vector2 point, List<Vector2> verts)
+        {
+            bool oddNodes = false;
+
+            int j = verts.Count - 1;
+            float x = point.X;
+            float y = point.Y;
+
+            for (int i = 0; i < verts.Count; i++)
+            {
+                Vector2 tpi = verts[i];
+                Vector2 tpj = verts[j];
+
+                if (tpi.Y < y && tpj.Y >= y || tpj.Y < y && tpi.Y >= y)
+                    if (tpi.X + (y - tpi.Y) / (tpj.Y - tpi.Y) * (tpj.X - tpi.X) < x)
+                        oddNodes = !oddNodes;
+
+                j = i;
+            }
+
+            return oddNodes;
+        }
     }
 }

@@ -487,7 +487,7 @@ namespace Hunted
                                 {
                                     int doorx = rand.Next(innerBounds.Width - 7) + 3;
                                     for (int xx = innerBounds.Left + doorx; xx < (innerBounds.Left + doorx) + 4; xx++) wallLayer.Tiles[xx, innerBounds.Top] = null;
-                                    if (!carparkPlaced && rand.Next(3) == 1)
+                                    if (!carparkPlaced && rand.Next(2) == 0)
                                     {
                                         carpark = new Building() { Type = BuildingType.Carpark, Rect = new Rectangle((innerBounds.Left + doorx), innerBounds.Top + 2, 4, 4) };
                                         newCompound.Buildings.Add(carpark);
@@ -498,7 +498,7 @@ namespace Hunted
                                 {
                                     int doorx = rand.Next(innerBounds.Width - 7) + 3;
                                     for (int xx = innerBounds.Left + doorx; xx < (innerBounds.Left + doorx) + 4; xx++) wallLayer.Tiles[xx, innerBounds.Bottom] = null;
-                                    if (!carparkPlaced && rand.Next(3) == 1)
+                                    if (!carparkPlaced && rand.Next(2) == 0)
                                     {
                                         carpark = new Building() { Type = BuildingType.Carpark, Rect = new Rectangle((innerBounds.Left + doorx), innerBounds.Bottom - 6, 4, 4) };
                                         newCompound.Buildings.Add(carpark);
@@ -509,7 +509,7 @@ namespace Hunted
                                 {
                                     int doory = rand.Next(innerBounds.Height - 7) + 3;
                                     for (int yy = innerBounds.Top + doory; yy < (innerBounds.Top + doory) + 4; yy++) wallLayer.Tiles[innerBounds.Left,yy] = null;
-                                    if (!carparkPlaced && rand.Next(3) == 1)
+                                    if (!carparkPlaced && rand.Next(2) == 0)
                                     {
                                         carpark = new Building() { Type = BuildingType.Carpark, Rect = new Rectangle(innerBounds.Left + 2, (innerBounds.Top + doory), 4, 4) };
                                         newCompound.Buildings.Add(carpark);
@@ -520,7 +520,7 @@ namespace Hunted
                                 {
                                     int doory = rand.Next(innerBounds.Height - 7) + 3;
                                     for (int yy = innerBounds.Top + doory; yy < (innerBounds.Top + doory) + 4; yy++) wallLayer.Tiles[innerBounds.Right, yy] = null;
-                                    if (!carparkPlaced && rand.Next(3) == 1)
+                                    if (!carparkPlaced && rand.Next(2) == 0)
                                     {
                                         carpark = new Building() { Type = BuildingType.Carpark, Rect = new Rectangle(innerBounds.Right - 6, (innerBounds.Top + doory), 4, 4) };
                                         newCompound.Buildings.Add(carpark);
@@ -587,10 +587,10 @@ namespace Hunted
                                     }
                                 }
 
-                                if (carpark!=null)
-                                    for (int xx = carpark.Rect.Left; xx < carpark.Rect.Right; xx++)
-                                        for (int yy = carpark.Rect.Top; yy < carpark.Rect.Bottom; yy++)
-                                             terrainLayer.Tiles[xx, yy] = map.Tiles[CARPARK];
+                                //if (carpark!=null)
+                                //    for (int xx = carpark.Rect.Left; xx < carpark.Rect.Right; xx++)
+                                //        for (int yy = carpark.Rect.Top; yy < carpark.Rect.Bottom; yy++)
+                                //             terrainLayer.Tiles[xx, yy] = map.Tiles[CARPARK];
 
                                 MakeBuildings(map, wallLayer, terrainLayer, newCompound);
 

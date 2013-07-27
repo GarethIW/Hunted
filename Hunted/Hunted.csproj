@@ -78,6 +78,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AudioController.cs" />
+    <Compile Include="VehicleController.cs" />
     <Compile Include="ItemController.cs" />
     <Compile Include="Dude\Weapons\Knife.cs" />
     <Compile Include="Dude\Weapons\Pistol.cs" />
@@ -115,6 +116,8 @@
     <Compile Include="SpriteAnimation.cs" />
     <Compile Include="TerrainGeneration.cs" />
     <Compile Include="TickerText.cs" />
+    <Compile Include="Vehicles\Jeep.cs" />
+    <Compile Include="Vehicles\Vehicle.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />
