@@ -12,6 +12,8 @@ namespace Hunted
 {
     public class HeroDude : Dude
     {
+        
+
         public HeroDude(Vector2 pos) : base(pos)
         {
             Health = 100f;
@@ -50,10 +52,20 @@ namespace Hunted
                     Hud.Instance.Ticker.AddLine("> This compound has been revealed!");
                 }
             }
+
+            if (drivingVehicle!=null)
+            {
+                HeadTorch.Active = false;
+
+                Position = drivingVehicle.Position;
+            }
+            else HeadTorch.Active = true;
         }
 
         public override void Draw(SpriteBatch sb, LightingEngine lightingEngine)
         {
+            if (drivingVehicle != null) return;
+
             base.Draw(sb, lightingEngine);
         }
 

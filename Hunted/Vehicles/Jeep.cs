@@ -35,10 +35,10 @@ namespace Hunted
         public override void Update(GameTime gameTime, Map gameMap)
         {
             CollisionVerts.Clear();
-            CollisionVerts.Add(Helper.PointOnCircle(ref Position, 150, -0.44f + (Rotation-MathHelper.PiOver2)));
-            CollisionVerts.Add(Helper.PointOnCircle(ref Position, 150, 0.44f + (Rotation - MathHelper.PiOver2)));
-            CollisionVerts.Add(Helper.PointOnCircle(ref Position, 150, -0.44f + MathHelper.Pi + (Rotation - MathHelper.PiOver2)));
-            CollisionVerts.Add(Helper.PointOnCircle(ref Position, 150, 0.44f + MathHelper.Pi + (Rotation - MathHelper.PiOver2)));
+            CollisionVerts.Add(Helper.PointOnCircle(ref Position, 150, -0.44f + (Rotation)));
+            CollisionVerts.Add(Helper.PointOnCircle(ref Position, 150, 0.44f + (Rotation)));
+            CollisionVerts.Add(Helper.PointOnCircle(ref Position, 150, -0.44f + MathHelper.Pi + (Rotation)));
+            CollisionVerts.Add(Helper.PointOnCircle(ref Position, 150, 0.44f + MathHelper.Pi + (Rotation)));
             base.Update(gameTime, gameMap);
 
             //HeadTorch.Position = Helper.PointOnCircle(ref Position, 30, Rotation - MathHelper.PiOver2);
@@ -47,7 +47,7 @@ namespace Hunted
 
         public override void Draw(SpriteBatch sb, LightingEngine lightingEngine)
         {  
-            sb.Draw(spriteSheet, Position, new Rectangle(0,0,200,300), lightingEngine.CurrentSunColor, Rotation, new Vector2(200,300)/2, 1f, SpriteEffects.None, 1);
+            sb.Draw(spriteSheet, Position, new Rectangle(0,0,200,300), lightingEngine.CurrentSunColor, Rotation+MathHelper.PiOver2, new Vector2(200,300)/2, 1f, SpriteEffects.None, 1);
             
         }
 
@@ -57,14 +57,14 @@ namespace Hunted
             {
                 Vector2 pos = Position + new Vector2(lightingEngine.CurrentShadowVect.X * i, lightingEngine.CurrentShadowVect.Y * i);
 
-                sb.Draw(spriteSheet, pos, new Rectangle(0, 0, 200, 300), Color.Black * 0.03f, Rotation, new Vector2(200, 300) / 2, 1f, SpriteEffects.None, 1);
+                sb.Draw(spriteSheet, pos, new Rectangle(0, 0, 200, 300), Color.Black * 0.03f, Rotation + MathHelper.PiOver2, new Vector2(200, 300) / 2, 1f, SpriteEffects.None, 1);
             }
         }
 
         public override void DrawLightBlock(SpriteBatch sb)
         {
             // Arms
-            sb.Draw(spriteSheet, Position, new Rectangle(0, 0, 200, 300), Color.Black, Rotation, new Vector2(200, 300) / 2, 1f, SpriteEffects.None, 1);
+            sb.Draw(spriteSheet, Position, new Rectangle(0, 0, 200, 300), Color.Black, Rotation + MathHelper.PiOver2, new Vector2(200, 300) / 2, 1f, SpriteEffects.None, 1);
         }
 
 

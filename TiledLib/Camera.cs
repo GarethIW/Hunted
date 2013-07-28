@@ -19,6 +19,7 @@ namespace TiledLib
         public float Rotation;
         public float RotationTarget;
         public float Zoom = 1f;
+        public float ZoomTarget = 1f;
 
         public Matrix CameraMatrix;
 
@@ -97,6 +98,8 @@ namespace TiledLib
             
             // Move camera toward target
             Position = Vector2.Lerp(Position, Target, speed * 0.5f);
+            Zoom = MathHelper.Lerp(Zoom, ZoomTarget, speed * 0.5f);
+
 
             Rotation = TurnToFace(Vector2.Zero, AngleToVector(RotationTarget, 1f), Rotation, 0.02f);
 

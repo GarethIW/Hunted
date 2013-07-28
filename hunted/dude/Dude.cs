@@ -23,6 +23,8 @@ namespace Hunted
 
         public int Ammo;
 
+        public Vehicle drivingVehicle = null;
+
         public LightSource HeadTorch;
 
         internal float maxSpeed = 5f;
@@ -95,6 +97,36 @@ namespace Hunted
             {
                 amount.Normalize();
                 Speed = amount * maxSpeed;
+            }
+        }
+
+        public virtual void EnterVehicle(Map gameMap)
+        {
+            if (drivingVehicle == null)
+            {
+                foreach (Vehicle v in VehicleController.Instance.Vehicles)
+                {
+                    if ((v.Position - Position).Length() < 200f)
+                    {
+                        drivingVehicle = v;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                // Exit vehicle
+                //bool found = false;
+                for (float a = 0f; a < MathHelper.TwoPi; a += 0.5f)
+                {
+                    Vector2 pos = Helper.PointOnCircle(ref drivingVehicle.Position, 200, a);
+                    if (!gameMap.CheckTileCollision(pos) && !Helper.IsPointInShape(pos, drivingVehicle.CollisionVerts))
+                    {
+                        Position = pos;
+                        drivingVehicle = null;
+                        break;
+                    }
+                }
             }
         }
 

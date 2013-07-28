@@ -26,6 +26,13 @@ namespace Hunted
         public List<Vector2> CollisionVerts = new List<Vector2>();
 
         internal float maxSpeed = 12f;
+        internal float linearSpeed = 0f;
+        internal float decelerate = 0.025f;
+        internal float acceleration = 0.1f;
+        internal float turnSpeed = 0.025f;
+        internal float turnAmount = 0f;
+
+        bool turning = false;
 
         internal Texture2D spriteSheet;
 
@@ -33,6 +40,8 @@ namespace Hunted
 
         internal List<Weapon> Weapons = new List<Weapon>();
         internal int SelectedWeapon = 0;
+
+        
 
         public Vehicle(Vector2 pos)
         {
@@ -69,8 +78,30 @@ namespace Hunted
                
             }
 
+            if(linearSpeed>0f) linearSpeed -= decelerate;
+            if (linearSpeed < 0f) linearSpeed += decelerate;
 
-            Speed = Vector2.Zero;
+            linearSpeed = MathHelper.Clamp(linearSpeed, -5f, maxSpeed);
+            Vector2 moveVect = Helper.AngleToVector(Rotation, 100f);
+            moveVect.Normalize();
+
+            if (!turning)
+            {
+                //if (turnAmount > 0f) turnAmount -= 0.25f;
+                //if (turnAmount < 0f) turnAmount += 0.25f;
+                //turnAmount = 0f;
+
+                turnAmount = MathHelper.Lerp(turnAmount, 0f, 0.1f);
+            }
+
+            if ((turnAmount > 0f && turnAmount < 0.001f) || (turnAmount < 0f && turnAmount > -0.001f)) turnAmount = 0f;
+
+            if (linearSpeed >= 0.1f || linearSpeed <= -0.1f)
+                Rotation += MathHelper.Clamp((linearSpeed / 100f) * turnAmount,-0.025f,0.025f);
+
+            Speed = moveVect * linearSpeed;
+
+            turning = false;
 
             Health = MathHelper.Clamp(Health, 0f, 100f);
         }
@@ -116,7 +147,10 @@ namespace Hunted
             //sb.Draw(spriteSheet, Position, Animations["arms"].CellRect, Color.Black, Rotation, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
         }
 
-        public virtual void Collided() { }
+        public virtual void Collided() 
+        {
+            linearSpeed = 0f;
+        }
 
         public virtual void HitByProjectile(Projectile p)
         {
@@ -132,6 +166,26 @@ namespace Hunted
             }
         }
 
+
+        internal void Accelerate(float max)
+        {
+            if (linearSpeed < (maxSpeed * max)) linearSpeed += acceleration;
+            
+        }
+
+        internal void Brake()
+        {
+            linearSpeed -= acceleration * 2f;
+        }
+
+        internal void Turn(float p)
+        {
+            if (turnAmount > 0f && p < 0f) turnAmount = 0f;
+            if (turnAmount < 0f && p > 0f) turnAmount = 0f;
+            turnAmount += (turnSpeed * p);
+            turning = true;
+        }
+
         void DoCollisions(Map gameMap)
         {
             bool LCollision = false;
@@ -141,30 +195,30 @@ namespace Hunted
 
             if (Speed.X > 0f)
             {
-                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 50, 0f))) RCollision = true;
-                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 50, -0.4f))) RCollision = true;
-                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 50, 0.4f))) RCollision = true;
+                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 100, 0f))) RCollision = true;
+                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 100, -0.3f))) RCollision = true;
+                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 100, 0.3f))) RCollision = true;
             }
 
             if (Speed.X < 0f)
             {
-                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 50, MathHelper.Pi))) LCollision = true;
-                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 50, MathHelper.Pi - 0.4f))) LCollision = true;
-                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 50, MathHelper.Pi + 0.4f))) LCollision = true;
+                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 100, MathHelper.Pi))) LCollision = true;
+                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 100, MathHelper.Pi - 0.3f))) LCollision = true;
+                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 100, MathHelper.Pi + 0.3f))) LCollision = true;
             }
 
             if (Speed.Y < 0f)
             {
-                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 50, (MathHelper.PiOver2 + MathHelper.Pi)))) UCollision = true;
-                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 50, (MathHelper.PiOver2 + MathHelper.Pi) - 0.4f))) UCollision = true;
-                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 50, (MathHelper.PiOver2 + MathHelper.Pi) + 0.4f))) UCollision = true;
+                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 100, (MathHelper.PiOver2 + MathHelper.Pi)))) UCollision = true;
+                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 100, (MathHelper.PiOver2 + MathHelper.Pi) - 0.3f))) UCollision = true;
+                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 100, (MathHelper.PiOver2 + MathHelper.Pi) + 0.3f))) UCollision = true;
             }
 
             if (Speed.Y > 0f)
             {
-                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 50, MathHelper.PiOver2))) DCollision = true;
-                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 50, MathHelper.PiOver2 - 0.4f))) DCollision = true;
-                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 50, MathHelper.PiOver2 + 0.4f))) DCollision = true;
+                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 100, MathHelper.PiOver2))) DCollision = true;
+                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 100, MathHelper.PiOver2 - 0.3f))) DCollision = true;
+                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 100, MathHelper.PiOver2 + 0.3f))) DCollision = true;
             }
 
             if (Speed.X > 0f && RCollision) Speed.X = 0f;
@@ -172,8 +226,10 @@ namespace Hunted
             if (Speed.Y > 0f && DCollision) Speed.Y = 0f;
             if (Speed.Y < 0f && UCollision) Speed.Y = 0f;
 
-            if (UCollision || DCollision || LCollision || RCollision) Collided();
+            if (UCollision || DCollision || LCollision || RCollision) 
+                Collided();
         }
+
 
 
     }

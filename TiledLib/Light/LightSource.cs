@@ -48,6 +48,8 @@ namespace TiledLib
         public int Radius;
         public float RenderRadius;
 
+        public bool Active = true;
+
         public Vector2 PrintPosition
         {
             get { return this.Position - new Vector2(this.Radius, this.Radius); }
@@ -112,6 +114,8 @@ namespace TiledLib
 
         public void Draw(SpriteBatch spriteBatch, RenderTarget2D beamRT)
         {
+            if(!Active) return;
+
             if (SpotStencil == null)
             {
                 int size = (int)(this.Radius * 2f);
@@ -130,6 +134,8 @@ namespace TiledLib
 
         public void Draw(SpriteBatch spriteBatch, byte opacity, RenderTarget2D printRT)
         {
+            if(!Active) return;
+
             Color colorA = this.Color;
             colorA.A = opacity;
             int size = (int)(this.Radius * 2f);
@@ -138,6 +144,8 @@ namespace TiledLib
 
         public void Draw(SpriteBatch spriteBatch, Color color, byte opacity, RenderTarget2D printRT)
         {
+            if(!Active) return;
+
             color.A = opacity;
             int size = (int)(this.Radius * 2f);
             spriteBatch.Draw(printRT, new Rectangle((int)this.PrintPosition.X, (int)this.PrintPosition.Y, size, size), color);
