@@ -21,7 +21,7 @@ namespace Hunted
 
         public float Health;
 
-        public List<LightSource> Lights;
+        public List<LightSource> Lights = new List<LightSource>();
 
         public List<Vector2> CollisionVerts = new List<Vector2>();
 
@@ -81,7 +81,7 @@ namespace Hunted
             if(linearSpeed>0f) linearSpeed -= decelerate;
             if (linearSpeed < 0f) linearSpeed += decelerate;
 
-            linearSpeed = MathHelper.Clamp(linearSpeed, -5f, maxSpeed);
+            linearSpeed = MathHelper.Clamp(linearSpeed, -(maxSpeed/2), maxSpeed);
             Vector2 moveVect = Helper.AngleToVector(Rotation, 100f);
             moveVect.Normalize();
 
@@ -104,6 +104,28 @@ namespace Hunted
             turning = false;
 
             Health = MathHelper.Clamp(Health, 0f, 100f);
+
+            foreach (Dude d in EnemyController.Instance.Enemies)
+            {
+                if (Helper.IsPointInShape(d.Position, this.CollisionVerts) && d.Health>=0f)
+                {
+                    Health -= 0.5f;
+                    d.HitByVehicle(this);
+                }
+            }
+
+            if (Health < 50f)
+            {
+                maxSpeed = 10f;
+            }
+            if (Health < 20f)
+            {
+                maxSpeed = (Health * 4f) / 10f;
+            }
+            if (Health <= 0f)
+            {
+                maxSpeed = 0f;
+            }
         }
 
         public virtual void Move(Vector2 amount)
@@ -149,20 +171,22 @@ namespace Hunted
 
         public virtual void Collided() 
         {
+            Health -= ((float)Math.Abs(linearSpeed) / 2f);
             linearSpeed = 0f;
+            Speed = Vector2.Zero;
         }
 
         public virtual void HitByProjectile(Projectile p)
         {
-            Health -= (p.Owner.GetType() == typeof(HeroDude)) ? p.Damage : p.Damage / 2;
-            AudioController.PlaySFX("hit", 0.5f, -0.4f, 0.4f, Position);
+            Health -= p.Damage/5f;
+            //AudioController.PlaySFX("hit", 0.5f, -0.4f, 0.4f, Position);
             if (p.Type != ProjectileType.Knife)
             {
-                ParticleController.Instance.AddGSW(p);
+                //ParticleController.Instance.AddGSW(p);
             }
             else
             {
-                ParticleController.Instance.AddKnifeWound(p);
+                //ParticleController.Instance.AddKnifeWound(p);
             }
         }
 
@@ -188,46 +212,97 @@ namespace Hunted
 
         void DoCollisions(Map gameMap)
         {
-            bool LCollision = false;
-            bool RCollision = false;
-            bool UCollision = false;
-            bool DCollision = false;
+            bool Collision = false;
+            Vector2 test = Speed;
+            test.Normalize();
+            float rot = Helper.V2ToAngle(test);
 
-            if (Speed.X > 0f)
+            if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 135, rot))) Collision = true;
+            if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 135, rot -0.2f))) Collision = true;
+            if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 135, rot + 0.2f))) Collision = true;
+            foreach (Vehicle veh in VehicleController.Instance.Vehicles)
             {
-                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 100, 0f))) RCollision = true;
-                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 100, -0.3f))) RCollision = true;
-                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 100, 0.3f))) RCollision = true;
+                if (veh == this) continue;
+                if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 135, rot), veh.CollisionVerts)) Collision = true;
+                if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 135, rot - 0.2f), veh.CollisionVerts)) Collision = true;
+                if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 135, rot + 0.2f), veh.CollisionVerts)) Collision = true;
             }
-
-            if (Speed.X < 0f)
+            if (Collision)
             {
-                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 100, MathHelper.Pi))) LCollision = true;
-                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 100, MathHelper.Pi - 0.3f))) LCollision = true;
-                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 100, MathHelper.Pi + 0.3f))) LCollision = true;
-            }
-
-            if (Speed.Y < 0f)
-            {
-                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 100, (MathHelper.PiOver2 + MathHelper.Pi)))) UCollision = true;
-                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 100, (MathHelper.PiOver2 + MathHelper.Pi) - 0.3f))) UCollision = true;
-                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 100, (MathHelper.PiOver2 + MathHelper.Pi) + 0.3f))) UCollision = true;
-            }
-
-            if (Speed.Y > 0f)
-            {
-                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 100, MathHelper.PiOver2))) DCollision = true;
-                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 100, MathHelper.PiOver2 - 0.3f))) DCollision = true;
-                if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 100, MathHelper.PiOver2 + 0.3f))) DCollision = true;
-            }
-
-            if (Speed.X > 0f && RCollision) Speed.X = 0f;
-            if (Speed.X < 0f && LCollision) Speed.X = 0f;
-            if (Speed.Y > 0f && DCollision) Speed.Y = 0f;
-            if (Speed.Y < 0f && UCollision) Speed.Y = 0f;
-
-            if (UCollision || DCollision || LCollision || RCollision) 
                 Collided();
+            }
+
+            //bool LCollision = false;
+            //bool RCollision = false;
+            //bool UCollision = false;
+            //bool DCollision = false;
+
+            //if (Speed.X > 0f)
+            //{
+            //    if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 135, 0f))) RCollision = true;
+            //    if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 135, -0.2f))) RCollision = true;
+            //    if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 135, 0.2f))) RCollision = true;
+            //    foreach (Vehicle veh in VehicleController.Instance.Vehicles)
+            //    {
+            //        if (veh == this) continue;
+            //        if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 135, 0f), veh.CollisionVerts)) RCollision = true;
+            //        if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 135, -0.2f), veh.CollisionVerts)) RCollision = true;
+            //        if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 135, 0.2f), veh.CollisionVerts)) RCollision = true;
+            //    }
+            //}
+
+            //if (Speed.X < 0f)
+            //{
+            //    if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 135, MathHelper.Pi))) LCollision = true;
+            //    if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 135, MathHelper.Pi - 0.2f))) LCollision = true;
+            //    if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 135, MathHelper.Pi + 0.2f))) LCollision = true;
+            //    foreach (Vehicle veh in VehicleController.Instance.Vehicles)
+            //    {
+            //        if (veh == this) continue;
+
+            //        if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 135, MathHelper.Pi), veh.CollisionVerts)) LCollision = true;
+            //        if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 135, MathHelper.Pi - 0.2f), veh.CollisionVerts)) LCollision = true;
+            //        if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 135, MathHelper.Pi + 0.2f), veh.CollisionVerts)) LCollision = true;
+            //    }
+            //}
+
+            //if (Speed.Y < 0f)
+            //{
+            //    if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 135, (MathHelper.PiOver2 + MathHelper.Pi)))) UCollision = true;
+            //    if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 135, (MathHelper.PiOver2 + MathHelper.Pi) - 0.2f))) UCollision = true;
+            //    if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 135, (MathHelper.PiOver2 + MathHelper.Pi) + 0.2f))) UCollision = true;
+            //    foreach (Vehicle veh in VehicleController.Instance.Vehicles)
+            //    {
+            //        if (veh == this) continue;
+
+            //        if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 135, (MathHelper.PiOver2 + MathHelper.Pi)), veh.CollisionVerts)) UCollision = true;
+            //        if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 135, (MathHelper.PiOver2 + MathHelper.Pi) - 0.2f), veh.CollisionVerts)) UCollision = true;
+            //        if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 135, (MathHelper.PiOver2 + MathHelper.Pi) + 0.2f), veh.CollisionVerts)) UCollision = true;
+            //    }
+            //}
+
+            //if (Speed.Y > 0f)
+            //{
+            //    if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 135, MathHelper.PiOver2))) DCollision = true;
+            //    if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 135, MathHelper.PiOver2 - 0.2f))) DCollision = true;
+            //    if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 135, MathHelper.PiOver2 + 0.2f))) DCollision = true;
+            //    foreach (Vehicle veh in VehicleController.Instance.Vehicles)
+            //    {
+            //        if (veh == this) continue;
+
+            //        if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 135, MathHelper.PiOver2), veh.CollisionVerts)) DCollision = true;
+            //        if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 135, MathHelper.PiOver2 - 0.2f), veh.CollisionVerts)) DCollision = true;
+            //        if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 135, MathHelper.PiOver2 + 0.2f), veh.CollisionVerts)) DCollision = true;
+            //    }
+            //}
+
+            //if (Speed.X > 0f && RCollision) Speed.X = 0f;
+            //if (Speed.X < 0f && LCollision) Speed.X = 0f;
+            //if (Speed.Y > 0f && DCollision) Speed.Y = 0f;
+            //if (Speed.Y < 0f && UCollision) Speed.Y = 0f;
+
+            //if (UCollision || DCollision || LCollision || RCollision)
+            //    Collided();
         }
 
 

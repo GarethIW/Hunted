@@ -104,39 +104,79 @@ namespace Hunted
 
             Thread.Sleep(1000);
 
+            bool compoundsOK = false;
+
             List<Compound> compounds = new List<Compound>();
 
             TileLayer terrainLayer = map.GetLayer("Terrain") as TileLayer;
             TileLayer wallLayer = map.GetLayer("Wall") as TileLayer;
 
-            for (int i = lightingEngine.LightSources.Count - 1; i >= 0; i--)
-                if (lightingEngine.LightSources[i].SpotStencil != null) lightingEngine.LightSources.RemoveAt(i);
+            float[][] noise = null;
 
-            for (int y = 0; y < map.Width; y++)
+            while (!compoundsOK)
             {
-                for (int x = 0; x < map.Height; x++)
+                compounds.Clear();
+
+                for (int i = lightingEngine.LightSources.Count - 1; i >= 0; i--)
+                    if (lightingEngine.LightSources[i].SpotStencil != null) lightingEngine.LightSources.RemoveAt(i);
+
+                for (int y = 0; y < map.Width; y++)
                 {
-                    terrainLayer.Tiles[x, y] = null;
-                    wallLayer.Tiles[x, y] = null;
+                    for (int x = 0; x < map.Height; x++)
+                    {
+                        terrainLayer.Tiles[x, y] = null;
+                        wallLayer.Tiles[x, y] = null;
+                    }
                 }
+
+                PercentComplete = 5;
+
+                // Inital terrain
+                noise = PerlinNoise.GeneratePerlinNoise(map.Width, map.Height, 8);
+                for (int y = 0; y < map.Width; y++)
+                {
+                    for (int x = 0; x < map.Height; x++)
+                        if (noise[y][x] < 0.5f)
+                            terrainLayer.Tiles[x, y] = map.Tiles[WATER];
+                        else if (noise[y][x] < 0.6f)
+                            terrainLayer.Tiles[x, y] = map.Tiles[SAND];
+                        else
+                            terrainLayer.Tiles[x, y] = map.Tiles[GRASS];
+                }
+
+                PercentComplete = 20;
+
+
+                // Trees
+                float[][] treeNoise = PerlinNoise.GeneratePerlinNoise(map.Width, map.Height, 4);
+
+                for (int y = 0; y < map.Width; y++)
+                {
+                    for (int x = 0; x < map.Height; x++)
+                    {
+                        if (noise[y][x] > 0.62f)
+                            if (treeNoise[y][x] > 0.5f)
+                                wallLayer.Tiles[x, y] = map.Tiles[TREE];
+                    }
+                }
+
+                PercentComplete = 35;
+
+                // Compounds
+                CreateCompounds(map, terrainLayer, wallLayer, compounds, noise, 0.65f, 20000f, 20, lightingEngine, gd);
+                CreateCompounds(map, terrainLayer, wallLayer, compounds, noise, 0.75f, 12000f, 30, lightingEngine, gd);
+
+                // Test to see if compounds are okay
+                int numOKComps = 0;
+                foreach (Compound c in compounds)
+                {
+                    if (c.Buildings.Count(b => b.Type != BuildingType.Carpark && b.Type != BuildingType.Helipad) > 0) numOKComps++;
+                }
+
+                if (numOKComps > 5) compoundsOK = true;
             }
 
-            PercentComplete = 5;
-
-            // Inital terrain
-            float[][] noise = PerlinNoise.GeneratePerlinNoise(map.Width, map.Height, 8);
-            for (int y = 0; y < map.Width; y++)
-            {
-                for (int x = 0; x < map.Height; x++)
-                    if (noise[y][x] < 0.5f)
-                        terrainLayer.Tiles[x, y] = map.Tiles[WATER];
-                    else if (noise[y][x] < 0.6f)
-                        terrainLayer.Tiles[x, y] = map.Tiles[SAND];
-                    else
-                        terrainLayer.Tiles[x, y] = map.Tiles[GRASS];
-            }
-
-            PercentComplete = 20;
+            PercentComplete = 45;
 
             // Remove stray tiles
             for (int y = 0; y < map.Width; y++)
@@ -157,22 +197,11 @@ namespace Hunted
                 }
             }
 
-            PercentComplete = 30;
+            
 
-            // Trees
-            float[][] treeNoise = PerlinNoise.GeneratePerlinNoise(map.Width, map.Height, 4);
+            
 
-            for (int y = 0; y < map.Width; y++)
-            {
-                for (int x = 0; x < map.Height; x++)
-                {
-                    if (noise[y][x] > 0.62f)
-                        if (treeNoise[y][x] > 0.5f)
-                            wallLayer.Tiles[x, y] = map.Tiles[TREE];
-                }
-            }
-
-            PercentComplete = 35;
+            PercentComplete = 55;
 
             // Detail tiling!
             for (int y = 0; y < map.Width; y++)
@@ -292,13 +321,7 @@ namespace Hunted
 
                     }
                 }
-            }
-
-            PercentComplete = 60;
-
-            // Compounds
-            CreateCompounds(map, terrainLayer, wallLayer, compounds, noise, 0.65f, 20000f, 20, lightingEngine, gd);
-            CreateCompounds(map, terrainLayer, wallLayer, compounds, noise, 0.75f, 12000f, 30, lightingEngine, gd);
+            } 
 
             PercentComplete = 75;
 

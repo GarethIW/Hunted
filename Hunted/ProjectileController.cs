@@ -99,6 +99,15 @@ namespace Hunted
                         p.Active = false;
                     }
                 }
+
+                foreach (Vehicle v in VehicleController.Instance.Vehicles)
+                {
+                    if (Helper.IsPointInShape(p.Position, v.CollisionVerts))
+                    {
+                        v.HitByProjectile(p);
+                        p.Active = false;
+                    }
+                }
             }
 
             Projectiles.RemoveAll(part => !part.Active);

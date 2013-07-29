@@ -177,7 +177,7 @@ namespace Hunted
             {
                 ScreenManager.Game.IsMouseVisible = false;
 
-                TimeOfDay = TimeOfDay.AddMinutes(gameTime.ElapsedGameTime.TotalSeconds);
+                TimeOfDay = TimeOfDay.AddMinutes(gameTime.ElapsedGameTime.TotalSeconds * 50);
                 gameDay = 1 + ((TimeOfDay - StartTime).Days);
 
                 lightingEngine.Update(gameTime, TimeOfDay, ScreenManager.SpriteBatch, ScreenManager.GraphicsDevice);
@@ -198,9 +198,12 @@ namespace Hunted
                 gameCamera.Target = gameHero.Position;
                 if (gameHero.drivingVehicle != null)
                 {
-                    gameCamera.ZoomTarget = 1f - ((0.5f / gameHero.drivingVehicle.maxSpeed) * gameHero.drivingVehicle.linearSpeed);
+                    if (gameHero.drivingVehicle.maxSpeed > 0f)
+                        gameCamera.ZoomTarget = 1f - ((0.5f / gameHero.drivingVehicle.maxSpeed) * (float)Math.Abs(gameHero.drivingVehicle.linearSpeed));
+                    else gameCamera.ZoomTarget = 1f;
                 }
                 else gameCamera.ZoomTarget = 1f;
+                if (gameCamera.Zoom > 1.0f) gameCamera.Zoom = 1.0f;
                 gameCamera.Update(new Rectangle(0, 0, ScreenManager.GraphicsDevice.Viewport.Width, ScreenManager.GraphicsDevice.Viewport.Height));
 
                 mapUpdate += gameTime.ElapsedGameTime.TotalMilliseconds;
@@ -211,7 +214,7 @@ namespace Hunted
                 }
                 if (mapUpdate >= 100)
                 {
-                    for (float a = 0.0f; a < MathHelper.TwoPi; a += 0.1f)
+                    for (float a = 0.0f; a < MathHelper.TwoPi; a += 0.05f)
                     {
                         for (float r = 0.0f; r < revealRadius; r += 50f)
                         {
@@ -279,38 +282,50 @@ namespace Hunted
                     gameCamera.Target -= (input.MouseDelta/gameCamera.Zoom);
                 }
 
-                if (input.CurrentMouseState.ScrollWheelValue < input.LastMouseState.ScrollWheelValue) gameCamera.Zoom -= (0.1f*gameCamera.Zoom);
-                if (input.CurrentMouseState.ScrollWheelValue > input.LastMouseState.ScrollWheelValue) gameCamera.Zoom += (0.1f*gameCamera.Zoom);
-                if (gameCamera.Zoom > 1.0f) gameCamera.Zoom = 1.0f;
+                //if (input.CurrentMouseState.ScrollWheelValue < input.LastMouseState.ScrollWheelValue) gameCamera.Zoom -= (0.1f*gameCamera.Zoom);
+                //if (input.CurrentMouseState.ScrollWheelValue > input.LastMouseState.ScrollWheelValue) gameCamera.Zoom += (0.1f*gameCamera.Zoom);
+                
+
+                if (input.CurrentMouseState.ScrollWheelValue < input.LastMouseState.ScrollWheelValue) gameHero.SelectWeapon(-1,true);
+                if (input.CurrentMouseState.ScrollWheelValue > input.LastMouseState.ScrollWheelValue) gameHero.SelectWeapon(1, true);
 
                 mousePos = new Vector2(input.LastMouseState.X, input.LastMouseState.Y);
                 mousePos = Vector2.Transform(mousePos, Matrix.Invert(gameCamera.CameraMatrix));
 
-                if (input.CurrentGamePadStates[0].ThumbSticks.Left.Length() > 0.2f)
-                {
-                    gameHero.Move(new Vector2(input.CurrentGamePadStates[0].ThumbSticks.Left.X, -input.CurrentGamePadStates[0].ThumbSticks.Left.Y));
-                }
-                if (input.CurrentGamePadStates[0].ThumbSticks.Right.Length() > 0.2f)
-                {
-                    gameHero.LookAt(Helper.PointOnCircle(ref gameHero.Position, 200, Helper.V2ToAngle(new Vector2(input.CurrentGamePadStates[0].ThumbSticks.Right.X, -input.CurrentGamePadStates[0].ThumbSticks.Right.Y))));
-                }
-                else
+               
+
+               
+
+                if (gameHero.drivingVehicle == null)
                 {
                     if (input.CurrentGamePadStates[0].ThumbSticks.Left.Length() > 0.2f)
                     {
-                        gameHero.LookAt(Helper.PointOnCircle(ref gameHero.Position, 200, Helper.V2ToAngle(new Vector2(input.CurrentGamePadStates[0].ThumbSticks.Left.X, -input.CurrentGamePadStates[0].ThumbSticks.Left.Y))));
+                        gameHero.Move(new Vector2(input.CurrentGamePadStates[0].ThumbSticks.Left.X, -input.CurrentGamePadStates[0].ThumbSticks.Left.Y));
                     }
+                    if (input.CurrentGamePadStates[0].ThumbSticks.Right.Length() > 0.2f)
+                    {
+                        gameHero.LookAt(Helper.PointOnCircle(ref gameHero.Position, 200, Helper.V2ToAngle(new Vector2(input.CurrentGamePadStates[0].ThumbSticks.Right.X, -input.CurrentGamePadStates[0].ThumbSticks.Right.Y))));
+                    }
+                    else
+                    {
+                        if (input.CurrentGamePadStates[0].ThumbSticks.Left.Length() > 0.2f)
+                        {
+                            gameHero.LookAt(Helper.PointOnCircle(ref gameHero.Position, 200, Helper.V2ToAngle(new Vector2(input.CurrentGamePadStates[0].ThumbSticks.Left.X, -input.CurrentGamePadStates[0].ThumbSticks.Left.Y))));
+                        }
+                    }
+
+                    crosshairPos = new Vector2(input.CurrentMouseState.X, input.CurrentMouseState.Y);
+
+                    Vector2 keyboardStick = Vector2.Zero;
+                    if (input.CurrentKeyboardStates[0].IsKeyDown(Keys.W)) keyboardStick.Y = -1f;
+                    if (input.CurrentKeyboardStates[0].IsKeyDown(Keys.S)) keyboardStick.Y = 1f;
+                    if (input.CurrentKeyboardStates[0].IsKeyDown(Keys.A)) keyboardStick.X = -1f;
+                    if (input.CurrentKeyboardStates[0].IsKeyDown(Keys.D)) keyboardStick.X = 1f;
+                    if (keyboardStick.Length() > 0f) gameHero.Move(keyboardStick);
+                    gameHero.Attack(gameTime, input.CurrentMouseState.LeftButton == ButtonState.Pressed, gameCamera);
+
+                    gameHero.LookAt(gameCamera.Position + (crosshairPos - new Vector2(gameCamera.Width / 2, gameCamera.Height / 2)));//Helper.PointOnCircle(ref gameHero.Position, 200, Helper.V2ToAngle(((gameHero.Position - gameCamera.Position) ) + (crosshairPos- new Vector2(gameCamera.Width / 2, gameCamera.Height / 2)))));
                 }
-
-                crosshairPos = new Vector2(input.CurrentMouseState.X, input.CurrentMouseState.Y);
-
-                Vector2 keyboardStick = Vector2.Zero;
-                if (input.CurrentKeyboardStates[0].IsKeyDown(Keys.W)) keyboardStick.Y = -1f;
-                if (input.CurrentKeyboardStates[0].IsKeyDown(Keys.S)) keyboardStick.Y = 1f;
-                if (input.CurrentKeyboardStates[0].IsKeyDown(Keys.A)) keyboardStick.X = -1f;
-                if (input.CurrentKeyboardStates[0].IsKeyDown(Keys.D)) keyboardStick.X = 1f;
-                if (keyboardStick.Length() > 0f) gameHero.Move(keyboardStick);
-                gameHero.Attack(gameTime, input.CurrentMouseState.LeftButton == ButtonState.Pressed, gameCamera);
 
                 // driving controls
                 if (gameHero.drivingVehicle != null)
@@ -321,8 +336,7 @@ namespace Hunted
                     if (input.CurrentKeyboardStates[0].IsKeyDown(Keys.D)) gameHero.drivingVehicle.Turn(1f);
                 }
 
-
-                gameHero.LookAt(gameCamera.Position + (crosshairPos - new Vector2(gameCamera.Width / 2, gameCamera.Height / 2)));//Helper.PointOnCircle(ref gameHero.Position, 200, Helper.V2ToAngle(((gameHero.Position - gameCamera.Position) ) + (crosshairPos- new Vector2(gameCamera.Width / 2, gameCamera.Height / 2)))));
+                
 
 
             }

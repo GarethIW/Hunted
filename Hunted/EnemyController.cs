@@ -43,7 +43,7 @@ namespace Hunted
             }
 
             // Spawn some new enemies
-            if (count < 5)
+            if (count < 10)
             {
                 Vector2 pos = Helper.RandomPointInCircle(gameHero.Position, 2000f, 4000f);
                 if (!gameMap.CheckTileCollision(pos) && pos.X > 0 && pos.X < (gameMap.Width * gameMap.TileWidth) && pos.Y > 0 && pos.Y < (gameMap.Height * gameMap.TileHeight))

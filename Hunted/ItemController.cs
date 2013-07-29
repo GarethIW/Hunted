@@ -48,7 +48,7 @@ namespace Hunted
                 count++;
                 i.Update(gameTime);
 
-                if ((gameHero.Position - i.Position).Length() < 50f)
+                if ((gameHero.Position - i.Position).Length() < 50f && gameHero.drivingVehicle==null)
                 {
                     Pickup(i, gameHero, gameMap, mapFog);
                 }

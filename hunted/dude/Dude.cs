@@ -182,6 +182,14 @@ namespace Hunted
             }
         }
 
+        public virtual void HitByVehicle(Vehicle v)
+        {
+            Health -= 1 + ((float)Math.Abs(v.linearSpeed)) / 2f;
+            Speed = v.Speed;
+            AudioController.PlaySFX("hit", 0.5f, -0.4f, 0.4f, Position);
+            ParticleController.Instance.AddVehicleWound(this);
+        }
+
         void DoCollisions(Map gameMap)
         {
             bool LCollision = false;

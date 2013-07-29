@@ -94,18 +94,23 @@ namespace Hunted
                     if (CheckLineOfSight(gameHero.Position, gameMap))
                     {
                         Target = Position; // Stop dead in tracks
-                        State = AIState.Chasing; // Begin chasing player
+                        if (gameHero.drivingVehicle == null)
+                            State = AIState.Chasing; // Begin chasing player
+                        else
+                        {
+                            if (Weapons[SelectedWeapon].GetType() != typeof(Knife)) State = AIState.Chasing;
+                        }
                     }
 
                     // Allow the enemy to "hear" the player if player moves close to enemy
-                    if (gameHero.Speed.Length() > 0f && (gameHero.Position - Position).Length() < 250f)
+                    if ((gameHero.Speed.Length() > 0f && (gameHero.Position - Position).Length() < 250f) || gameHero.drivingVehicle != null)
                         LookAt(gameHero.Position);
 
                     break;
                 case AIState.Chasing:
                     Target = gameHero.Position;
                     LookAt(gameHero.Position);
-                    if ((gameHero.Position - Position).Length() < 350f && CheckLineOfSight(gameHero.Position, gameMap))
+                    if ((gameHero.Position - Position).Length() < 450f && CheckLineOfSight(gameHero.Position, gameMap))
                     {
                         Target = Position;
                         State = AIState.Attacking;
@@ -153,8 +158,12 @@ namespace Hunted
                     }
                     else
                     {
-                        Target = gameHero.Position;
-                        if ((gameHero.Position - Position).Length() < 80f) Target = Position;
+                        if (gameHero.drivingVehicle == null)
+                        {
+                            Target = gameHero.Position;
+                            if ((gameHero.Position - Position).Length() < 80f) Target = Position;
+                        }
+                        else State = AIState.Patrolling;
                     }
 
                     break;

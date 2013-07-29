@@ -156,5 +156,15 @@ namespace Hunted
                 Add(p.Position, dir, 10000f, true, new Rectangle(0, 0, 7, 7), -0.01f + ((float)Helper.Random.NextDouble() * 0.02f), 3f, Color.White, 0.5f, SpecialParticle.Blood, ParticleBlendMode.Alpha);
             }
         }
+
+        internal void AddVehicleWound(Dude d)
+        {
+            for (int i = 0; i < Helper.Random.Next(20); i++)
+            {
+                float a = (float)Helper.Random.NextDouble() * MathHelper.TwoPi;
+                Vector2 dir = Helper.AngleToVector(a, ((float)Helper.Random.NextDouble() * 10f));
+                Add(d.Position, dir, 10000f, true, new Rectangle(0, 0, 7, 7), -0.01f + ((float)Helper.Random.NextDouble() * 0.02f), 3f, Color.White, 0.5f, SpecialParticle.Blood, ParticleBlendMode.Alpha);
+            }
+        }
     }
 }
