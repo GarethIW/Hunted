@@ -58,6 +58,7 @@ namespace Hunted
                 HeadTorch.Active = false;
 
                 Position = drivingVehicle.Position;
+                Rotation = drivingVehicle.Rotation + MathHelper.PiOver2;
             }
             else HeadTorch.Active = true;
         }

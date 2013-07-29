@@ -531,7 +531,7 @@ namespace Hunted
                         j.Rotation = (float)Helper.Random.NextDouble() * MathHelper.TwoPi;
                         j.LoadContent(vehicleController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine);
                         vehicleController.Vehicles.Add(j);
-                        gameHero.Position = j.Position + new Vector2(300, 0);
+                       // gameHero.Position = j.Position + new Vector2(300, 0);
                     }
                 }
             }
