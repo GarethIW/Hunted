@@ -52,8 +52,8 @@ namespace Hunted
         public override void Update(GameTime gameTime, Map gameMap, HeroDude gameHero, Camera gameCamera)
         {
             CollisionVerts.Clear();
-            CollisionVerts.Add(Helper.PointOnCircle(ref Position, 200, -0.44f + (Rotation)));
-            CollisionVerts.Add(Helper.PointOnCircle(ref Position, 200, 0.44f + (Rotation)));
+            CollisionVerts.Add(Helper.PointOnCircle(ref Position, 100, -0.44f + (Rotation)));
+            CollisionVerts.Add(Helper.PointOnCircle(ref Position, 100, 0.44f + (Rotation)));
             CollisionVerts.Add(Helper.PointOnCircle(ref Position, 200, MathHelper.Pi + (Rotation)));
             //CollisionVerts.Add(Helper.PointOnCircle(ref Position, 150, 0.44f + MathHelper.Pi + (Rotation)));
             base.Update(gameTime, gameMap, gameHero, gameCamera);
@@ -104,7 +104,7 @@ namespace Hunted
             turning = false;
 
             if (gameHero.drivingVehicle == this) bladesSpeed = MathHelper.Lerp(bladesSpeed, 0.5f, 0.01f);
-            if (gameHero.drivingVehicle == null) bladesSpeed = MathHelper.Lerp(bladesSpeed, 0f, 0.001f);
+            if (gameHero.drivingVehicle == null) bladesSpeed = MathHelper.Lerp(bladesSpeed, 0f, 0.01f);
             bladesRot += bladesSpeed;
 
             if (gameHero.drivingVehicle == this)
@@ -134,7 +134,7 @@ namespace Hunted
         public override void DrawLightBlock(SpriteBatch sb)
         {
             // Arms
-            sb.Draw(spriteSheet, Position, new Rectangle(200, 0, 300, 400), Color.Black, Rotation + MathHelper.PiOver2, new Vector2(300, 400) / 2, 1f, SpriteEffects.None, 1);
+            sb.Draw(spriteSheet, Position, new Rectangle(200, 0, 300, 400), Color.Black, Rotation + MathHelper.PiOver2, new Vector2(150, 125) / 2, 1f, SpriteEffects.None, 1);
         }
 
         internal void DrawInAir(SpriteBatch sb, LightingEngine lightingEngine)
@@ -190,9 +190,22 @@ namespace Hunted
             base.Turn(p);
         }
 
-        internal void Land()
+        internal void Land(Map gameMap)
         {
-            landing = true;
+            if (landing || takingOff) return;
+
+            bool found = false;
+            for (float a = 0f; a < MathHelper.TwoPi; a += 0.5f)
+            {
+                for (int r = 0; r < 300; r += 20)
+                {
+                    Vector2 pos = Helper.PointOnCircle(ref Position, r, a);
+                    if (gameMap.CheckTileCollision(pos)) found = true;
+                    foreach (Vehicle v in VehicleController.Instance.Vehicles) if (v != this && Helper.IsPointInShape(pos, v.CollisionVerts)) found = true;
+                }
+            }
+
+            if(!found) landing = true;
         }
     }
 

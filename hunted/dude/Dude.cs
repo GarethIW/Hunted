@@ -117,7 +117,7 @@ namespace Hunted
             {
                 // Exit vehicle
                 //bool found = false;
-                if (drivingVehicle is Chopper && ((Chopper)drivingVehicle).Height > 0f) ((Chopper)drivingVehicle).Land();
+                if (drivingVehicle is Chopper && ((Chopper)drivingVehicle).Height > 0f) ((Chopper)drivingVehicle).Land(gameMap);
                 else
                 {
                     for (float a = 0f; a < MathHelper.TwoPi; a += 0.5f)

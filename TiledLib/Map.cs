@@ -67,6 +67,7 @@ namespace TiledLib
         public Vector2 HeroSpawn;
 
         public List<Compound> Compounds;
+        public List<Jetty> Jetties = new List<Jetty>();
 
         //private Layer collisionLayer;
 
@@ -535,11 +536,11 @@ namespace TiledLib
         }
 
 
-        public void DrawMinimap(SpriteBatch spriteBatch, Camera gameCamera, float zoom, RenderTarget2D minimapRT, bool[,] mapFog)
+        public void DrawMinimap(SpriteBatch spriteBatch, Camera gameCamera, float zoom, RenderTarget2D minimapRT, bool[,] mapFog, Vector2 playerPos)
         {
 
 
-            Rectangle worldArea = new Rectangle((int)((gameCamera.Position.X - (int)(((float)minimapRT.Width)))), (int)((gameCamera.Position.Y - (int)(((float)minimapRT.Height)))), (int)((minimapRT.Width) * 2), (int)((minimapRT.Height) * 2));
+            Rectangle worldArea = new Rectangle((int)((playerPos.X - (int)(((float)minimapRT.Width)))), (int)((playerPos.Y - (int)(((float)minimapRT.Height)))), (int)((minimapRT.Width) * 2), (int)((minimapRT.Height) * 2));
 
                 //Rectangle worldArea = new Rectangle(0, (int)gameCamera.Position.Y - (int)(((float)gameCamera.Height) * (2f-scale)), TileWidth * Width, (int)(((float)gameCamera.Height*2 ) * (3f-(2f*scale))));
 

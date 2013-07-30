@@ -106,6 +106,8 @@ namespace Hunted
 
             bool compoundsOK = false;
 
+            map.Jetties.Clear();
+
             List<Compound> compounds = new List<Compound>();
 
             TileLayer terrainLayer = map.GetLayer("Terrain") as TileLayer;
@@ -144,7 +146,7 @@ namespace Hunted
                             terrainLayer.Tiles[x, y] = map.Tiles[GRASS];
                 }
 
-                PercentComplete = 20;
+                PercentComplete = 10;
 
 
                 // Trees
@@ -160,7 +162,7 @@ namespace Hunted
                     }
                 }
 
-                PercentComplete = 35;
+                PercentComplete = 20;
 
                 // Compounds
                 CreateCompounds(map, terrainLayer, wallLayer, compounds, noise, 0.65f, 20000f, 20, lightingEngine, gd);
@@ -176,7 +178,7 @@ namespace Hunted
                 if (numOKComps > 5) compoundsOK = true;
             }
 
-            PercentComplete = 45;
+            PercentComplete = 35;
 
             // Remove stray tiles
             for (int y = 0; y < map.Width; y++)
@@ -197,8 +199,29 @@ namespace Hunted
                 }
             }
 
-            
+            PercentComplete = 45;
 
+            // Jetties!
+            for (int y = 40; y < map.Width - 40; y+=2)
+            {
+                for (int x = 40; x < map.Height - 40; x+=2)
+                {
+                    if (GetTileIndex(map, terrainLayer, x, y) == SAND)
+                    {
+                        if (GetTileIndex(map, terrainLayer, x, y - 10) == WATER && GetTileIndex(map, terrainLayer, x, y - 3) == WATER)
+                            if (TryMakeJetty(map, terrainLayer, new Point(x, y), new Point(0, -1))) continue;
+
+                        if (GetTileIndex(map, terrainLayer, x, y + 10) == WATER && GetTileIndex(map, terrainLayer, x, y + 3) == WATER)
+                            if (TryMakeJetty(map, terrainLayer, new Point(x, y), new Point(0, 1))) continue;
+
+                        if (GetTileIndex(map, terrainLayer, x - 10, y) == WATER && GetTileIndex(map, terrainLayer, x - 3, y) == WATER)
+                            if (TryMakeJetty(map, terrainLayer, new Point(x, y), new Point(-1, 0))) continue;
+
+                        if (GetTileIndex(map, terrainLayer, x + 10, y) == WATER && GetTileIndex(map, terrainLayer, x + 3, y) == WATER)
+                            if (TryMakeJetty(map, terrainLayer, new Point(x, y), new Point(1, 0))) continue;
+                    }
+                }
+            }
             
 
             PercentComplete = 55;
@@ -374,6 +397,53 @@ namespace Hunted
 
             PercentComplete = 100;
             //Generating = false;
+        }
+
+        private static bool TryMakeJetty(Map map, TileLayer terrainLayer, Point start, Point direction)
+        {
+            Vector2 jettyPos = Helper.PtoV(start) * map.TileWidth;
+            foreach (Jetty otherJ in map.Jetties) if ((otherJ.Position - jettyPos).Length() < 5000) return false;
+
+            Rectangle bounds = new Rectangle();
+            Vector2 boatPos = Vector2.Zero;
+            if (direction.Y == -1)
+            {
+                bounds = new Rectangle(start.X - 1, start.Y - 10, 2, 10);
+                boatPos = (new Vector2(bounds.Left, bounds.Top) * map.TileWidth) + new Vector2(100, -100);
+            }
+            if (direction.Y == 1)
+            {
+                bounds = new Rectangle(start.X - 1, start.Y, 2, 10);
+                boatPos = (new Vector2(bounds.Left, bounds.Bottom) * map.TileWidth) + new Vector2(100, 100);
+
+            }
+            if (direction.X == -1)
+            {
+                bounds = new Rectangle(start.X - 10, start.Y - 1, 10, 2);
+                boatPos = (new Vector2(bounds.Left, bounds.Top) * map.TileWidth) + new Vector2(-100, 100);
+
+            }
+            if (direction.X == 1)
+            {
+                bounds = new Rectangle(start.X, start.Y - 1, 10, 2);
+                boatPos = (new Vector2(bounds.Right, bounds.Top) * map.TileWidth) + new Vector2(100, 100);
+            }
+
+            for (int xx = bounds.Left; xx < bounds.Right; xx++)
+            {
+                for (int yy = bounds.Top; yy < bounds.Bottom; yy++)
+                {
+                    terrainLayer.Tiles[xx, yy] = map.Tiles[GRASS];
+                }
+            }
+
+            Jetty newJ = new Jetty();
+            newJ.Position = jettyPos;
+            newJ.Bounds = bounds;
+            newJ.BoatPosition = boatPos;
+            map.Jetties.Add(newJ);
+
+            return true;
         }
 
         private static Vector2 TryFindSpawn(int x, int y, Map map, TileLayer layer, out bool foundspawn)

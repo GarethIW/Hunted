@@ -205,6 +205,7 @@ namespace Hunted
                 if (gameHero.drivingVehicle != null)
                 {
                     if (gameHero.drivingVehicle.GetType() == typeof(Jeep)) revealRadius = 1600f;
+                    if (gameHero.drivingVehicle.GetType() == typeof(Chopper)) revealRadius = 2000f;
                 }
                 if (mapUpdate >= 100)
                 {
@@ -367,8 +368,8 @@ namespace Hunted
             {
                 ScreenManager.GraphicsDevice.SetRenderTarget(minimapRT);
                 ScreenManager.GraphicsDevice.Clear(Color.Black);
-                spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(0.05f) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(minimapRT.Width / 2, minimapRT.Height / 2, 0));
-                gameMap.DrawMinimap(spriteBatch, gameCamera, 0.05f, minimapRT, mapFog);
+                spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameHero.Position.X, -(int)gameHero.Position.Y, 0) * Matrix.CreateScale(0.05f) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(minimapRT.Width / 2, minimapRT.Height / 2, 0));
+                gameMap.DrawMinimap(spriteBatch, gameCamera, 0.05f, minimapRT, mapFog, gameHero.Position);
                 
                 //ScreenManager.SpriteBatch.Draw(lightingEngine.BeamStencils[BeamStencilType.Narrow], Vector2.Zero, null, Color.White);
                 ScreenManager.SpriteBatch.End();
@@ -553,9 +554,17 @@ namespace Hunted
                         chop.Rotation = (float)Helper.Random.NextDouble() * MathHelper.TwoPi;
                         chop.LoadContent(vehicleController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine);
                         vehicleController.Vehicles.Add(chop);
-                        gameHero.Position = chop.Position + new Vector2(300, 0);
+                        //gameHero.Position = chop.Position + new Vector2(300, 0);
                     }
                 }
+            }
+
+            foreach (Jetty jetty in gameMap.Jetties)
+            {
+                Jeep j = new Jeep(jetty.BoatPosition);
+                //j.Rotation = (float)Helper.Random.NextDouble() * MathHelper.TwoPi;
+                j.LoadContent(vehicleController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine);
+                vehicleController.Vehicles.Add(j);
             }
 
             gameHud.Ticker.AddLine("> Explore area and eliminate resistance");
