@@ -112,6 +112,7 @@ namespace Hunted
 
             TileLayer terrainLayer = map.GetLayer("Terrain") as TileLayer;
             TileLayer wallLayer = map.GetLayer("Wall") as TileLayer;
+            TileLayer waterLayer = map.GetLayer("Water") as TileLayer;
 
             float[][] noise = null;
 
@@ -139,11 +140,22 @@ namespace Hunted
                 {
                     for (int x = 0; x < map.Height; x++)
                         if (noise[y][x] < 0.5f)
+                        {
                             terrainLayer.Tiles[x, y] = map.Tiles[WATER];
+                            waterLayer.Tiles[x, y] = map.Tiles[WATER];
+                        }
                         else if (noise[y][x] < 0.6f)
+                        {
                             terrainLayer.Tiles[x, y] = map.Tiles[SAND];
+                            waterLayer.Tiles[x, y] = null;
+
+                        }
                         else
+                        {
                             terrainLayer.Tiles[x, y] = map.Tiles[GRASS];
+                            waterLayer.Tiles[x, y] = null;
+
+                        }
                 }
 
                 PercentComplete = 10;
@@ -186,7 +198,11 @@ namespace Hunted
                 for (int x = 0; x < map.Height; x++)
                 {
                     if (GetTileIndex(map, terrainLayer, x, y) == SAND)
-                        if (CountSurroundingTiles(map, terrainLayer, x, y, WATER) >= 5) terrainLayer.Tiles[x, y] = map.Tiles[WATER];
+                        if (CountSurroundingTiles(map, terrainLayer, x, y, WATER) >= 5)
+                        {
+                            terrainLayer.Tiles[x, y] = map.Tiles[WATER];
+                            waterLayer.Tiles[x, y] = map.Tiles[WATER];
+                        }
 
                     //if (GetTileIndex(map, terrainLayer, (map.Width-1) - x, (map.Height-1) - y) == SAND)
                     //    if (CountSurroundingTiles(map, terrainLayer, (map.Width - 1) - x, (map.Height - 1) - y, WATER) >= 5) terrainLayer.Tiles[(map.Width - 1) - x, (map.Height - 1) - y] = map.Tiles[WATER];
@@ -208,17 +224,28 @@ namespace Hunted
                 {
                     if (GetTileIndex(map, terrainLayer, x, y) == SAND)
                     {
-                        if (GetTileIndex(map, terrainLayer, x, y - 10) == WATER && GetTileIndex(map, terrainLayer, x, y - 3) == WATER)
-                            if (TryMakeJetty(map, terrainLayer, new Point(x, y), new Point(0, -1))) continue;
+                        switch (Helper.Random.Next(4))
+                        {
+                            case 0:
+                                if (GetTileIndex(map, terrainLayer, x, y - 10) == WATER && GetTileIndex(map, terrainLayer, x, y - 4) == WATER && GetTileIndex(map, terrainLayer, x, y - 2) == SAND)
+                                    if (TryMakeJetty(map, terrainLayer, waterLayer, new Point(x, y), new Point(0, -1))) continue;
+                                break;
+                            case 1:
 
-                        if (GetTileIndex(map, terrainLayer, x, y + 10) == WATER && GetTileIndex(map, terrainLayer, x, y + 3) == WATER)
-                            if (TryMakeJetty(map, terrainLayer, new Point(x, y), new Point(0, 1))) continue;
+                                if (GetTileIndex(map, terrainLayer, x, y + 10) == WATER && GetTileIndex(map, terrainLayer, x, y + 4) == WATER && GetTileIndex(map, terrainLayer, x, y + 2) == SAND)
+                                    if (TryMakeJetty(map, terrainLayer, waterLayer, new Point(x, y), new Point(0, 1))) continue;
+                                break;
 
-                        if (GetTileIndex(map, terrainLayer, x - 10, y) == WATER && GetTileIndex(map, terrainLayer, x - 3, y) == WATER)
-                            if (TryMakeJetty(map, terrainLayer, new Point(x, y), new Point(-1, 0))) continue;
+                            case 2:
+                                if (GetTileIndex(map, terrainLayer, x - 10, y) == WATER && GetTileIndex(map, terrainLayer, x - 4, y) == WATER && GetTileIndex(map, terrainLayer, x - 2, y) == SAND)
+                                    if (TryMakeJetty(map, terrainLayer, waterLayer, new Point(x, y), new Point(-1, 0))) continue;
+                                break;
 
-                        if (GetTileIndex(map, terrainLayer, x + 10, y) == WATER && GetTileIndex(map, terrainLayer, x + 3, y) == WATER)
-                            if (TryMakeJetty(map, terrainLayer, new Point(x, y), new Point(1, 0))) continue;
+                            case 3:
+                                if (GetTileIndex(map, terrainLayer, x + 10, y) == WATER && GetTileIndex(map, terrainLayer, x + 4, y) == WATER && GetTileIndex(map, terrainLayer, x + 2, y) == SAND)
+                                    if (TryMakeJetty(map, terrainLayer, waterLayer, new Point(x, y), new Point(1, 0))) continue;
+                                break;
+                        }
                     }
                 }
             }
@@ -399,13 +426,14 @@ namespace Hunted
             //Generating = false;
         }
 
-        private static bool TryMakeJetty(Map map, TileLayer terrainLayer, Point start, Point direction)
+        private static bool TryMakeJetty(Map map, TileLayer terrainLayer, TileLayer waterLayer, Point start, Point direction)
         {
             Vector2 jettyPos = Helper.PtoV(start) * map.TileWidth;
             foreach (Jetty otherJ in map.Jetties) if ((otherJ.Position - jettyPos).Length() < 5000) return false;
 
             Rectangle bounds = new Rectangle();
             Vector2 boatPos = Vector2.Zero;
+            float boatRot = 0f;
             if (direction.Y == -1)
             {
                 bounds = new Rectangle(start.X - 1, start.Y - 10, 2, 10);
@@ -421,12 +449,15 @@ namespace Hunted
             {
                 bounds = new Rectangle(start.X - 10, start.Y - 1, 10, 2);
                 boatPos = (new Vector2(bounds.Left, bounds.Top) * map.TileWidth) + new Vector2(-100, 100);
+                boatRot = MathHelper.PiOver2;
 
             }
             if (direction.X == 1)
             {
                 bounds = new Rectangle(start.X, start.Y - 1, 10, 2);
                 boatPos = (new Vector2(bounds.Right, bounds.Top) * map.TileWidth) + new Vector2(100, 100);
+                boatRot = MathHelper.PiOver2;
+
             }
 
             for (int xx = bounds.Left; xx < bounds.Right; xx++)
@@ -434,6 +465,7 @@ namespace Hunted
                 for (int yy = bounds.Top; yy < bounds.Bottom; yy++)
                 {
                     terrainLayer.Tiles[xx, yy] = map.Tiles[GRASS];
+                    waterLayer.Tiles[xx, yy] = null;
                 }
             }
 
@@ -441,6 +473,7 @@ namespace Hunted
             newJ.Position = jettyPos;
             newJ.Bounds = bounds;
             newJ.BoatPosition = boatPos;
+            newJ.BoatRotation = boatRot;
             map.Jetties.Add(newJ);
 
             return true;

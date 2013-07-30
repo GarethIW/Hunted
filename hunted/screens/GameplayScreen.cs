@@ -320,7 +320,7 @@ namespace Hunted
                     if (input.CurrentKeyboardStates[0].IsKeyDown(Keys.A)) keyboardStick.X = -1f;
                     if (input.CurrentKeyboardStates[0].IsKeyDown(Keys.D)) keyboardStick.X = 1f;
                     if (keyboardStick.Length() > 0f) gameHero.Move(keyboardStick);
-                    gameHero.Attack(gameTime, input.CurrentMouseState.LeftButton == ButtonState.Pressed, gameCamera);
+                    gameHero.Attack(gameTime, input.CurrentMouseState.LeftButton == ButtonState.Pressed, gameCamera, true);
 
                     gameHero.LookAt(gameCamera.Position + (crosshairPos - new Vector2(gameCamera.Width / 2, gameCamera.Height / 2)));//Helper.PointOnCircle(ref gameHero.Position, 200, Helper.V2ToAngle(((gameHero.Position - gameCamera.Position) ) + (crosshairPos- new Vector2(gameCamera.Width / 2, gameCamera.Height / 2)))));
                 }
@@ -404,7 +404,7 @@ namespace Hunted
             enemyController.DrawShadows(spriteBatch, lightingEngine, gameHero);
             gameHero.DrawShadows(spriteBatch, lightingEngine);
             vehicleController.DrawShadows(spriteBatch, lightingEngine, gameHero);
-            vehicleController.DrawHeliShadows(spriteBatch, lightingEngine, gameHero);          
+                
             spriteBatch.End();
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
@@ -422,7 +422,7 @@ namespace Hunted
             vehicleController.Draw(spriteBatch, lightingEngine, gameHero);
             gameMap.DrawShadows(spriteBatch, "Wall", gameCamera, lightingEngine);
             gameMap.DrawLayer(spriteBatch, "Wall", gameCamera, lightingEngine, Color.White);
-            vehicleController.DrawHelis(spriteBatch, lightingEngine, gameHero);
+            
             projectileController.Draw(spriteBatch);
             spriteBatch.End();
 
@@ -434,7 +434,11 @@ namespace Hunted
 
 
             lightingEngine.DrawSpots(spriteBatch, gameCamera, gameMap);
-           
+
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
+            vehicleController.DrawHeliShadows(spriteBatch, lightingEngine, gameHero);      
+            vehicleController.DrawHelis(spriteBatch, lightingEngine, gameHero);
+            spriteBatch.End();
 
             spriteBatch.Begin();
             //gameHUD.Draw(spriteBatch);
@@ -562,7 +566,7 @@ namespace Hunted
             foreach (Jetty jetty in gameMap.Jetties)
             {
                 Jeep j = new Jeep(jetty.BoatPosition);
-                //j.Rotation = (float)Helper.Random.NextDouble() * MathHelper.TwoPi;
+                j.Rotation = jetty.BoatRotation;
                 j.LoadContent(vehicleController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine);
                 vehicleController.Vehicles.Add(j);
             }

@@ -139,13 +139,14 @@ namespace Hunted
             Rotation = Helper.TurnToFace(Position, target, Rotation, 1f, 0.25f);
         }
 
-        public virtual void Attack(GameTime gameTime, bool trigger, Camera gameCamera)
+        public virtual void Attack(GameTime gameTime, bool trigger, Camera gameCamera, bool canCollide)
         {
-            Weapons[SelectedWeapon].Use(gameTime, trigger, gameCamera);
+            Weapons[SelectedWeapon].Use(gameTime, trigger, gameCamera, canCollide);
         }
 
         public virtual void Draw(SpriteBatch sb, LightingEngine lightingEngine)
-        {  
+        {
+            if (drivingVehicle != null) return;
             // Feet
             sb.Draw(spriteSheet, Position, Animations["feet"].CellRect, lightingEngine.CurrentSunColor, Rotation, new Vector2(100,100)/2, 1f, SpriteEffects.None, 1);
             // Arms
@@ -156,6 +157,8 @@ namespace Hunted
         
         public virtual void DrawShadows(SpriteBatch sb, LightingEngine lightingEngine)
         {
+            if (drivingVehicle != null) return;
+
             for (int i = 1; i < 20; i += 2)
             {
                 Vector2 pos = Position + new Vector2(lightingEngine.CurrentShadowVect.X * i, lightingEngine.CurrentShadowVect.Y * i);
@@ -166,6 +169,7 @@ namespace Hunted
 
         public virtual void DrawLightBlock(SpriteBatch sb)
         {
+            if (drivingVehicle != null) return;
             // Arms
             sb.Draw(spriteSheet, Position, Animations["arms"].CellRect, Color.Black, Rotation, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
         }

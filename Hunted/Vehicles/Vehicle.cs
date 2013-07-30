@@ -87,16 +87,7 @@ namespace Hunted
             }
         }
 
-        public virtual void LookAt(Vector2 target)
-        {
-            Rotation = Helper.TurnToFace(Position, target, Rotation, 1f, 0.25f);
-        }
-
-        public virtual void Attack(GameTime gameTime, bool trigger, Camera gameCamera)
-        {
-            Weapons[SelectedWeapon].Use(gameTime, trigger, gameCamera);
-        }
-
+      
         public virtual void Draw(SpriteBatch sb, LightingEngine lightingEngine)
         {  
             //sb.Draw(spriteSheet, Position, , lightingEngine.CurrentSunColor, Rotation, new Vector2(100,100)/2, 1f, SpriteEffects.None, 1);

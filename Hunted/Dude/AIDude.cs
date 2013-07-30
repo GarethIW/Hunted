@@ -98,7 +98,7 @@ namespace Hunted
                             State = AIState.Chasing; // Begin chasing player
                         else
                         {
-                            if (Weapons[SelectedWeapon].GetType() != typeof(Knife)) State = AIState.Chasing;
+                            if (Weapons[SelectedWeapon].GetType() != typeof(Knife)) State = AIState.Attacking;
                         }
                     }
 
@@ -110,7 +110,7 @@ namespace Hunted
                 case AIState.Chasing:
                     Target = gameHero.Position;
                     LookAt(gameHero.Position);
-                    if ((gameHero.Position - Position).Length() < 450f && CheckLineOfSight(gameHero.Position, gameMap))
+                    if ((gameHero.Position - Position).Length() < 450f && (CheckLineOfSight(gameHero.Position, gameMap) || gameHero.drivingVehicle is Chopper))
                     {
                         Target = Position;
                         State = AIState.Attacking;
@@ -141,13 +141,18 @@ namespace Hunted
                     break;
                 case AIState.Attacking:
                     LookAt(gameHero.Position);
-                    Attack(gameTime, true, gameCamera);
+                    bool shootUp = (gameHero.drivingVehicle != null && gameHero.drivingVehicle is Chopper);
+                    Attack(gameTime, true, gameCamera, !shootUp);
                     if (Weapons[SelectedWeapon].GetType() != typeof(Knife))
                     {
-                        if ((gameHero.Position - Position).Length() > 400f)
+                        if ((gameHero.Position - Position).Length() > 450f)
                         {
-                            Target = gameHero.Position;
-                            State = AIState.Chasing;
+                            if (gameHero.drivingVehicle == null)
+                            {
+                                Target = gameHero.Position;
+                                State = AIState.Chasing;
+                            }
+                            else State = AIState.Patrolling;
                         }
 
                         if (Helper.Random.Next(100) == 1)
@@ -305,13 +310,14 @@ namespace Hunted
 
         bool CheckLineOfSight(Vector2 pos, Map gameMap)
         {
-            for (float a = (Rotation-MathHelper.PiOver2) - MathHelper.PiOver4; a < (Rotation-MathHelper.PiOver2) + MathHelper.PiOver4; a += 0.05f)
+            
+            for (float a = (Rotation-MathHelper.PiOver2) - MathHelper.PiOver4; a < (Rotation-MathHelper.PiOver2) + MathHelper.PiOver4; a += 0.1f)
             {
-                for (int r = 0; r < 500; r += 50)
+                for (int r = 0; r < 500; r += 75)
                 {
                     Vector2 checkpos = Helper.PointOnCircle(ref Position, r, a);
                     if (gameMap.CheckTileCollision(checkpos)) break;
-                    if ((checkpos - pos).Length() < 20f) return true;
+                    if ((checkpos - pos).Length() < 100f) return true;
                 }
             }
 

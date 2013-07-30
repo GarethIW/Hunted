@@ -65,7 +65,7 @@ namespace Hunted
 
         public override void Draw(SpriteBatch sb, LightingEngine lightingEngine)
         {
-            if (drivingVehicle != null) return;
+            
 
             base.Draw(sb, lightingEngine);
         }

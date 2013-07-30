@@ -588,11 +588,16 @@ namespace TiledLib
 
         }
 
-        public bool CheckCollision(Vector2 position)
+        public bool CheckCollision(Vector2 position) { return CheckCollision(position, true, false); }
+
+        public bool CheckCollision(Vector2 position, bool checkWater, bool reverse)
         {
             for(int i=0;i<Layers.Count;i++)
             {
                 if (!Layers[i].Properties.Contains("Collision"))
+                    continue;
+
+                if (!checkWater && Layers[i].Name == "Water")
                     continue;
 
                 TileLayer tileLayer = Layers[i] as TileLayer;
@@ -620,7 +625,11 @@ namespace TiledLib
                     int pixelCheckX = (collisionTile.Source.X) + positionOnTileX;
                     int pixelCheckY = (collisionTile.Source.Y) + positionOnTileY;
 
-                    return collisionTile.CollisionData[(pixelCheckY * collisionTile.Texture.Width) + pixelCheckX];
+                    if(reverse)
+                        return !collisionTile.CollisionData[(pixelCheckY * collisionTile.Texture.Width) + pixelCheckX];
+                    else
+                        return collisionTile.CollisionData[(pixelCheckY * collisionTile.Texture.Width) + pixelCheckX];
+
                 }
                 else
                 {
@@ -628,7 +637,7 @@ namespace TiledLib
                 }
             }
 
-            return false;
+            return reverse;
         }
 
         public bool CheckTileCollision(Vector2 position)

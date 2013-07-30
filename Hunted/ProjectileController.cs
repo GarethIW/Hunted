@@ -68,7 +68,7 @@ namespace Hunted
                 p.Position += p.Velocity;
                 p.Rotation += p.RotationSpeed;
 
-                if (p.CanCollide && gameMap.CheckCollision(p.Position) == true)
+                if (p.CanCollide && gameMap.CheckCollision(p.Position,false,false) == true)
                 {
                     p.Velocity = Vector2.Zero;
                     p.RotationSpeed = 0f;
@@ -127,7 +127,7 @@ namespace Hunted
           
         }
 
-        public void Add(ProjectileType type, Dude owner, Vector2 position, Vector2 direction)
+        public void Add(ProjectileType type, Dude owner, Vector2 position, Vector2 direction, bool canCollide)
         {
             direction.Normalize();
 
@@ -137,7 +137,7 @@ namespace Hunted
                     Add(position, Vector2.Zero, 10, true, new Rectangle(8, 0, 1, 1), 0f, 15f, owner, type);
                     break;
                 case ProjectileType.Pistol:
-                    Add(position, direction * 20f, 2000, true, new Rectangle(0, 0, 2, 4), Helper.V2ToAngle(direction) + MathHelper.PiOver2, 5f, owner, type);
+                    Add(position, direction * 20f, 2000, canCollide, new Rectangle(0, 0, 2, 4), Helper.V2ToAngle(direction) + MathHelper.PiOver2, 5f, owner, type);
                     break;
             }
         }

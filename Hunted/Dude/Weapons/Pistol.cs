@@ -17,12 +17,12 @@ namespace Hunted.Weapons
             coolDownTarget = 500;
         }
 
-        public override bool Use(GameTime gameTime, bool trigger, Camera gameCamera)
+        public override bool Use(GameTime gameTime, bool trigger, Camera gameCamera, bool canCollide)
         {
-            if (!base.Use(gameTime, trigger, gameCamera)) return false;
+            if (!base.Use(gameTime, trigger, gameCamera, canCollide)) return false;
 
             AudioController.PlaySFX("pistol", 1f, -0.2f,0.2f, owner.Position);
-            ProjectileController.Instance.Add(ProjectileType.Pistol, owner, Helper.PointOnCircle(ref owner.Position, 40, owner.Rotation - MathHelper.PiOver2), owner.Position - Helper.PointOnCircle(ref owner.Position, 100, owner.Rotation + MathHelper.PiOver2));
+            ProjectileController.Instance.Add(ProjectileType.Pistol, owner, Helper.PointOnCircle(ref owner.Position, 40, owner.Rotation - MathHelper.PiOver2), owner.Position - Helper.PointOnCircle(ref owner.Position, 100, owner.Rotation + MathHelper.PiOver2), canCollide);
 
             return true;
         }

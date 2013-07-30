@@ -45,8 +45,9 @@ namespace Hunted
         public void Update(GameTime gameTime, HeroDude gameHero, DateTime timeofday, int gameDay)
         {
             heroHealthTarget = (gameHero.drivingVehicle==null?gameHero.Health:gameHero.drivingVehicle.Health);
+            if (heroHealthTarget > 99f && heroHealthTarget < 100f) heroHealthTarget = 100f;
+
             heroHealth = MathHelper.Lerp(heroHealth, heroHealthTarget, 0.1f);
-            if (heroHealth > 99f && heroHealth < 100f) heroHealth = 100f;
 
             showAmmo = gameHero.SelectedWeapon > 0;
 

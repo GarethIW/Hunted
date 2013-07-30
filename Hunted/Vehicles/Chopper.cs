@@ -134,7 +134,7 @@ namespace Hunted
         public override void DrawLightBlock(SpriteBatch sb)
         {
             // Arms
-            sb.Draw(spriteSheet, Position, new Rectangle(200, 0, 300, 400), Color.Black, Rotation + MathHelper.PiOver2, new Vector2(150, 125) / 2, 1f, SpriteEffects.None, 1);
+            sb.Draw(spriteSheet, Position, new Rectangle(200, 0, 300, 400), Color.Black, Rotation + MathHelper.PiOver2, new Vector2(150, 125), 1f, SpriteEffects.None, 1);
         }
 
         internal void DrawInAir(SpriteBatch sb, LightingEngine lightingEngine)

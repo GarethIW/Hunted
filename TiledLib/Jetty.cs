@@ -12,6 +12,7 @@ namespace TiledLib
         public Rectangle Bounds;
 
         public Vector2 BoatPosition;
+        public float BoatRotation;
     }
 
   

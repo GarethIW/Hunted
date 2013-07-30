@@ -28,7 +28,7 @@ namespace Hunted.Weapons
             coolDown = 0;
         }
 
-        public virtual bool Use(GameTime gameTime, bool trigger, Camera gameCamera)
+        public virtual bool Use(GameTime gameTime, bool trigger, Camera gameCamera, bool canCollide)
         {
             if (!trigger)
             {
