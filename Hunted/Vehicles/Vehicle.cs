@@ -25,6 +25,8 @@ namespace Hunted
 
         public List<Vector2> CollisionVerts = new List<Vector2>();
 
+
+        internal bool turning = false;
         internal float maxSpeed = 12f;
         internal float linearSpeed = 0f;
         internal float decelerate = 0.025f;
@@ -32,7 +34,7 @@ namespace Hunted
         internal float turnSpeed = 0.025f;
         internal float turnAmount = 0f;
 
-        bool turning = false;
+        
 
         internal Texture2D spriteSheet;
 
@@ -61,7 +63,7 @@ namespace Hunted
             
         }
 
-        public virtual void Update(GameTime gameTime, Map gameMap)
+        public virtual void Update(GameTime gameTime, Map gameMap, HeroDude gameHero, Camera gameCamera)
         {
             DoCollisions(gameMap);
             Position += Speed;
@@ -69,63 +71,11 @@ namespace Hunted
             Position.X = MathHelper.Clamp(Position.X, 50, (gameMap.Width * gameMap.TileWidth) -50);
             Position.Y = MathHelper.Clamp(Position.Y, 50, (gameMap.Height * gameMap.TileHeight) -50);
 
-            if (Speed.Length() > 0f)
-            {
-               
-            }
-            else
-            {
-               
-            }
-
-            if(linearSpeed>0f) linearSpeed -= decelerate;
-            if (linearSpeed < 0f) linearSpeed += decelerate;
-
-            linearSpeed = MathHelper.Clamp(linearSpeed, -(maxSpeed/2), maxSpeed);
-            Vector2 moveVect = Helper.AngleToVector(Rotation, 100f);
-            moveVect.Normalize();
-
-            if (!turning)
-            {
-                //if (turnAmount > 0f) turnAmount -= 0.25f;
-                //if (turnAmount < 0f) turnAmount += 0.25f;
-                //turnAmount = 0f;
-
-                turnAmount = MathHelper.Lerp(turnAmount, 0f, 0.1f);
-            }
-
-            if ((turnAmount > 0f && turnAmount < 0.001f) || (turnAmount < 0f && turnAmount > -0.001f)) turnAmount = 0f;
-
-            if (linearSpeed >= 0.1f || linearSpeed <= -0.1f)
-                Rotation += MathHelper.Clamp((linearSpeed / 100f) * turnAmount,-0.025f,0.025f);
-
-            Speed = moveVect * linearSpeed;
-
-            turning = false;
+         
 
             Health = MathHelper.Clamp(Health, 0f, 100f);
 
-            foreach (Dude d in EnemyController.Instance.Enemies)
-            {
-                if (Helper.IsPointInShape(d.Position, this.CollisionVerts) && d.Health>=0f)
-                {
-                    Health -= 0.5f;
-                    d.HitByVehicle(this);
-                }
-            }
-
-            if (Health < 50f)
-            {
-                maxSpeed = 10f;
-            }
-            if (Health < 20f)
-            {
-                maxSpeed = (Health * 4f) / 10f;
-            }
-            if (Health <= 0f)
-            {
-                maxSpeed = 0f;
-            }
+           
         }
 
         public virtual void Move(Vector2 amount)
@@ -171,9 +121,7 @@ namespace Hunted
 
         public virtual void Collided() 
         {
-            Health -= ((float)Math.Abs(linearSpeed) / 2f);
-            linearSpeed = 0f;
-            Speed = Vector2.Zero;
+            
         }
 
         public virtual void HitByProjectile(Projectile p)
@@ -191,23 +139,20 @@ namespace Hunted
         }
 
 
-        internal void Accelerate(float max)
+        internal virtual void Accelerate(float max)
         {
-            if (linearSpeed < (maxSpeed * max)) linearSpeed += acceleration;
+            
             
         }
 
-        internal void Brake()
+        internal virtual void Brake()
         {
-            linearSpeed -= acceleration * 2f;
+            
         }
 
-        internal void Turn(float p)
+        internal virtual void Turn(float p)
         {
-            if (turnAmount > 0f && p < 0f) turnAmount = 0f;
-            if (turnAmount < 0f && p > 0f) turnAmount = 0f;
-            turnAmount += (turnSpeed * p);
-            turning = true;
+            
         }
 
         void DoCollisions(Map gameMap)

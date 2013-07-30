@@ -177,7 +177,7 @@ namespace Hunted
             {
                 ScreenManager.Game.IsMouseVisible = false;
 
-                TimeOfDay = TimeOfDay.AddMinutes(gameTime.ElapsedGameTime.TotalSeconds * 50);
+                TimeOfDay = TimeOfDay.AddMinutes(gameTime.ElapsedGameTime.TotalSeconds);
                 gameDay = 1 + ((TimeOfDay - StartTime).Days);
 
                 lightingEngine.Update(gameTime, TimeOfDay, ScreenManager.SpriteBatch, ScreenManager.GraphicsDevice);
@@ -188,7 +188,7 @@ namespace Hunted
                 projectileController.Update(gameTime, gameMap, gameHero);
                 particleController.Update(gameTime, gameMap);
                 itemController.Update(gameTime, gameMap, gameHero, mapFog);
-                vehicleController.Update(gameTime, gameMap, gameHero);
+                vehicleController.Update(gameTime, gameMap, gameHero, gameCamera);
 
                 gameHero.Update(gameTime, gameMap, mapFog);
                 //lightSource1.Position = new Vector2(1000, 1000);
@@ -196,13 +196,7 @@ namespace Hunted
                 //cameraLightSource.Position = gameCamera.Position;
                 //cameraLightSource.Direction = new Vector2(1f, 1f);
                 gameCamera.Target = gameHero.Position;
-                if (gameHero.drivingVehicle != null)
-                {
-                    if (gameHero.drivingVehicle.maxSpeed > 0f)
-                        gameCamera.ZoomTarget = 1f - ((0.5f / gameHero.drivingVehicle.maxSpeed) * (float)Math.Abs(gameHero.drivingVehicle.linearSpeed));
-                    else gameCamera.ZoomTarget = 1f;
-                }
-                else gameCamera.ZoomTarget = 1f;
+                if (gameHero.drivingVehicle == null) gameCamera.ZoomTarget = 1f;
                 if (gameCamera.Zoom > 1.0f) gameCamera.Zoom = 1.0f;
                 gameCamera.Update(new Rectangle(0, 0, ScreenManager.GraphicsDevice.Viewport.Width, ScreenManager.GraphicsDevice.Viewport.Height));
 
@@ -274,7 +268,10 @@ namespace Hunted
                 if (input.IsNewButtonPress(Buttons.RightShoulder, null, out player) || input.IsNewButtonPress(Buttons.DPadDown, null, out player)) gameHero.SelectWeapon(1, true);
                 if (input.IsNewButtonPress(Buttons.LeftShoulder, null, out player) || input.IsNewButtonPress(Buttons.DPadUp, null, out player)) gameHero.SelectWeapon(-1, true);
 
-                if ((keyboardState.IsKeyDown(Keys.E) && !lastKeyboardState.IsKeyDown(Keys.E)) || input.IsNewButtonPress(Buttons.A, null, out player)) gameHero.EnterVehicle(gameMap);
+                if ((keyboardState.IsKeyDown(Keys.E) && !lastKeyboardState.IsKeyDown(Keys.E)) || input.IsNewButtonPress(Buttons.A, null, out player))
+                {
+                    gameHero.EnterVehicle(gameMap);
+                }
 
 
                 if (input.MouseDragging)
@@ -404,8 +401,9 @@ namespace Hunted
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
             itemController.DrawShadows(spriteBatch, lightingEngine, gameHero);
             enemyController.DrawShadows(spriteBatch, lightingEngine, gameHero);
-            vehicleController.DrawShadows(spriteBatch, lightingEngine, gameHero);
             gameHero.DrawShadows(spriteBatch, lightingEngine);
+            vehicleController.DrawShadows(spriteBatch, lightingEngine, gameHero);
+            vehicleController.DrawHeliShadows(spriteBatch, lightingEngine, gameHero);          
             spriteBatch.End();
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
@@ -419,10 +417,11 @@ namespace Hunted
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
             itemController.Draw(spriteBatch, lightingEngine, gameHero);
             enemyController.Draw(spriteBatch, lightingEngine, gameHero);
-            vehicleController.Draw(spriteBatch, lightingEngine, gameHero);
             gameHero.Draw(spriteBatch, lightingEngine);
+            vehicleController.Draw(spriteBatch, lightingEngine, gameHero);
             gameMap.DrawShadows(spriteBatch, "Wall", gameCamera, lightingEngine);
             gameMap.DrawLayer(spriteBatch, "Wall", gameCamera, lightingEngine, Color.White);
+            vehicleController.DrawHelis(spriteBatch, lightingEngine, gameHero);
             projectileController.Draw(spriteBatch);
             spriteBatch.End();
 
@@ -449,7 +448,7 @@ namespace Hunted
             if (TransitionPosition >= 0f)
                 ScreenManager.FadeBackBufferToBlack(1f - TransitionAlpha);
 
-            if (IsActive)
+            if (IsActive && gameHero.drivingVehicle==null)
             {
                 spriteBatch.Begin();
                 //gameHUD.Draw(spriteBatch);
@@ -546,6 +545,15 @@ namespace Hunted
                         j.LoadContent(vehicleController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine);
                         vehicleController.Vehicles.Add(j);
                        // gameHero.Position = j.Position + new Vector2(300, 0);
+                    }
+
+                    if (b.Type == BuildingType.Helipad)
+                    {
+                        Chopper chop = new Chopper((new Vector2(b.Rect.Center.X, b.Rect.Center.Y) * new Vector2(gameMap.TileWidth, gameMap.TileHeight)) + new Vector2(50, 50));
+                        chop.Rotation = (float)Helper.Random.NextDouble() * MathHelper.TwoPi;
+                        chop.LoadContent(vehicleController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine);
+                        vehicleController.Vehicles.Add(chop);
+                        gameHero.Position = chop.Position + new Vector2(300, 0);
                     }
                 }
             }

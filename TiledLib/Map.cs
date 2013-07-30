@@ -442,7 +442,7 @@ namespace TiledLib
             if (!l.Visible)
                 return;
 
-            if (gameCamera.Zoom < 0.5f) return;
+            if (gameCamera.Zoom < 0.4f) return;
 
             TileLayer tileLayer = l as TileLayer;
             if (tileLayer != null)

@@ -34,13 +34,13 @@ namespace Hunted
             lightingEngine = le;
         }
 
-        public void Update(GameTime gameTime, Map gameMap, HeroDude gameHero)
+        public void Update(GameTime gameTime, Map gameMap, HeroDude gameHero, Camera gameCamera)
         {
             int count = 0;
             foreach (Vehicle v in Vehicles.Where(veh => (gameHero.Position - veh.Position).Length() < 4000f))
             {
                 count++;
-                v.Update(gameTime, gameMap);
+                v.Update(gameTime, gameMap, gameHero, gameCamera);
 
                 if ((gameHero.Position - v.Position).Length() < 50f)
                 {
@@ -63,6 +63,7 @@ namespace Hunted
         {
             foreach (Vehicle v in Vehicles.Where(veh => (gameHero.Position - veh.Position).Length() < 2000f))
             {
+                if (v is Chopper && ((Chopper)v).Height > 0f) continue;
                 v.Draw(sb, lightingEngine);
             }
         }
@@ -71,6 +72,8 @@ namespace Hunted
         {
             foreach (Vehicle v in Vehicles.Where(veh => (gameHero.Position - veh.Position).Length() < 2000f))
             {
+                if (v is Chopper && ((Chopper)v).Height > 0f) continue;
+
                 v.DrawLightBlock(sb);
             }
         }
@@ -79,7 +82,31 @@ namespace Hunted
         {
             foreach (Vehicle v in Vehicles.Where(veh => (gameHero.Position - veh.Position).Length() < 2000f))
             {
+                if (v is Chopper && ((Chopper)v).Height > 0f) continue;
+
                 v.DrawShadows(sb, lightingEngine);
+            }
+        }
+
+        internal void DrawHelis(SpriteBatch sb, LightingEngine lightingEngine, HeroDude gameHero)
+        {
+            foreach (Vehicle v in Vehicles.Where(veh => (gameHero.Position - veh.Position).Length() < 2000f))
+            {
+                if (v is Chopper && ((Chopper)v).Height > 0f)
+                {
+                    ((Chopper)v).DrawInAir(sb, lightingEngine);
+                }
+            }
+        }
+
+        internal void DrawHeliShadows(SpriteBatch sb, LightingEngine lightingEngine, HeroDude gameHero)
+        {
+            foreach (Vehicle v in Vehicles.Where(veh => (gameHero.Position - veh.Position).Length() < 2000f))
+            {
+                if (v is Chopper && ((Chopper)v).Height > 0f)
+                {
+                    ((Chopper)v).DrawShadowsInAir(sb, lightingEngine);
+                }
             }
         }
     }

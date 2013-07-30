@@ -117,14 +117,18 @@ namespace Hunted
             {
                 // Exit vehicle
                 //bool found = false;
-                for (float a = 0f; a < MathHelper.TwoPi; a += 0.5f)
+                if (drivingVehicle is Chopper && ((Chopper)drivingVehicle).Height > 0f) ((Chopper)drivingVehicle).Land();
+                else
                 {
-                    Vector2 pos = Helper.PointOnCircle(ref drivingVehicle.Position, 200, a);
-                    if (!gameMap.CheckTileCollision(pos) && !Helper.IsPointInShape(pos, drivingVehicle.CollisionVerts))
+                    for (float a = 0f; a < MathHelper.TwoPi; a += 0.5f)
                     {
-                        Position = pos;
-                        drivingVehicle = null;
-                        break;
+                        Vector2 pos = Helper.PointOnCircle(ref drivingVehicle.Position, 200, a);
+                        if (!gameMap.CheckTileCollision(pos) && !Helper.IsPointInShape(pos, drivingVehicle.CollisionVerts))
+                        {
+                            Position = pos;
+                            drivingVehicle = null;
+                            break;
+                        }
                     }
                 }
             }

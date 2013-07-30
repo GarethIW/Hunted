@@ -660,9 +660,9 @@ namespace Hunted
             {
                 newCompound.Buildings.Add(heliPad);
 
-                for (int xx = heliPad.Rect.Left; xx < heliPad.Rect.Right; xx++)
-                    for (int yy = heliPad.Rect.Top; yy < heliPad.Rect.Bottom; yy++)
-                        terrainLayer.Tiles[xx, yy] = map.Tiles[CARPARK];
+                //for (int xx = heliPad.Rect.Left; xx < heliPad.Rect.Right; xx++)
+                //    for (int yy = heliPad.Rect.Top; yy < heliPad.Rect.Bottom; yy++)
+                //        terrainLayer.Tiles[xx, yy] = map.Tiles[CARPARK];
             }
 
             

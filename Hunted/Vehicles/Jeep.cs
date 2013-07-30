@@ -36,14 +36,58 @@ namespace Hunted
             base.Initialize();
         }
 
-        public override void Update(GameTime gameTime, Map gameMap)
+        public override void Update(GameTime gameTime, Map gameMap, HeroDude gameHero, Camera gameCamera)
         {
             CollisionVerts.Clear();
             CollisionVerts.Add(Helper.PointOnCircle(ref Position, 150, -0.44f + (Rotation)));
             CollisionVerts.Add(Helper.PointOnCircle(ref Position, 150, 0.44f + (Rotation)));
             CollisionVerts.Add(Helper.PointOnCircle(ref Position, 150, -0.44f + MathHelper.Pi + (Rotation)));
             CollisionVerts.Add(Helper.PointOnCircle(ref Position, 150, 0.44f + MathHelper.Pi + (Rotation)));
-            base.Update(gameTime, gameMap);
+
+            base.Update(gameTime, gameMap, gameHero, gameCamera);
+
+            if (linearSpeed > 0f) linearSpeed -= decelerate;
+            if (linearSpeed < 0f) linearSpeed += decelerate;
+
+            linearSpeed = MathHelper.Clamp(linearSpeed, -(maxSpeed / 2), maxSpeed);
+            Vector2 moveVect = Helper.AngleToVector(Rotation, 100f);
+            moveVect.Normalize();
+
+            if (!turning)
+            {
+                turnAmount = MathHelper.Lerp(turnAmount, 0f, 0.1f);
+            }
+
+            if ((turnAmount > 0f && turnAmount < 0.001f) || (turnAmount < 0f && turnAmount > -0.001f)) turnAmount = 0f;
+
+            if (linearSpeed >= 0.1f || linearSpeed <= -0.1f)
+                Rotation += MathHelper.Clamp((linearSpeed / 100f) * turnAmount, -0.025f, 0.025f);
+
+            Speed = moveVect * linearSpeed;
+
+            turning = false;
+
+            foreach (Dude d in EnemyController.Instance.Enemies)
+            {
+                if (Helper.IsPointInShape(d.Position, this.CollisionVerts) && d.Health >= 0f)
+                {
+                    Health -= 0.5f;
+                    d.HitByVehicle(this);
+                }
+            }
+
+            if (Health < 50f)
+            {
+                maxSpeed = 10f;
+            }
+            if (Health < 20f)
+            {
+                maxSpeed = (Health * 4f) / 10f;
+            }
+            if (Health <= 0f)
+            {
+                maxSpeed = 0f;
+            }
 
             //HeadTorch.Position = Helper.PointOnCircle(ref Position, 30, Rotation - MathHelper.PiOver2);
             //HeadTorch.Rotation = Rotation - MathHelper.PiOver2;
@@ -51,6 +95,13 @@ namespace Hunted
             Lights[1].Position = Helper.PointOnCircle(ref Position, 137, (Rotation) + 0.2f);
             Lights[0].Rotation = Rotation;
             Lights[1].Rotation = Rotation;
+
+            if (gameHero.drivingVehicle == this)
+            {
+                if (maxSpeed > 0f)
+                    gameCamera.ZoomTarget = 1f - ((0.5f / maxSpeed) * (float)Math.Abs(linearSpeed));
+                else gameCamera.ZoomTarget = 1f;
+            }
         }
 
         public override void Draw(SpriteBatch sb, LightingEngine lightingEngine)
@@ -69,12 +120,46 @@ namespace Hunted
             }
         }
 
+
+
         public override void DrawLightBlock(SpriteBatch sb)
         {
             // Arms
             sb.Draw(spriteSheet, Position, new Rectangle(0, 0, 200, 300), Color.Black, Rotation + MathHelper.PiOver2, new Vector2(200, 300) / 2, 1f, SpriteEffects.None, 1);
         }
 
+        public override void Collided()
+        {
+            Health -= ((float)Math.Abs(linearSpeed) / 2f);
+            linearSpeed = 0f;
+            Speed = Vector2.Zero;
+
+            base.Collided();
+        }
+
+        internal override void Accelerate(float max)
+        {
+            if (linearSpeed < (maxSpeed * max)) linearSpeed += acceleration;
+
+            base.Accelerate(max);
+        }
+
+        internal override void Brake()
+        {
+            linearSpeed -= acceleration * 2f;
+
+            base.Brake();
+        }
+
+        internal override void Turn(float p)
+        {
+            if (turnAmount > 0f && p < 0f) turnAmount = 0f;
+            if (turnAmount < 0f && p > 0f) turnAmount = 0f;
+            turnAmount += (turnSpeed * p);
+            turning = true;
+
+            base.Turn(p);
+        }
 
     }
 
