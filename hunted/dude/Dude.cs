@@ -89,6 +89,9 @@ namespace Hunted
 
             Health = MathHelper.Clamp(Health, 0f, 100f);
             Ammo = (int)MathHelper.Clamp(Ammo, 0, 100);
+
+            foreach (Weapon w in Weapons) w.Update(gameTime);
+            
         }
 
         public virtual void Move(Vector2 amount)
@@ -148,7 +151,7 @@ namespace Hunted
         {
             if (drivingVehicle != null) return;
             // Feet
-            sb.Draw(spriteSheet, Position, Animations["feet"].CellRect, lightingEngine.CurrentSunColor, Rotation, new Vector2(100,100)/2, 1f, SpriteEffects.None, 1);
+            sb.Draw(spriteSheet, Position, Animations["feet"].CellRect, lightingEngine.CurrentSunColor, (Speed.Length()>0f)?Helper.V2ToAngle(Speed)+MathHelper.PiOver2:Rotation, new Vector2(100,100)/2, 1f, SpriteEffects.None, 1);
             // Arms
             sb.Draw(spriteSheet, Position, Animations["arms"].CellRect, lightingEngine.CurrentSunColor, Rotation, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
             // Head
@@ -185,6 +188,10 @@ namespace Hunted
             if (p.Type != ProjectileType.Knife)
             {
                 ParticleController.Instance.AddGSW(p);
+            }
+            else if(p.Type == ProjectileType.SMG)
+            {
+                ParticleController.Instance.AddSMGWound(p);
             }
             else
             {

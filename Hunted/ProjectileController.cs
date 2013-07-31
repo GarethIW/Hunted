@@ -19,6 +19,7 @@ namespace Hunted
         Pistol,
         SMG,
         Shot,
+        Rifle,
         Grenade,
         Rocket
     }
@@ -146,6 +147,15 @@ namespace Hunted
                     break;
                 case ProjectileType.Pistol:
                     Add(position, direction * 20f, 2000, canCollide, new Rectangle(0, 0, 2, 4), Helper.V2ToAngle(direction) + MathHelper.PiOver2, 5f, owner, type);
+                    break;
+                case ProjectileType.Shot:
+                    Add(position, direction * (10f+((float)Helper.Random.NextDouble()*10f)), 1000, canCollide, new Rectangle(0, 0, 2, 2), Helper.V2ToAngle(direction) + MathHelper.PiOver2, 3f, owner, type);
+                    break;
+                case ProjectileType.SMG:
+                    Add(position, direction * 17f, 1500, canCollide, new Rectangle(0, 0, 2, 2), Helper.V2ToAngle(direction) + MathHelper.PiOver2, 2f, owner, type);
+                    break;
+                case ProjectileType.Rifle:
+                    Add(position, direction * 30f, 1500, canCollide, new Rectangle(0, 0, 2, 4), Helper.V2ToAngle(direction) + MathHelper.PiOver2, 8f, owner, type);
                     break;
             }
         }

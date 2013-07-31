@@ -78,6 +78,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AudioController.cs" />
+    <Compile Include="Dude\Weapons\Rifle.cs" />
+    <Compile Include="Dude\Weapons\SMG.cs" />
+    <Compile Include="Dude\Weapons\Shotgun.cs" />
     <Compile Include="VehicleController.cs" />
     <Compile Include="ItemController.cs" />
     <Compile Include="Dude\Weapons\Knife.cs" />

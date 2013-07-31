@@ -42,7 +42,9 @@ namespace Hunted
             effects.Add("mortar", content.Load<SoundEffect>("audio/sfx/mortar"));
             effects.Add("pistol", content.Load<SoundEffect>("audio/sfx/pistol"));
             effects.Add("shotgun", content.Load<SoundEffect>("audio/sfx/shotgun"));
+            effects.Add("shotgunreload", content.Load<SoundEffect>("audio/sfx/shotreload"));
             effects.Add("smg", content.Load<SoundEffect>("audio/sfx/smg"));
+            effects.Add("rifle", content.Load<SoundEffect>("audio/sfx/rifle"));
             effects.Add("sniper", content.Load<SoundEffect>("audio/sfx/sniper"));
             effects.Add("sword", content.Load<SoundEffect>("audio/sfx/sword"));
             effects.Add("fstep-grass", content.Load<SoundEffect>("audio/sfx/fstep-grass"));

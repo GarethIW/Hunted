@@ -27,6 +27,9 @@ namespace Hunted
 
             Weapons.Add(new Knife(this));
             Weapons.Add(new Pistol(this));
+            Weapons.Add(new Shotgun(this));
+            Weapons.Add(new SMG(this));
+            Weapons.Add(new Rifle(this));            
             SelectedWeapon = 1;
         }
 

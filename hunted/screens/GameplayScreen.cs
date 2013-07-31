@@ -499,9 +499,9 @@ namespace Hunted
                         if (!found)
                         {
                             AIDude newDude = new AIDude(pos);
+                            newDude.BelongsToCompound = true;
                             newDude.LoadContent(enemyController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine);
                             newDude.Health = 10 + Helper.Random.Next(30);
-                            newDude.BelongsToCompound = true;
                             enemyController.Enemies.Add(newDude);
                         }
 

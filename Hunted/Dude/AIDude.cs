@@ -50,8 +50,23 @@ namespace Hunted
             if (Helper.Random.Next(2) == 1)
             {
                 Weapons.Add(new Pistol(this));
-                SelectedWeapon = 1;
             }
+
+            switch (Helper.Random.Next(BelongsToCompound?20:50))
+            {
+                case 1:
+                    Weapons.Add(new Shotgun(this));
+                    break;
+                case 2:
+                    Weapons.Add(new SMG(this));
+                    break;
+                case 3:
+                    Weapons.Add(new Rifle(this));
+                    break;
+            }
+
+            SelectedWeapon = Weapons.Count - 1;
+
         }
 
         internal void Initialize(GraphicsDevice gd, LightingEngine le)
@@ -106,7 +121,11 @@ namespace Hunted
                     if ((gameHero.Speed.Length() > 0f && (gameHero.Position - Position).Length() < 250f) || gameHero.drivingVehicle != null)
                         LookAt(gameHero.Position);
 
-                    if ((gameHero.Position - Position).Length() < 800f && gameHero.drivingVehicle != null && gameHero.drivingVehicle is Chopper && !(Weapons[SelectedWeapon] is Knife)) State = AIState.Attacking;
+                    if ((gameHero.Position - Position).Length() < 800f && 
+                        gameHero.drivingVehicle != null && 
+                        gameHero.drivingVehicle is Chopper && 
+                        ((Chopper)gameHero.drivingVehicle).Height >0f &&
+                        !(Weapons[SelectedWeapon] is Knife)) State = AIState.Attacking;
 
                     break;
                 case AIState.Chasing:
@@ -143,7 +162,7 @@ namespace Hunted
                     break;
                 case AIState.Attacking:
                     LookAt(gameHero.Position);
-                    bool shootUp = (gameHero.drivingVehicle != null && gameHero.drivingVehicle is Chopper);
+                    bool shootUp = (gameHero.drivingVehicle != null && gameHero.drivingVehicle is Chopper && ((Chopper)gameHero.drivingVehicle).Height >0f);
                     Attack(gameTime, true, gameCamera, !shootUp);
                     if (Weapons[SelectedWeapon].GetType() != typeof(Knife))
                     {

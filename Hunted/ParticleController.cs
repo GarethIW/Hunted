@@ -147,6 +147,18 @@ namespace Hunted
             }
         }
 
+        internal void AddSMGWound(Projectile p)
+        {
+            for (int i = 0; i < Helper.Random.Next(3); i++)
+            {
+                Vector2 dir = p.Velocity;
+                float a = Helper.V2ToAngle(dir);
+                a += -0.1f + ((float)Helper.Random.NextDouble() * 0.2f);
+                dir = Helper.AngleToVector(a, 10f + ((float)Helper.Random.NextDouble() * 10f));
+                Add(p.Position, dir, 10000f, true, new Rectangle(0, 0, 7, 7), -0.01f + ((float)Helper.Random.NextDouble() * 0.02f), 3f, Color.White, 0.5f, SpecialParticle.Blood, ParticleBlendMode.Alpha);
+            }
+        }
+
         internal void AddKnifeWound(Projectile p)
         {
             for (int i = 0; i < Helper.Random.Next(20); i++)

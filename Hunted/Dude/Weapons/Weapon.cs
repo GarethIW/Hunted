@@ -28,6 +28,11 @@ namespace Hunted.Weapons
             coolDown = 0;
         }
 
+        public virtual void Update(GameTime gameTime)
+        {
+            coolDown += gameTime.ElapsedGameTime.TotalMilliseconds;
+        }
+
         public virtual bool Use(GameTime gameTime, bool trigger, Camera gameCamera, bool canCollide)
         {
             if (!trigger)
@@ -39,23 +44,23 @@ namespace Hunted.Weapons
             if (triggerHeld && !isAuto && (owner.GetType() == typeof(HeroDude))) return false;
             triggerHeld = true;
 
+            if (coolDown < coolDownTarget * ((owner is HeroDude)?1f:2f)) return false;
+            coolDown = 0;
+
             if (this.GetType() != typeof(Knife))
             {
                 //if (clipAmmo <= 0) return false;
                 if (owner.Ammo <= 0 && owner.GetType() == typeof(HeroDude)) return false;
 
                 //if (owner.GetType() == typeof(HeroDude)) clipAmmo--;
-                if (owner.GetType() == typeof(HeroDude)) owner.Ammo--;
             }
 
-            if (isAuto || (owner.GetType() == typeof(AIDude)))
-            {
-                coolDown += gameTime.ElapsedGameTime.TotalMilliseconds;
+            //if ((owner.GetType() == typeof(AIDude)))
+            //{
+                
 
-                if (coolDown < coolDownTarget) return false;
-
-                coolDown = 0;
-            }
+            
+            //}
 
             return true;
         }
