@@ -10,12 +10,16 @@ using TiledLib;
 
 namespace Hunted
 {
-    public class Jeep : Vehicle
+    public class Boat : Vehicle
     {
 
-        public Jeep(Vector2 pos):base(pos)
+        public Boat(Vector2 pos):base(pos)
         {
             Health = 100f;
+            acceleration = 0.2f;
+            //decelerate = 0.01f;
+            maxSpeed = 15f;
+            turnSpeed = 0.005f;
         }
 
 
@@ -30,9 +34,9 @@ namespace Hunted
             //HeadTorch = new LightSource(gd, 500, LightAreaQuality.High, Color.White, BeamStencilType.Narrow, SpotStencilType.None);
             //le.LightSources.Add(HeadTorch);
             Lights.Add(new LightSource(gd, 500, LightAreaQuality.High, Color.White, BeamStencilType.Narrow, SpotStencilType.None));
-            Lights.Add(new LightSource(gd, 500, LightAreaQuality.High, Color.White, BeamStencilType.Narrow, SpotStencilType.None));
+            //Lights.Add(new LightSource(gd, 500, LightAreaQuality.High, Color.White, BeamStencilType.Narrow, SpotStencilType.None));
             le.LightSources.Add(Lights[0]);
-            le.LightSources.Add(Lights[1]);
+            //le.LightSources.Add(Lights[1]);
             base.Initialize();
         }
 
@@ -55,7 +59,7 @@ namespace Hunted
 
             if (!turning)
             {
-                turnAmount = MathHelper.Lerp(turnAmount, 0f, 0.1f);
+                turnAmount = MathHelper.Lerp(turnAmount, 0f, 0.05f);
             }
 
             if ((turnAmount > 0f && turnAmount < 0.001f) || (turnAmount < 0f && turnAmount > -0.001f)) turnAmount = 0f;
@@ -82,19 +86,19 @@ namespace Hunted
             }
             if (Health < 20f)
             {
-                limitedSpeed = (Health * 4f) / 10f;
+                limitedSpeed = 5f;
             }
             if (Health <= 0f)
             {
-                limitedSpeed = 0f;
+                limitedSpeed = 2f;
             }
 
             //HeadTorch.Position = Helper.PointOnCircle(ref Position, 30, Rotation - MathHelper.PiOver2);
             //HeadTorch.Rotation = Rotation - MathHelper.PiOver2;
-            Lights[0].Position = Helper.PointOnCircle(ref Position, 137, (Rotation) - 0.2f);
-            Lights[1].Position = Helper.PointOnCircle(ref Position, 137, (Rotation) + 0.2f);
+            Lights[0].Position = Helper.PointOnCircle(ref Position, 137, (Rotation));
+            //Lights[1].Position = Helper.PointOnCircle(ref Position, 137, (Rotation) + 0.2f);
             Lights[0].Rotation = Rotation;
-            Lights[1].Rotation = Rotation;
+            //Lights[1].Rotation = Rotation;
 
             if (gameHero.drivingVehicle == this)
             {
@@ -146,7 +150,7 @@ namespace Hunted
 
         internal override void Brake()
         {
-            linearSpeed -= acceleration * 2f;
+            linearSpeed -= acceleration * 0.5f;
 
             base.Brake();
         }
@@ -159,6 +163,44 @@ namespace Hunted
             turning = true;
 
             base.Turn(p);
+        }
+
+        internal override void DoCollisions(Map gameMap)
+        {
+            bool Collision = false;
+            if (Speed == Vector2.Zero) return;
+            Vector2 test = Speed;
+            test.Normalize();
+            float rot = Helper.V2ToAngle(test);
+
+            if (gameMap.GetTile(Helper.PointOnCircle(ref Position, 135, rot), "Terrain").Properties.Contains("CanBoat"))
+            {
+                if (gameMap.GetTile(Helper.PointOnCircle(ref Position, 135, rot), "Water") == null) linearSpeed = MathHelper.Lerp(linearSpeed, 0f, 0.05f);
+                if (gameMap.GetTile(Helper.PointOnCircle(ref Position, 50, rot), "Water") == null) linearSpeed = MathHelper.Lerp(linearSpeed, 0f, 1f);
+            }
+            else Collision = true;
+            if (gameMap.GetTile(Helper.PointOnCircle(ref Position, 135, rot-0.2f), "Terrain").Properties.Contains("CanBoat"))
+            {
+                if (gameMap.GetTile(Helper.PointOnCircle(ref Position, 135, rot-0.2f), "Water") == null) linearSpeed = MathHelper.Lerp(linearSpeed, 0f, 0.05f);
+                
+            }
+            else Collision = true;
+            if (gameMap.GetTile(Helper.PointOnCircle(ref Position, 135, rot+0.2f), "Terrain").Properties.Contains("CanBoat"))
+            {
+                if (gameMap.GetTile(Helper.PointOnCircle(ref Position, 135, rot+0.2f), "Water") == null) linearSpeed = MathHelper.Lerp(linearSpeed, 0f, 0.05f);
+            }
+            else Collision = true;
+            foreach (Vehicle veh in VehicleController.Instance.Vehicles)
+            {
+                if (veh == this) continue;
+                if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 135, rot), veh.CollisionVerts)) Collision = true;
+                if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 135, rot - 0.2f), veh.CollisionVerts)) Collision = true;
+                if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 135, rot + 0.2f), veh.CollisionVerts)) Collision = true;
+            }
+            if (Collision)
+            {
+                Collided();
+            }
         }
 
     }

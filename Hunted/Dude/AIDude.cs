@@ -106,11 +106,13 @@ namespace Hunted
                     if ((gameHero.Speed.Length() > 0f && (gameHero.Position - Position).Length() < 250f) || gameHero.drivingVehicle != null)
                         LookAt(gameHero.Position);
 
+                    if ((gameHero.Position - Position).Length() < 800f && gameHero.drivingVehicle != null && gameHero.drivingVehicle is Chopper && !(Weapons[SelectedWeapon] is Knife)) State = AIState.Attacking;
+
                     break;
                 case AIState.Chasing:
                     Target = gameHero.Position;
                     LookAt(gameHero.Position);
-                    if ((gameHero.Position - Position).Length() < 450f && (CheckLineOfSight(gameHero.Position, gameMap) || gameHero.drivingVehicle is Chopper))
+                    if (((gameHero.Position - Position).Length() < 450f && CheckLineOfSight(gameHero.Position, gameMap)) || ((gameHero.Position - Position).Length() < 800f && gameHero.drivingVehicle is Chopper))
                     {
                         Target = Position;
                         State = AIState.Attacking;

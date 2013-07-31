@@ -5,6 +5,7 @@
   <tile id="0">
    <properties>
     <property name="Anim" value="Water1"/>
+    <property name="CanBoat" value="True"/>
     <property name="CollisionSet" value="True"/>
     <property name="fstep" value="sand"/>
    </properties>
@@ -12,23 +13,26 @@
   <tile id="1">
    <properties>
     <property name="Anim" value="Water2"/>
+    <property name="CanBoat" value="True"/>
     <property name="fstep" value="sand"/>
    </properties>
   </tile>
   <tile id="2">
    <properties>
-    <property name="Anim" value="Water3"/>
+    <property name="CanBoat" value="True"/>
     <property name="fstep" value="sand"/>
    </properties>
   </tile>
   <tile id="3">
    <properties>
     <property name="Anim" value="Water4"/>
+    <property name="CanBoat" value="True"/>
    </properties>
   </tile>
   <tile id="4">
    <properties>
     <property name="Anim" value="Water5"/>
+    <property name="CanBoat" value="True"/>
    </properties>
   </tile>
   <tile id="5">
@@ -59,22 +63,26 @@
   <tile id="10">
    <properties>
     <property name="Anim" value="Water6"/>
+    <property name="CanBoat" value="True"/>
     <property name="fstep" value="sand"/>
    </properties>
   </tile>
   <tile id="11">
    <properties>
     <property name="Anim" value="Water7"/>
+    <property name="CanBoat" value="True"/>
    </properties>
   </tile>
   <tile id="12">
    <properties>
     <property name="Anim" value="Water8"/>
+    <property name="CanBoat" value="True"/>
     <property name="fstep" value="sand"/>
    </properties>
   </tile>
   <tile id="13">
    <properties>
+    <property name="CanBoat" value="True"/>
     <property name="fstep" value="sand"/>
    </properties>
   </tile>
@@ -90,6 +98,7 @@
   </tile>
   <tile id="16">
    <properties>
+    <property name="CanBoat" value="True"/>
     <property name="fstep" value="sand"/>
    </properties>
   </tile>
@@ -111,29 +120,34 @@
   <tile id="20">
    <properties>
     <property name="Anim" value="Water9"/>
+    <property name="CanBoat" value="True"/>
     <property name="fstep" value="sand"/>
    </properties>
   </tile>
   <tile id="21">
    <properties>
     <property name="Anim" value="Water10"/>
+    <property name="CanBoat" value="True"/>
     <property name="fstep" value="sand"/>
    </properties>
   </tile>
   <tile id="22">
    <properties>
     <property name="Anim" value="Water11"/>
+    <property name="CanBoat" value="True"/>
     <property name="fstep" value="sand"/>
    </properties>
   </tile>
   <tile id="23">
    <properties>
     <property name="Anim" value="Water12"/>
+    <property name="CanBoat" value="True"/>
    </properties>
   </tile>
   <tile id="24">
    <properties>
     <property name="Anim" value="Water13"/>
+    <property name="CanBoat" value="True"/>
    </properties>
   </tile>
   <tile id="25">

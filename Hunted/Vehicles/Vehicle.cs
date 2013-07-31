@@ -28,6 +28,7 @@ namespace Hunted
 
         internal bool turning = false;
         internal float maxSpeed = 12f;
+        internal float limitedSpeed;
         internal float linearSpeed = 0f;
         internal float decelerate = 0.025f;
         internal float acceleration = 0.1f;
@@ -49,6 +50,7 @@ namespace Hunted
         {
             Position = pos;
             Active = true;
+            
         }
 
         
@@ -59,8 +61,8 @@ namespace Hunted
 
         internal virtual void Initialize()
         {
-            
-            
+
+            limitedSpeed = maxSpeed;
         }
 
         public virtual void Update(GameTime gameTime, Map gameMap, HeroDude gameHero, Camera gameCamera)
@@ -117,7 +119,7 @@ namespace Hunted
 
         public virtual void HitByProjectile(Projectile p)
         {
-            Health -= p.Damage/5f;
+            Health -= p.Damage/2f;
             //AudioController.PlaySFX("hit", 0.5f, -0.4f, 0.4f, Position);
             if (p.Type != ProjectileType.Knife)
             {
@@ -146,7 +148,7 @@ namespace Hunted
             
         }
 
-        void DoCollisions(Map gameMap)
+        internal virtual void DoCollisions(Map gameMap)
         {
             bool Collision = false;
             Vector2 test = Speed;

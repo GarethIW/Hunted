@@ -178,6 +178,8 @@ namespace Hunted
 
         public virtual void HitByProjectile(Projectile p)
         {
+            if (drivingVehicle != null) return;
+
             Health -= (p.Owner.GetType() == typeof(HeroDude)) ? p.Damage : p.Damage / 2;
             AudioController.PlaySFX("hit", 0.5f, -0.4f, 0.4f, Position);
             if (p.Type != ProjectileType.Knife)
@@ -188,6 +190,7 @@ namespace Hunted
             {
                 ParticleController.Instance.AddKnifeWound(p);
             }
+            p.Active = false;
         }
 
         public virtual void HitByVehicle(Vehicle v)

@@ -103,13 +103,19 @@ namespace Hunted
 
             turning = false;
 
-            if (gameHero.drivingVehicle == this) bladesSpeed = MathHelper.Lerp(bladesSpeed, 0.5f, 0.01f);
+            if (gameHero.drivingVehicle == this && Health>0f) bladesSpeed = MathHelper.Lerp(bladesSpeed, 0.5f, 0.01f);
             if (gameHero.drivingVehicle == null) bladesSpeed = MathHelper.Lerp(bladesSpeed, 0f, 0.01f);
             bladesRot += bladesSpeed;
 
             if (gameHero.drivingVehicle == this)
             {
                 gameCamera.ZoomTarget = 1f - ((maxCameraScale / 1f) * Height);
+            }
+
+            if (Health <= 0f)
+            {
+                Land(gameMap);
+                if (Height <= 0f) bladesSpeed = MathHelper.Lerp(bladesSpeed, 0f, 0.01f);
             }
         }
 

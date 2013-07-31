@@ -588,10 +588,12 @@ namespace TiledLib
 
         }
 
-        public bool CheckCollision(Vector2 position) { return CheckCollision(position, true, false); }
+        public bool CheckCollision(Vector2 position) { return CheckCollision(position, true); }
 
-        public bool CheckCollision(Vector2 position, bool checkWater, bool reverse)
+        public bool CheckCollision(Vector2 position, bool checkWater)
         {
+            //bool waterOK = false;
+
             for(int i=0;i<Layers.Count;i++)
             {
                 if (!Layers[i].Properties.Contains("Collision"))
@@ -625,10 +627,14 @@ namespace TiledLib
                     int pixelCheckX = (collisionTile.Source.X) + positionOnTileX;
                     int pixelCheckY = (collisionTile.Source.Y) + positionOnTileY;
 
-                    if(reverse)
-                        return !collisionTile.CollisionData[(pixelCheckY * collisionTile.Texture.Width) + pixelCheckX];
-                    else
-                        return collisionTile.CollisionData[(pixelCheckY * collisionTile.Texture.Width) + pixelCheckX];
+                    //if(reverse)
+                    //    return !collisionTile.CollisionData[(pixelCheckY * collisionTile.Texture.Width) + pixelCheckX];
+                    //else
+                    //if (checkWater)
+                   // {
+                    //    if (Layers[i].Name == "Water") waterOK = true;
+                    //}
+                    return collisionTile.CollisionData[(pixelCheckY * collisionTile.Texture.Width) + pixelCheckX];
 
                 }
                 else
@@ -637,7 +643,8 @@ namespace TiledLib
                 }
             }
 
-            return reverse;
+            return false;
+            //else return !waterOK;
         }
 
         public bool CheckTileCollision(Vector2 position)
@@ -697,9 +704,9 @@ namespace TiledLib
             return null;
         }
 
-        public Tile GetTile(Vector2 position, int layer)
+        public Tile GetTile(Vector2 position, string layer)
         {
-            TileLayer tileLayer = GetLayer(layer.ToString()) as TileLayer;
+            TileLayer tileLayer = GetLayer(layer) as TileLayer;
             if (tileLayer == null) return null;
 
             position.X = (int)position.X;

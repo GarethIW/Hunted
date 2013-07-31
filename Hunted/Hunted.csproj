@@ -117,6 +117,7 @@
     <Compile Include="TerrainGeneration.cs" />
     <Compile Include="TickerText.cs" />
     <Compile Include="Vehicles\Chopper.cs" />
+    <Compile Include="Vehicles\Boat.cs" />
     <Compile Include="Vehicles\Jeep.cs" />
     <Compile Include="Vehicles\Vehicle.cs" />
   </ItemGroup>

@@ -68,16 +68,23 @@ namespace Hunted
                 p.Position += p.Velocity;
                 p.Rotation += p.RotationSpeed;
 
-                if (p.CanCollide && gameMap.CheckCollision(p.Position,false,false) == true)
+                if (p.CanCollide && gameMap.CheckCollision(p.Position,false) == true)
                 {
                     p.Velocity = Vector2.Zero;
                     p.RotationSpeed = 0f;
                 }
 
-                if (p.Life <= 0)
+                
+
+                foreach (Vehicle v in VehicleController.Instance.Vehicles)
                 {
-                    p.Active = false;
+                    if (Helper.IsPointInShape(p.Position, v.CollisionVerts))
+                    {
+                        v.HitByProjectile(p);
+                        p.Active = false;
+                    }
                 }
+                if (!p.Active) continue;
 
                 if (p.Owner.GetType() == typeof(HeroDude))
                 {
@@ -90,25 +97,26 @@ namespace Hunted
                         }
                     }
                 }
+                if (!p.Active) continue;
+
 
                 if (p.Owner.GetType() == typeof(AIDude))
                 {
                     if ((gameHero.Position - p.Position).Length() < 60f)
                     {
                         gameHero.HitByProjectile(p);
-                        p.Active = false;
+                        
                     }
                 }
 
-                foreach (Vehicle v in VehicleController.Instance.Vehicles)
+                if (p.Life <= 0)
                 {
-                    if (Helper.IsPointInShape(p.Position, v.CollisionVerts))
-                    {
-                        v.HitByProjectile(p);
-                        p.Active = false;
-                    }
+                    p.Active = false;
                 }
+               
             }
+
+
 
             Projectiles.RemoveAll(part => !part.Active);
         }

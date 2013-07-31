@@ -206,6 +206,7 @@ namespace Hunted
                 {
                     if (gameHero.drivingVehicle.GetType() == typeof(Jeep)) revealRadius = 1600f;
                     if (gameHero.drivingVehicle.GetType() == typeof(Chopper)) revealRadius = 2000f;
+                    if (gameHero.drivingVehicle.GetType() == typeof(Boat)) revealRadius = 2500f;
                 }
                 if (mapUpdate >= 100)
                 {
@@ -565,10 +566,10 @@ namespace Hunted
 
             foreach (Jetty jetty in gameMap.Jetties)
             {
-                Jeep j = new Jeep(jetty.BoatPosition);
-                j.Rotation = jetty.BoatRotation;
-                j.LoadContent(vehicleController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine);
-                vehicleController.Vehicles.Add(j);
+                Boat b = new Boat(jetty.BoatPosition);
+                b.Rotation = jetty.BoatRotation;
+                b.LoadContent(vehicleController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine);
+                vehicleController.Vehicles.Add(b);
             }
 
             gameHud.Ticker.AddLine("> Explore area and eliminate resistance");
