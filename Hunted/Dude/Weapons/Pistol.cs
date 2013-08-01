@@ -18,14 +18,14 @@ namespace Hunted.Weapons
             sortOrder = 1;
         }
 
-        public override bool Use(GameTime gameTime, bool trigger, Camera gameCamera, bool canCollide)
+        public override bool Use(GameTime gameTime, Vector2 target, bool trigger, Camera gameCamera, bool canCollide)
         {
-            if (!base.Use(gameTime, trigger, gameCamera, canCollide)) return false;
+            if (!base.Use(gameTime, target, trigger, gameCamera, canCollide)) return false;
 
             if (owner.GetType() == typeof(HeroDude)) owner.Ammo--;
 
             AudioController.PlaySFX("pistol", 1f, -0.2f,0.2f, owner.Position);
-            ProjectileController.Instance.Add(ProjectileType.Pistol, owner, Helper.PointOnCircle(ref owner.Position, 40, owner.Rotation - MathHelper.PiOver2), owner.Position - Helper.PointOnCircle(ref owner.Position, 100, owner.Rotation + MathHelper.PiOver2), canCollide);
+            ProjectileController.Instance.Add(ProjectileType.Pistol, owner, muzzlePos, target - muzzlePos, canCollide);
 
             return true;
         }

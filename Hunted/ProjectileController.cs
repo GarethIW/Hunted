@@ -89,7 +89,7 @@ namespace Hunted
 
                 if (p.Owner.GetType() == typeof(HeroDude))
                 {
-                    foreach (AIDude d in EnemyController.Instance.Enemies.Where(dude => dude.Active))
+                    foreach (AIDude d in EnemyController.Instance.Enemies.Where(dude => dude.Active && !dude.Dead))
                     {
                         if ((d.Position - p.Position).Length() < 60f)
                         {

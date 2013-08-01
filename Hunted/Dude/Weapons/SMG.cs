@@ -22,9 +22,9 @@ namespace Hunted.Weapons
             sortOrder = 3;
         }
 
-        public override bool Use(GameTime gameTime, bool trigger, Camera gameCamera, bool canCollide)
+        public override bool Use(GameTime gameTime, Vector2 target, bool trigger, Camera gameCamera, bool canCollide)
         {
-            if (!base.Use(gameTime, trigger, gameCamera, canCollide)) return false;
+            if (!base.Use(gameTime, target, trigger, gameCamera, canCollide)) return false;
 
             if(owner is AIDude) AIroundscount++;
             roundsCount++;
@@ -43,7 +43,7 @@ namespace Hunted.Weapons
 
 
             AudioController.PlaySFX("smg", 1f, -0.2f,0.2f, owner.Position);
-            ProjectileController.Instance.Add(ProjectileType.SMG, owner, Helper.PointOnCircle(ref owner.Position, 40, owner.Rotation - MathHelper.PiOver2), owner.Position - Helper.PointOnCircle(ref owner.Position, 100, owner.Rotation + MathHelper.PiOver2 + (((float)Helper.Random.NextDouble() * 0.02f) - 0.01f)), canCollide);
+            ProjectileController.Instance.Add(ProjectileType.SMG, owner, muzzlePos, target - muzzlePos, canCollide);
 
             return true;
         }

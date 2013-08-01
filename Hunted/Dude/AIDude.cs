@@ -181,7 +181,7 @@ namespace Hunted
                 case AIState.Attacking:
                     LookAt(gameHero.Position);
                     bool shootUp = (gameHero.drivingVehicle != null && gameHero.drivingVehicle is Chopper && ((Chopper)gameHero.drivingVehicle).Height >0f);
-                    Attack(gameTime, true, gameCamera, !shootUp);
+                    Attack(gameTime, gameHero.Position, true, gameCamera, !shootUp);
                     if (Weapons[SelectedWeapon].GetType() != typeof(Knife))
                     {
                         if ((gameHero.Position - Position).Length() > 450f)

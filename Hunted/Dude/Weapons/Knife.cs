@@ -18,9 +18,9 @@ namespace Hunted.Weapons
             sortOrder = 0;
         }
 
-        public override bool Use(GameTime gameTime, bool trigger, Camera gameCamera, bool canCollide)
+        public override bool Use(GameTime gameTime, Vector2 target, bool trigger, Camera gameCamera, bool canCollide)
         {
-            if (!base.Use(gameTime, trigger, gameCamera, canCollide)) return false;
+            if (!base.Use(gameTime, target, trigger, gameCamera, canCollide)) return false;
 
            // ProjectileController.Instance.Add(ProjectileType.Pistol, owner, Helper.PointOnCircle(ref owner.Position, 40, owner.Rotation - MathHelper.PiOver2), owner.Position - Helper.PointOnCircle(ref owner.Position, 100, owner.Rotation + MathHelper.PiOver2));
             AudioController.PlaySFX("sword", 1f, -0.3f, 0.3f, owner.Position);

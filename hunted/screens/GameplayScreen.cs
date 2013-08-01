@@ -321,7 +321,7 @@ namespace Hunted
                     if (input.CurrentKeyboardStates[0].IsKeyDown(Keys.A)) keyboardStick.X = -1f;
                     if (input.CurrentKeyboardStates[0].IsKeyDown(Keys.D)) keyboardStick.X = 1f;
                     if (keyboardStick.Length() > 0f) gameHero.Move(keyboardStick);
-                    gameHero.Attack(gameTime, input.CurrentMouseState.LeftButton == ButtonState.Pressed, gameCamera, true);
+                    gameHero.Attack(gameTime, gameCamera.Position + (crosshairPos - new Vector2(gameCamera.Width / 2, gameCamera.Height / 2)), input.CurrentMouseState.LeftButton == ButtonState.Pressed, gameCamera, true);
 
                     gameHero.LookAt(gameCamera.Position + (crosshairPos - new Vector2(gameCamera.Width / 2, gameCamera.Height / 2)));//Helper.PointOnCircle(ref gameHero.Position, 200, Helper.V2ToAngle(((gameHero.Position - gameCamera.Position) ) + (crosshairPos- new Vector2(gameCamera.Width / 2, gameCamera.Height / 2)))));
                 }

@@ -22,6 +22,8 @@ namespace Hunted.Weapons
 
         internal int sortOrder;
 
+        internal Vector2 muzzlePos;
+
         public Weapon(Dude own)
         {
             owner = own;
@@ -33,9 +35,11 @@ namespace Hunted.Weapons
         public virtual void Update(GameTime gameTime)
         {
             coolDown += gameTime.ElapsedGameTime.TotalMilliseconds;
+
+            muzzlePos = Helper.PointOnCircle(ref owner.Position, 60, (owner.Rotation - MathHelper.PiOver2) + 0.25f);
         }
 
-        public virtual bool Use(GameTime gameTime, bool trigger, Camera gameCamera, bool canCollide)
+        public virtual bool Use(GameTime gameTime, Vector2 target, bool trigger, Camera gameCamera, bool canCollide)
         {
             if (!trigger)
             {

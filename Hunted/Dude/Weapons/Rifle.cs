@@ -20,7 +20,7 @@ namespace Hunted.Weapons
             sortOrder = 4;
         }
 
-        public override bool Use(GameTime gameTime, bool trigger, Camera gameCamera, bool canCollide)
+        public override bool Use(GameTime gameTime, Vector2 target, bool trigger, Camera gameCamera, bool canCollide)
         {
             if (!trigger)
             {
@@ -29,7 +29,7 @@ namespace Hunted.Weapons
             }
 
 
-            if (!base.Use(gameTime, trigger, gameCamera, canCollide)) return false;
+            if (!base.Use(gameTime, target, trigger, gameCamera, canCollide)) return false;
 
             roundsCount++;
             if (roundsCount == 3)
@@ -43,7 +43,7 @@ namespace Hunted.Weapons
 
 
             AudioController.PlaySFX("rifle", 1f, 0f,0.3f, owner.Position);
-            ProjectileController.Instance.Add(ProjectileType.Rifle, owner, Helper.PointOnCircle(ref owner.Position, 40, owner.Rotation - MathHelper.PiOver2), owner.Position - Helper.PointOnCircle(ref owner.Position, 100, owner.Rotation + MathHelper.PiOver2), canCollide);
+            ProjectileController.Instance.Add(ProjectileType.Rifle, owner, muzzlePos, target - muzzlePos, canCollide);
 
             return true;
         }

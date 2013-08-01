@@ -52,10 +52,11 @@ namespace Hunted
 
         internal virtual void Initialize()
         {
-            Animations.Add("feet", new SpriteAnimation(2, 100, 0, new Rectangle(0,0,100,100), true));
-            Animations.Add("arms", new SpriteAnimation(2, 100, 1, new Rectangle(0,0,100,100), true));
-            Animations.Add("head", new SpriteAnimation(2, 100, 2, new Rectangle(0, 0, 100, 100), false));
-
+            Animations.Add("feet", new SpriteAnimation(4, 100, 0, 0, new Rectangle(0,0,100,100), true, true));
+            Animations.Add("arms", new SpriteAnimation(4, 100, 0, 1, new Rectangle(0,0,100,100), true, true));
+            Animations.Add("head", new SpriteAnimation(2, 100, 0, 2, new Rectangle(0, 0, 100, 100), false, false));
+            Animations.Add("hands", new SpriteAnimation(1, 100, 0, 3, new Rectangle(0, 0, 100, 100), true, false));
+            Animations.Add("gun", new SpriteAnimation(1, 100, 0, 4, new Rectangle(0, 0, 100, 100), true, false));
             Active = true;
             Dead = false;
         }
@@ -76,8 +77,10 @@ namespace Hunted
                     Animations["feet"].Update(gameTime);
                     Animations["arms"].Update(gameTime);
                     Animations["head"].Update(gameTime);
+                    
+                    
 
-                    if (Animations["feet"].CurrentFrame == 0)
+                    if (Animations["feet"].CurrentFrame == 0 || Animations["feet"].CurrentFrame == 3)
                     {
                         // Footsteps
                         Tile t = ((TileLayer)gameMap.GetLayer("Terrain")).Tiles[(int)(Position.X / gameMap.TileWidth), (int)(Position.Y / gameMap.TileWidth)];
@@ -91,10 +94,29 @@ namespace Hunted
                     Animations["head"].Reset();
                 }
 
+                Animations["hands"].CellRect.X = 100 * Animations["hands"].CurrentFrame;
+                Animations["gun"].CellRect.X = 100 * Animations["gun"].CurrentFrame;
 
                 Speed = Vector2.Zero;
 
                 foreach (Weapon w in Weapons) w.Update(gameTime);
+
+
+                if (Weapons[SelectedWeapon] is Knife)
+                {
+                    if (Weapons[SelectedWeapon].coolDown > 0 && Weapons[SelectedWeapon].coolDown < 100) Animations["hands"].CurrentFrame = 1;
+                    else if (Weapons[SelectedWeapon].coolDown >= 100 && Weapons[SelectedWeapon].coolDown < 200) Animations["hands"].CurrentFrame = 2;
+                    else if (Weapons[SelectedWeapon].coolDown >= 200 && Weapons[SelectedWeapon].coolDown < 300) Animations["hands"].CurrentFrame = 3;
+                    else Animations["hands"].CurrentFrame = 0;
+
+                    Animations["gun"].CurrentFrame = 0;
+
+                }
+                else
+                {
+                    Animations["hands"].CurrentFrame = 3;
+                    Animations["gun"].CurrentFrame = Weapons[SelectedWeapon].sortOrder;
+                }
 
             }
 
@@ -148,7 +170,7 @@ namespace Hunted
                         Vector2 pos = Helper.PointOnCircle(ref drivingVehicle.Position, 200, a);
                         if (!gameMap.CheckTileCollision(pos) && !Helper.IsPointInShape(pos, drivingVehicle.CollisionVerts))
                         {
-                            if (!LineCollision(pos, gameMap))
+                            if (drivingVehicle is Boat || !LineCollision(pos, gameMap))
                             {
                                 Position = pos;
                                 drivingVehicle = null;
@@ -167,11 +189,11 @@ namespace Hunted
             Rotation = Helper.TurnToFace(Position, target, Rotation, 1f, 0.25f);
         }
 
-        public virtual void Attack(GameTime gameTime, bool trigger, Camera gameCamera, bool canCollide)
+        public virtual void Attack(GameTime gameTime, Vector2 target, bool trigger, Camera gameCamera, bool canCollide)
         {
             if (Dead || !Active) return;
 
-            Weapons[SelectedWeapon].Use(gameTime, trigger, gameCamera, canCollide);
+            Weapons[SelectedWeapon].Use(gameTime, target, trigger, gameCamera, canCollide);
         }
 
         public virtual void Draw(SpriteBatch sb, LightingEngine lightingEngine)
@@ -182,10 +204,14 @@ namespace Hunted
             if (drivingVehicle != null) return;
             // Feet
             sb.Draw(spriteSheet, Position, Animations["feet"].CellRect, lightingEngine.CurrentSunColor, (Speed.Length()>0f)?Helper.V2ToAngle(Speed)+MathHelper.PiOver2:Rotation, new Vector2(100,100)/2, 1f, SpriteEffects.None, 1);
+            // Hands
+            sb.Draw(spriteSheet, Position, Animations["hands"].CellRect, lightingEngine.CurrentSunColor, Rotation-0.2f, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
+            // Gun
+            sb.Draw(spriteSheet, Position, Animations["gun"].CellRect, lightingEngine.CurrentSunColor, Rotation - 0.2f, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
             // Arms
-            sb.Draw(spriteSheet, Position, Animations["arms"].CellRect, lightingEngine.CurrentSunColor, Rotation, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
+            sb.Draw(spriteSheet, Position, Animations["arms"].CellRect, lightingEngine.CurrentSunColor, Rotation - 0.2f, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
             // Head
-            sb.Draw(spriteSheet, Position, Animations["head"].CellRect, lightingEngine.CurrentSunColor, Rotation, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
+            sb.Draw(spriteSheet, Position, Animations["head"].CellRect, lightingEngine.CurrentSunColor, Rotation - 0.2f, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
         }
         
         public virtual void DrawShadows(SpriteBatch sb, LightingEngine lightingEngine)
@@ -196,9 +222,12 @@ namespace Hunted
 
             for (int i = 1; i < 20; i += 2)
             {
+
                 Vector2 pos = Position + new Vector2(lightingEngine.CurrentShadowVect.X * i, lightingEngine.CurrentShadowVect.Y * i);
 
-                sb.Draw(spriteSheet, pos, Animations["arms"].CellRect, Color.Black * 0.03f, Rotation, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
+                sb.Draw(spriteSheet, pos, Animations["hands"].CellRect, Color.Black * 0.03f, Rotation - 0.2f, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
+                sb.Draw(spriteSheet, pos, Animations["gun"].CellRect, Color.Black * 0.03f, Rotation - 0.2f, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
+                sb.Draw(spriteSheet, pos, Animations["arms"].CellRect, Color.Black * 0.03f, Rotation - 0.2f, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
             }
         }
 
@@ -208,7 +237,9 @@ namespace Hunted
 
             if (drivingVehicle != null) return;
             // Arms
-            sb.Draw(spriteSheet, Position, Animations["arms"].CellRect, Color.Black, Rotation, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
+            sb.Draw(spriteSheet, Position, Animations["gun"].CellRect, Color.Black, Rotation - 0.2f, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
+            sb.Draw(spriteSheet, Position, Animations["hands"].CellRect, Color.Black, Rotation - 0.2f, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
+            sb.Draw(spriteSheet, Position, Animations["arms"].CellRect, Color.Black, Rotation - 0.2f, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
         }
 
         public virtual void Collided() { }
