@@ -41,28 +41,46 @@ namespace Hunted
             Health = 100f;
         }
 
-        public void LoadContent(Texture2D sheet, GraphicsDevice gd, LightingEngine le)
+        public void LoadContent(Texture2D sheet, GraphicsDevice gd, LightingEngine le, HeroDude gameHero)
         {
             spriteSheet = sheet;
             Initialize(gd, le);
 
             Weapons.Add(new Knife(this));
-            if (Helper.Random.Next(2) == 1)
+            if (Helper.Random.Next(gameHero.Weapons.Count>1?2:10) == 1)
             {
                 Weapons.Add(new Pistol(this));
             }
 
-            switch (Helper.Random.Next(BelongsToCompound?20:50))
+            if (BelongsToCompound)
             {
-                case 1:
-                    Weapons.Add(new Shotgun(this));
-                    break;
-                case 2:
-                    Weapons.Add(new SMG(this));
-                    break;
-                case 3:
-                    Weapons.Add(new Rifle(this));
-                    break;
+                switch (Helper.Random.Next(20))
+                {
+                    case 1:
+                        Weapons.Add(new Shotgun(this));
+                        break;
+                    case 2:
+                        Weapons.Add(new SMG(this));
+                        break;
+                    case 3:
+                        Weapons.Add(new Rifle(this));
+                        break;
+                }
+            }
+            else
+            {
+                switch (Helper.Random.Next(gameHero.Weapons.Count > 1 ? (gameHero.Weapons.Count > 2 ? 30 : 50) : 100))
+                {
+                    case 1:
+                        Weapons.Add(new Shotgun(this));
+                        break;
+                    case 2:
+                        Weapons.Add(new SMG(this));
+                        break;
+                    case 3:
+                        Weapons.Add(new Rifle(this));
+                        break;
+                }
             }
 
             SelectedWeapon = Weapons.Count - 1;
@@ -195,93 +213,125 @@ namespace Hunted
                     break;
             }
 
+            if (gameHero.Dead) State = AIState.Patrolling;
 
             if (Health <= 0 && !Dead)
             {
+                deadTime = 5000;
+                deadAlpha = 1f;
                 Dead = true;
-                Active = false;
-                SpawnDrops(gameMap);
+                SpawnDrops(gameMap, gameHero);
                 LightingEngine.Instance.RemoveSource(HeadTorch);
             }
 
             if (IsGeneral)
             {
-                if ((gameHero.Position - Position).Length() < 720f && !Discovered)
+                if ((gameHero.Position - Position).Length() < 720f && !Discovered && gameHero.drivingVehicle==null && !LineCollision(gameHero.Position, gameMap)) 
                 {
                     Discovered = true;
                     Hud.Instance.Ticker.AddLine("> You have found a General!");
                 }
             }
 
-            base.Update(gameTime, gameMap, mapFog);
-
             HeadTorch.Position = Helper.PointOnCircle(ref Position, 30, Rotation - MathHelper.PiOver2);
             HeadTorch.Rotation = Rotation - MathHelper.PiOver2;
+
+            if (Dead)
+            {
+                if (deadTime <= 0)
+                {
+                    deadAlpha -= 0.01f;
+                }
+            }
+
+            if (Dead && deadTime <= 0 && deadAlpha <= 0f)
+            {
+                Active = false;
+            }
+
+            base.Update(gameTime, gameMap, mapFog);
+
+            
         }
 
-        private void SpawnDrops(Map gameMap)
+        private void SpawnDrops(Map gameMap, HeroDude gameHero)
         {
-            int drop = Helper.Random.Next(65);
-            if (drop < 5) return;
-            if (drop >= 5 && drop < 35)
+            bool hasweapon = false;
+            foreach(Weapon w in gameHero.Weapons)
+                if(w.GetType()==Weapons[SelectedWeapon].GetType()) hasweapon = true;
+
+            if (hasweapon)
             {
-                if (Helper.Random.Next(2) == 0)
+                int drop = Helper.Random.Next(65);
+                if (drop < 5) return;
+                if (drop >= 5 && drop < 35)
                 {
-                    List<Compound> c = gameMap.FindNearestCompounds(Position);
-                    if (c[0].Discovered == false) ItemController.Instance.Spawn(ItemType.CompoundMap, Position);
-                    else if (BelongsToCompound)
+                    if (Helper.Random.Next(2) == 0)
                     {
-                        bool found = false;
-                        for(int i =1;i<=2;i++)
+                        List<Compound> c = gameMap.FindNearestCompounds(Position);
+                        if (c[0].Discovered == false) ItemController.Instance.Spawn(ItemType.CompoundMap, Position);
+                        else if (BelongsToCompound)
                         {
-                            if (c[i].Discovered == false)
+                            bool found = false;
+                            for (int i = 1; i <= 2; i++)
                             {
-                                ItemController.Instance.Spawn(ItemType.CompoundMap, Position);
-                                found = true;
-                                break;
+                                if (c[i].Discovered == false)
+                                {
+                                    ItemController.Instance.Spawn(ItemType.CompoundMap, Position);
+                                    found = true;
+                                    break;
+                                }
                             }
+                            if (!found) ItemController.Instance.Spawn(ItemType.Ammo, Position);
                         }
-                        if(!found) ItemController.Instance.Spawn(ItemType.Ammo, Position);
+                        else ItemController.Instance.Spawn(ItemType.Health, Position);
                     }
                     else ItemController.Instance.Spawn(ItemType.Health, Position);
                 }
-                else ItemController.Instance.Spawn(ItemType.Health, Position);
-            }
-            if (drop >= 35 && drop < 58)
-            {
-                if (Helper.Random.Next(2) == 0)
+                if (drop >= 35 && drop < 58)
                 {
-                    List<Compound> c = gameMap.FindNearestCompounds(Position);
-                    if (c[0].Discovered == false) ItemController.Instance.Spawn(ItemType.CompoundMap, Position);
-                    else if (BelongsToCompound)
+                    if (Helper.Random.Next(2) == 0)
                     {
-                        bool found = false;
-                        for (int i = 1; i <= 2; i++)
+                        List<Compound> c = gameMap.FindNearestCompounds(Position);
+                        if (c[0].Discovered == false) ItemController.Instance.Spawn(ItemType.CompoundMap, Position);
+                        else if (BelongsToCompound)
                         {
-                            if (c[i].Discovered == false)
+                            bool found = false;
+                            for (int i = 1; i <= 2; i++)
                             {
-                                ItemController.Instance.Spawn(ItemType.CompoundMap, Position);
-                                found = true;
-                                break;
+                                if (c[i].Discovered == false)
+                                {
+                                    ItemController.Instance.Spawn(ItemType.CompoundMap, Position);
+                                    found = true;
+                                    break;
+                                }
                             }
+                            if (!found) ItemController.Instance.Spawn(ItemType.Ammo, Position);
                         }
-                        if(!found) ItemController.Instance.Spawn(ItemType.Ammo, Position);
+                        else ItemController.Instance.Spawn(ItemType.Ammo, Position);
                     }
                     else ItemController.Instance.Spawn(ItemType.Ammo, Position);
                 }
-                else ItemController.Instance.Spawn(ItemType.Ammo, Position);
-            }
-            if (drop >= 58 && BelongsToCompound)
-            {
-                foreach (AIDude e in EnemyController.Instance.Enemies.Where(en => en.IsGeneral).OrderBy(en => (en.Position - Position).Length()))
+                if (drop >= 58 && BelongsToCompound)
                 {
-                    if (!e.Discovered && (e.Position - Position).Length()<20000)
+                    foreach (AIDude e in EnemyController.Instance.Enemies.Where(en => en.IsGeneral).OrderBy(en => (en.Position - Position).Length()))
                     {
-                        ItemController.Instance.Spawn(ItemType.GeneralMap, Position);
-                        break;
+                        if (!e.Discovered && (e.Position - Position).Length() < 20000)
+                        {
+                            ItemController.Instance.Spawn(ItemType.GeneralMap, Position);
+                            break;
+                        }
+                        else break;
                     }
-                    else break;
                 }
+            }
+            else
+            {
+                if (Weapons[SelectedWeapon] is Pistol) ItemController.Instance.Spawn(ItemType.Pistol, Position);
+                if (Weapons[SelectedWeapon] is Shotgun) ItemController.Instance.Spawn(ItemType.Shotgun, Position);
+                if (Weapons[SelectedWeapon] is SMG) ItemController.Instance.Spawn(ItemType.SMG, Position);
+                if (Weapons[SelectedWeapon] is Rifle) ItemController.Instance.Spawn(ItemType.Rifle, Position);
+               
             }
         }
 
@@ -312,6 +362,8 @@ namespace Hunted
 
         public override void Draw(SpriteBatch sb, LightingEngine lightingEngine)
         {
+            if (Dead) return;
+
             //DrawChasePath(sb, chasePath);
             base.Draw(sb, lightingEngine);
 

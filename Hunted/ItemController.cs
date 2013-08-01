@@ -35,6 +35,10 @@ namespace Hunted
             rectDict.Add(ItemType.Ammo, new Rectangle(50, 0, 50, 50));
             rectDict.Add(ItemType.CompoundMap, new Rectangle(100, 0, 50, 50));
             rectDict.Add(ItemType.GeneralMap, new Rectangle(150, 0, 50, 50));
+            rectDict.Add(ItemType.Pistol, new Rectangle(200, 0, 50, 50));
+            rectDict.Add(ItemType.Shotgun, new Rectangle(250, 0, 50, 50));
+            rectDict.Add(ItemType.SMG, new Rectangle(300, 0, 50, 50));
+            rectDict.Add(ItemType.Rifle, new Rectangle(350, 0, 50, 50));
 
             graphicsDevice = gd;
             lightingEngine = le;
@@ -99,6 +103,12 @@ namespace Hunted
                     break;
                 case ItemType.GeneralMap:
                     EnemyController.Instance.DiscoverGeneral(i.Position);
+                    break;
+                case ItemType.Pistol:
+                case ItemType.Shotgun:
+                case ItemType.SMG:
+                case ItemType.Rifle:
+                    gameHero.GiveWeapon(i.Type);
                     break;
             }
 

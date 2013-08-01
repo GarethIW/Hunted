@@ -36,6 +36,9 @@ namespace Hunted
         internal List<Weapon> Weapons = new List<Weapon>();
         internal int SelectedWeapon = 0;
 
+        internal double deadTime;
+        internal float deadAlpha;
+
         public Dude(Vector2 pos)
         {
             Position = pos;
@@ -53,49 +56,63 @@ namespace Hunted
             Animations.Add("arms", new SpriteAnimation(2, 100, 1, new Rectangle(0,0,100,100), true));
             Animations.Add("head", new SpriteAnimation(2, 100, 2, new Rectangle(0, 0, 100, 100), false));
 
-            
+            Active = true;
+            Dead = false;
         }
 
         public virtual void Update(GameTime gameTime, Map gameMap, bool[,] mapFog)
         {
-            DoCollisions(gameMap);
-            Position += Speed;
-
-            Position.X = MathHelper.Clamp(Position.X, 50, (gameMap.Width * gameMap.TileWidth) -50);
-            Position.Y = MathHelper.Clamp(Position.Y, 50, (gameMap.Height * gameMap.TileHeight) -50);
-
-            if (Speed.Length() > 0f)
+            if (!Dead)
             {
-                Animations["feet"].Update(gameTime);
-                Animations["arms"].Update(gameTime);
-                Animations["head"].Update(gameTime);
 
-                if (Animations["feet"].CurrentFrame == 0)
+                DoCollisions(gameMap);
+                Position += Speed;
+
+                Position.X = MathHelper.Clamp(Position.X, 50, (gameMap.Width * gameMap.TileWidth) - 50);
+                Position.Y = MathHelper.Clamp(Position.Y, 50, (gameMap.Height * gameMap.TileHeight) - 50);
+
+                if (Speed.Length() > 0f)
                 {
-                    // Footsteps
-                    Tile t = ((TileLayer)gameMap.GetLayer("Terrain")).Tiles[(int)(Position.X / gameMap.TileWidth), (int)(Position.Y / gameMap.TileWidth)];
-                    if (t.Properties.Contains("fstep")) AudioController.PlaySFX("fstep-" + t.Properties["fstep"], 0.1f, -0.3f, 0.3f, Position);
+                    Animations["feet"].Update(gameTime);
+                    Animations["arms"].Update(gameTime);
+                    Animations["head"].Update(gameTime);
+
+                    if (Animations["feet"].CurrentFrame == 0)
+                    {
+                        // Footsteps
+                        Tile t = ((TileLayer)gameMap.GetLayer("Terrain")).Tiles[(int)(Position.X / gameMap.TileWidth), (int)(Position.Y / gameMap.TileWidth)];
+                        if (t.Properties.Contains("fstep")) AudioController.PlaySFX("fstep-" + t.Properties["fstep"], 0.1f, -0.3f, 0.3f, Position);
+                    }
                 }
-            }
-            else
-            {
-                Animations["feet"].Reset();
-                Animations["arms"].Reset();
-                Animations["head"].Reset();
-            }
+                else
+                {
+                    Animations["feet"].Reset();
+                    Animations["arms"].Reset();
+                    Animations["head"].Reset();
+                }
 
 
-            Speed = Vector2.Zero;
+                Speed = Vector2.Zero;
+
+                foreach (Weapon w in Weapons) w.Update(gameTime);
+
+            }
 
             Health = MathHelper.Clamp(Health, 0f, 100f);
             Ammo = (int)MathHelper.Clamp(Ammo, 0, 100);
 
-            foreach (Weapon w in Weapons) w.Update(gameTime);
+            if (Dead)
+            {
+                deadTime -= gameTime.ElapsedGameTime.TotalMilliseconds;
+                
+            }
             
         }
 
         public virtual void Move(Vector2 amount)
         {
+            if (Dead || !Active) return;
+
             if (amount.Length() > 0f)
             {
                 amount.Normalize();
@@ -105,6 +122,9 @@ namespace Hunted
 
         public virtual void EnterVehicle(Map gameMap)
         {
+            if (Dead || !Active) return;
+
+
             if (drivingVehicle == null)
             {
                 foreach (Vehicle v in VehicleController.Instance.Vehicles)
@@ -128,9 +148,12 @@ namespace Hunted
                         Vector2 pos = Helper.PointOnCircle(ref drivingVehicle.Position, 200, a);
                         if (!gameMap.CheckTileCollision(pos) && !Helper.IsPointInShape(pos, drivingVehicle.CollisionVerts))
                         {
-                            Position = pos;
-                            drivingVehicle = null;
-                            break;
+                            if (!LineCollision(pos, gameMap))
+                            {
+                                Position = pos;
+                                drivingVehicle = null;
+                                break;
+                            }
                         }
                     }
                 }
@@ -139,16 +162,23 @@ namespace Hunted
 
         public virtual void LookAt(Vector2 target)
         {
+            if (Dead || !Active) return;
+
             Rotation = Helper.TurnToFace(Position, target, Rotation, 1f, 0.25f);
         }
 
         public virtual void Attack(GameTime gameTime, bool trigger, Camera gameCamera, bool canCollide)
         {
+            if (Dead || !Active) return;
+
             Weapons[SelectedWeapon].Use(gameTime, trigger, gameCamera, canCollide);
         }
 
         public virtual void Draw(SpriteBatch sb, LightingEngine lightingEngine)
         {
+            if (Dead) return;
+
+
             if (drivingVehicle != null) return;
             // Feet
             sb.Draw(spriteSheet, Position, Animations["feet"].CellRect, lightingEngine.CurrentSunColor, (Speed.Length()>0f)?Helper.V2ToAngle(Speed)+MathHelper.PiOver2:Rotation, new Vector2(100,100)/2, 1f, SpriteEffects.None, 1);
@@ -160,6 +190,8 @@ namespace Hunted
         
         public virtual void DrawShadows(SpriteBatch sb, LightingEngine lightingEngine)
         {
+            if (Dead) return;
+
             if (drivingVehicle != null) return;
 
             for (int i = 1; i < 20; i += 2)
@@ -172,6 +204,8 @@ namespace Hunted
 
         public virtual void DrawLightBlock(SpriteBatch sb)
         {
+            if (Dead) return;
+
             if (drivingVehicle != null) return;
             // Arms
             sb.Draw(spriteSheet, Position, Animations["arms"].CellRect, Color.Black, Rotation, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
@@ -181,6 +215,8 @@ namespace Hunted
 
         public virtual void HitByProjectile(Projectile p)
         {
+            if (Dead || !Active) return;
+
             if (drivingVehicle != null) return;
 
             Health -= (p.Owner.GetType() == typeof(HeroDude)) ? p.Damage : p.Damage / 2;
@@ -202,10 +238,26 @@ namespace Hunted
 
         public virtual void HitByVehicle(Vehicle v)
         {
+            if (Dead || !Active) return;
+
             Health -= 1 + ((float)Math.Abs(v.linearSpeed)) / 2f;
             Speed = v.Speed;
             AudioController.PlaySFX("hit", 0.5f, -0.4f, 0.4f, Position);
             ParticleController.Instance.AddVehicleWound(this);
+        }
+
+        internal bool LineCollision(Vector2 testPos, Map gameMap)
+        {
+            Vector2 testVector = Position;
+            Vector2 testLine = (testPos - Position);
+
+            while ((testVector - testPos).Length() > 30)
+            {
+                if (gameMap.CheckCollision(testVector)) return true;
+                testVector += (testLine / 50f);
+            }
+
+            return false;
         }
 
         void DoCollisions(Map gameMap)

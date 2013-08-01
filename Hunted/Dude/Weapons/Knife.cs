@@ -15,6 +15,7 @@ namespace Hunted.Weapons
             clipAmmo = 1;
             isAuto = true;
             coolDownTarget = 500;
+            sortOrder = 0;
         }
 
         public override bool Use(GameTime gameTime, bool trigger, Camera gameCamera, bool canCollide)

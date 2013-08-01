@@ -49,7 +49,7 @@ namespace Hunted
                 if (!gameMap.CheckTileCollision(pos) && pos.X > 0 && pos.X < (gameMap.Width * gameMap.TileWidth) && pos.Y > 0 && pos.Y < (gameMap.Height * gameMap.TileHeight))
                 {
                     AIDude newDude = new AIDude(pos);
-                    newDude.LoadContent(SpriteSheet, graphicsDevice, lightingEngine);
+                    newDude.LoadContent(SpriteSheet, graphicsDevice, lightingEngine, gameHero);
                     newDude.Health = 10 + Helper.Random.Next(30);
                     Enemies.Add(newDude);
                 }
@@ -89,7 +89,7 @@ namespace Hunted
                 if (!e.Discovered)
                 {
                     e.Discovered = true;
-                    Hud.Instance.Ticker.AddLine("> A general's location has been revealed! (Tab/Back for map)");
+                    Hud.Instance.Ticker.AddLine("> A General's location has been revealed! (Tab/Back for map)");
                     break;
                 }
                 else break;

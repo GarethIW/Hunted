@@ -173,19 +173,19 @@ namespace Hunted
             test.Normalize();
             float rot = Helper.V2ToAngle(test);
 
-            if (gameMap.GetTile(Helper.PointOnCircle(ref Position, 135, rot), "Terrain").Properties.Contains("CanBoat"))
+            if (gameMap.GetTile(Helper.PointOnCircle(ref Position, 135, rot), "Terrain")!=null && gameMap.GetTile(Helper.PointOnCircle(ref Position, 135, rot), "Terrain").Properties.Contains("CanBoat"))
             {
                 if (gameMap.GetTile(Helper.PointOnCircle(ref Position, 135, rot), "Water") == null) linearSpeed = MathHelper.Lerp(linearSpeed, 0f, 0.05f);
                 if (gameMap.GetTile(Helper.PointOnCircle(ref Position, 50, rot), "Water") == null) linearSpeed = MathHelper.Lerp(linearSpeed, 0f, 1f);
             }
             else Collision = true;
-            if (gameMap.GetTile(Helper.PointOnCircle(ref Position, 135, rot-0.2f), "Terrain").Properties.Contains("CanBoat"))
+            if (gameMap.GetTile(Helper.PointOnCircle(ref Position, 135, rot-0.2f), "Terrain") != null && gameMap.GetTile(Helper.PointOnCircle(ref Position, 135, rot - 0.2f), "Terrain").Properties.Contains("CanBoat"))
             {
                 if (gameMap.GetTile(Helper.PointOnCircle(ref Position, 135, rot-0.2f), "Water") == null) linearSpeed = MathHelper.Lerp(linearSpeed, 0f, 0.05f);
                 
             }
             else Collision = true;
-            if (gameMap.GetTile(Helper.PointOnCircle(ref Position, 135, rot+0.2f), "Terrain").Properties.Contains("CanBoat"))
+            if (gameMap.GetTile(Helper.PointOnCircle(ref Position, 135, rot+0.2f), "Terrain") != null && gameMap.GetTile(Helper.PointOnCircle(ref Position, 135, rot + 0.2f), "Terrain").Properties.Contains("CanBoat"))
             {
                 if (gameMap.GetTile(Helper.PointOnCircle(ref Position, 135, rot+0.2f), "Water") == null) linearSpeed = MathHelper.Lerp(linearSpeed, 0f, 0.05f);
             }

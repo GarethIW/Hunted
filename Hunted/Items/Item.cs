@@ -11,7 +11,11 @@ namespace Hunted
         Health,
         Ammo,
         CompoundMap,
-        GeneralMap
+        GeneralMap,
+        Pistol,
+        Shotgun,
+        SMG,
+        Rifle
     }
 
     public class Item

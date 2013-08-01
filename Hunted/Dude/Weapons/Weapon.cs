@@ -20,6 +20,8 @@ namespace Hunted.Weapons
 
         internal Dude owner;
 
+        internal int sortOrder;
+
         public Weapon(Dude own)
         {
             owner = own;

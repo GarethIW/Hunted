@@ -61,11 +61,20 @@ namespace Hunted
 
         public void Draw(SpriteBatch sb, LightingEngine lightingEngine, HeroDude gameHero)
         {
-            foreach (Vehicle v in Vehicles.Where(veh => (gameHero.Position - veh.Position).Length() < 2000f))
+            foreach (Vehicle v in Vehicles.Where(veh => (gameHero.Position - veh.Position).Length() < 2000f && !(veh is Chopper)))
             {
-                if (v is Chopper && ((Chopper)v).Height > 0f) continue;
+                
                 v.Draw(sb, lightingEngine);
             }
+
+            // Draw helis on top of other vehicles because of rotor blades
+            foreach (Vehicle v in Vehicles.Where(veh => (gameHero.Position - veh.Position).Length() < 2000f && veh is Chopper))
+            {
+                if (((Chopper)v).Height > 0f) continue;
+                v.Draw(sb, lightingEngine);
+            }
+
+            
         }
 
         public void DrawLightBlock(SpriteBatch sb, HeroDude gameHero)

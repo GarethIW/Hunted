@@ -454,6 +454,11 @@ namespace Hunted
             if (TransitionPosition >= 0f)
                 ScreenManager.FadeBackBufferToBlack(1f - TransitionAlpha);
 
+            if (gameHero.deadAlpha<1f)
+            {
+                ScreenManager.FadeBackBufferToBlack(1f - gameHero.deadAlpha);
+            }
+
             if (IsActive && gameHero.drivingVehicle==null)
             {
                 spriteBatch.Begin();
@@ -500,7 +505,7 @@ namespace Hunted
                         {
                             AIDude newDude = new AIDude(pos);
                             newDude.BelongsToCompound = true;
-                            newDude.LoadContent(enemyController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine);
+                            newDude.LoadContent(enemyController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine, gameHero);
                             newDude.Health = 10 + Helper.Random.Next(30);
                             enemyController.Enemies.Add(newDude);
                         }
@@ -528,7 +533,7 @@ namespace Hunted
                         }
                         Vector2 pos = (new Vector2(b.Rect.Center.X, b.Rect.Center.Y) * new Vector2(gameMap.TileWidth, gameMap.TileHeight)) + new Vector2(50, 50);
                         AIDude newDude = new AIDude(pos);
-                        newDude.LoadContent(enemyController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine);
+                        newDude.LoadContent(enemyController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine, gameHero);
                         newDude.Health = 50 + Helper.Random.Next(30);
                         newDude.BelongsToCompound = true;
                         newDude.IsGeneral = true;

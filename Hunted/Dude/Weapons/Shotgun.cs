@@ -15,6 +15,7 @@ namespace Hunted.Weapons
             clipAmmo = 8;
             isAuto = false;
             coolDownTarget = 1000;
+            sortOrder = 2;
         }
 
         public override void Update(GameTime gameTime)

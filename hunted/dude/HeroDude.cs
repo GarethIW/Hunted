@@ -12,7 +12,6 @@ namespace Hunted
 {
     public class HeroDude : Dude
     {
-        
 
         public HeroDude(Vector2 pos) : base(pos)
         {
@@ -26,11 +25,11 @@ namespace Hunted
             Initialize(gd, le);
 
             Weapons.Add(new Knife(this));
-            Weapons.Add(new Pistol(this));
-            Weapons.Add(new Shotgun(this));
-            Weapons.Add(new SMG(this));
-            Weapons.Add(new Rifle(this));            
-            SelectedWeapon = 1;
+            //Weapons.Add(new Pistol(this));
+            //Weapons.Add(new Shotgun(this));
+            //Weapons.Add(new SMG(this));
+            //Weapons.Add(new Rifle(this));            
+            SelectedWeapon = 0;
         }
 
         internal void Initialize(GraphicsDevice gd, LightingEngine le)
@@ -63,7 +62,34 @@ namespace Hunted
                 Position = drivingVehicle.Position;
                 Rotation = drivingVehicle.Rotation + MathHelper.PiOver2;
             }
-            else HeadTorch.Active = true;
+            else if(!Dead) HeadTorch.Active = true;
+
+            if (Health <= 0 && !Dead)
+            {
+                deadTime = 5000;
+                deadAlpha = 1f;
+                Dead = true;
+                HeadTorch.Active = false;
+            }
+
+            if (Dead)
+            {
+                if (deadTime < 3000)
+                {
+                    deadAlpha -= 0.01f;
+                }
+                if (deadTime < 1000)
+                {
+                    Position = gameMap.HeroSpawn;
+                    Camera.Instance.Position = Position;
+                    Camera.Instance.Target = Position;
+                    Health = 100f;
+                    HeadTorch.Active = true;
+                    Dead = false;
+                }
+            }
+
+            if (!Dead && deadAlpha < 1f) deadAlpha += 0.01f;
         }
 
         public override void Draw(SpriteBatch sb, LightingEngine lightingEngine)
@@ -84,6 +110,28 @@ namespace Hunted
                 if (SelectedWeapon == -1) SelectedWeapon = Weapons.Count - 1;
             }
             else SelectedWeapon = weapon;
+        }
+
+        internal void GiveWeapon(ItemType itemType)
+        {
+            switch(itemType)
+            {
+                case ItemType.Pistol:
+                    if (Weapons.Count(w => w is Pistol) == 0) Weapons.Add(new Pistol(this));
+                        break;
+                case ItemType.Shotgun:
+                        if (Weapons.Count(w => w is Shotgun) == 0) Weapons.Add(new Shotgun(this));
+                        break;
+                case ItemType.SMG:
+                        if (Weapons.Count(w => w is SMG) == 0) Weapons.Add(new SMG(this));
+                        break;
+                case ItemType.Rifle:
+                        if (Weapons.Count(w => w is Rifle) == 0) Weapons.Add(new Rifle(this));
+                        break;
+            }
+
+            Weapons = Weapons.OrderBy(w => w.sortOrder).ToList();
+            
         }
     }
 
