@@ -46,6 +46,11 @@ namespace Hunted
 
             turnSpeed = 0.1f;
 
+            CollisionVerts.Clear();
+            CollisionVerts.Add(Helper.PointOnCircle(ref Position, 100, -0.44f + (Rotation)));
+            CollisionVerts.Add(Helper.PointOnCircle(ref Position, 100, 0.44f + (Rotation)));
+            CollisionVerts.Add(Helper.PointOnCircle(ref Position, 200, MathHelper.Pi + (Rotation)));
+
             base.Initialize();
         }
 

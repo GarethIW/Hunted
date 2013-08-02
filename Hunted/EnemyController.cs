@@ -46,7 +46,7 @@ namespace Hunted
             if (count < 10)
             {
                 Vector2 pos = Helper.RandomPointInCircle(gameHero.Position, 2000f, 4000f);
-                if (!gameMap.CheckTileCollision(pos) && pos.X > 0 && pos.X < (gameMap.Width * gameMap.TileWidth) && pos.Y > 0 && pos.Y < (gameMap.Height * gameMap.TileHeight))
+                if (!gameMap.CheckTileCollision(pos) && pos.X > 0 && pos.X < (gameMap.Width * gameMap.TileWidth) && pos.Y > 0 && pos.Y < (gameMap.Height * gameMap.TileHeight) && !VehicleController.Instance.CheckVehicleCollision(pos))
                 {
                     AIDude newDude = new AIDude(pos);
                     newDude.LoadContent(SpriteSheet, graphicsDevice, lightingEngine, gameHero);
@@ -93,6 +93,15 @@ namespace Hunted
                     break;
                 }
                 else break;
+            }
+        }
+
+        internal void ClearSpawn(Vector2 pos)
+        {
+            foreach (Dude d in Enemies.Where(e => (pos - e.Position).Length() < 800f).ToList())
+            {
+                LightingEngine.Instance.RemoveSource(d.HeadTorch);
+                d.Active = false;
             }
         }
     }

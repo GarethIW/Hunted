@@ -265,6 +265,9 @@ namespace Hunted
 
                 if (keyboardState.IsKeyDown(Keys.D1) && !lastKeyboardState.IsKeyDown(Keys.D1)) gameHero.SelectWeapon(0, false);
                 if (keyboardState.IsKeyDown(Keys.D2) && !lastKeyboardState.IsKeyDown(Keys.D2)) gameHero.SelectWeapon(1, false);
+                if (keyboardState.IsKeyDown(Keys.D3) && !lastKeyboardState.IsKeyDown(Keys.D3)) gameHero.SelectWeapon(2, false);
+                if (keyboardState.IsKeyDown(Keys.D4) && !lastKeyboardState.IsKeyDown(Keys.D4)) gameHero.SelectWeapon(3, false);
+                if (keyboardState.IsKeyDown(Keys.D5) && !lastKeyboardState.IsKeyDown(Keys.D5)) gameHero.SelectWeapon(4, false);
 
                 if (input.IsNewButtonPress(Buttons.Y, null, out player)) gameHero.SelectWeapon(1, true);
                 if (input.IsNewButtonPress(Buttons.RightShoulder, null, out player) || input.IsNewButtonPress(Buttons.DPadDown, null, out player)) gameHero.SelectWeapon(1, true);
@@ -463,7 +466,7 @@ namespace Hunted
             {
                 spriteBatch.Begin();
                 //gameHUD.Draw(spriteBatch);
-                spriteBatch.Draw(crosshairTex, crosshairPos, new Rectangle(gameHero.SelectedWeapon==0?48:0,0,48,48), Color.White, 0f, new Vector2(crosshairTex.Width/4, crosshairTex.Height), 1f, SpriteEffects.None, 1);
+                spriteBatch.Draw(crosshairTex, crosshairPos, new Rectangle(gameHero.SelectedWeapon==0?48:0,0,48,48), Color.White, 0f, new Vector2(crosshairTex.Width/4, crosshairTex.Height/2), 1f, SpriteEffects.None, 1);
                 spriteBatch.End();
             }
         }
@@ -478,6 +481,31 @@ namespace Hunted
 
             
             List<Compound> possibleComps = new List<Compound>();
+
+            // Spawn vehicles
+            foreach (Compound c in gameMap.Compounds)
+            {
+                foreach (Building b in c.Buildings)
+                {
+                    if (b.Type == BuildingType.Carpark)
+                    {
+                        Jeep j = new Jeep((new Vector2(b.Rect.Center.X, b.Rect.Center.Y) * new Vector2(gameMap.TileWidth, gameMap.TileHeight)) + new Vector2(50, 50));
+                        j.Rotation = (float)Helper.Random.NextDouble() * MathHelper.TwoPi;
+                        j.LoadContent(vehicleController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine);
+                        vehicleController.Vehicles.Add(j);
+                        // gameHero.Position = j.Position + new Vector2(300, 0);
+                    }
+
+                    if (b.Type == BuildingType.Helipad)
+                    {
+                        Chopper chop = new Chopper((new Vector2(b.Rect.Center.X, b.Rect.Center.Y) * new Vector2(gameMap.TileWidth, gameMap.TileHeight)) + new Vector2(50, 50));
+                        chop.Rotation = (float)Helper.Random.NextDouble() * MathHelper.TwoPi;
+                        chop.LoadContent(vehicleController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine);
+                        vehicleController.Vehicles.Add(chop);
+                        //gameHero.Position = chop.Position + new Vector2(300, 0);
+                    }
+                }
+            }
 
             // Spawn enemies
             foreach (Compound c in gameMap.Compounds)
@@ -496,6 +524,8 @@ namespace Hunted
                         if (((TileLayer)gameMap.GetLayer("Wall")).Tiles[x, y] != null) continue;
                         Vector2 pos = new Vector2((x * gameMap.TileWidth) + 50, (y * gameMap.TileHeight) + 50);
                         bool found = false;
+
+                        if (vehicleController.CheckVehicleCollision(pos)) found = true;
                         foreach (AIDude d in enemyController.Enemies)
                         {
                             if ((d.Position - pos).Length() < 700) found = true;
@@ -544,30 +574,7 @@ namespace Hunted
                 }
             }
 
-            // Spawn vehicles
-            foreach (Compound c in gameMap.Compounds)
-            {
-                foreach (Building b in c.Buildings)
-                {
-                    if (b.Type == BuildingType.Carpark)
-                    {
-                        Jeep j = new Jeep((new Vector2(b.Rect.Center.X, b.Rect.Center.Y) * new Vector2(gameMap.TileWidth, gameMap.TileHeight)) + new Vector2(50, 50));
-                        j.Rotation = (float)Helper.Random.NextDouble() * MathHelper.TwoPi;
-                        j.LoadContent(vehicleController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine);
-                        vehicleController.Vehicles.Add(j);
-                       // gameHero.Position = j.Position + new Vector2(300, 0);
-                    }
-
-                    if (b.Type == BuildingType.Helipad)
-                    {
-                        Chopper chop = new Chopper((new Vector2(b.Rect.Center.X, b.Rect.Center.Y) * new Vector2(gameMap.TileWidth, gameMap.TileHeight)) + new Vector2(50, 50));
-                        chop.Rotation = (float)Helper.Random.NextDouble() * MathHelper.TwoPi;
-                        chop.LoadContent(vehicleController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine);
-                        vehicleController.Vehicles.Add(chop);
-                        //gameHero.Position = chop.Position + new Vector2(300, 0);
-                    }
-                }
-            }
+            
 
             foreach (Jetty jetty in gameMap.Jetties)
             {

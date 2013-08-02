@@ -36,7 +36,7 @@ namespace Hunted.Weapons
         {
             coolDown += gameTime.ElapsedGameTime.TotalMilliseconds;
 
-            muzzlePos = Helper.PointOnCircle(ref owner.Position, 60, (owner.Rotation - MathHelper.PiOver2) + 0.25f);
+            muzzlePos = Helper.PointOnCircle(ref owner.Position, 65, (owner.Rotation - MathHelper.PiOver2) + 0.26f);
         }
 
         public virtual bool Use(GameTime gameTime, Vector2 target, bool trigger, Camera gameCamera, bool canCollide)

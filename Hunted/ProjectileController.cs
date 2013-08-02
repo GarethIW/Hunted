@@ -67,7 +67,7 @@ namespace Hunted
             {
                 p.Life -= gameTime.ElapsedGameTime.TotalMilliseconds;
                 p.Position += p.Velocity;
-                p.Rotation += p.RotationSpeed;
+                //p.Rotation += p.RotationSpeed;
 
                 if (p.CanCollide && gameMap.CheckCollision(p.Position,false) == true)
                 {

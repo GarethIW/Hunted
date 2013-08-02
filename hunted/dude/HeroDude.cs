@@ -25,10 +25,10 @@ namespace Hunted
             Initialize(gd, le);
 
             Weapons.Add(new Knife(this));
-            Weapons.Add(new Pistol(this));
-            Weapons.Add(new Shotgun(this));
-            Weapons.Add(new SMG(this));
-            Weapons.Add(new Rifle(this));            
+            //Weapons.Add(new Pistol(this));
+            //Weapons.Add(new Shotgun(this));
+            //Weapons.Add(new SMG(this));
+            //Weapons.Add(new Rifle(this));            
             SelectedWeapon = 0;
         }
 
@@ -70,6 +70,7 @@ namespace Hunted
                 deadAlpha = 1f;
                 Dead = true;
                 HeadTorch.Active = false;
+                ParticleController.Instance.AddBloodPool(Position);
             }
 
             if (Dead)
@@ -86,6 +87,12 @@ namespace Hunted
                     Health = 100f;
                     HeadTorch.Active = true;
                     Dead = false;
+                    Weapons.Clear();
+                    Weapons.Add(new Knife(this));  
+                    SelectedWeapon = 0;
+                    EnemyController.Instance.ClearSpawn(gameMap.HeroSpawn);
+                    VehicleController.Instance.ClearSpawn(gameMap.HeroSpawn);
+                    Ammo = 0;
                 }
             }
 
@@ -97,6 +104,8 @@ namespace Hunted
             
 
             base.Draw(sb, lightingEngine);
+
+
         }
 
 
@@ -109,7 +118,11 @@ namespace Hunted
                 if (SelectedWeapon == Weapons.Count) SelectedWeapon = 0;
                 if (SelectedWeapon == -1) SelectedWeapon = Weapons.Count - 1;
             }
-            else SelectedWeapon = weapon;
+            else
+            {
+                foreach(Weapon w in Weapons)
+                    if(w.sortOrder==weapon) SelectedWeapon = Weapons.IndexOf(w);
+            }
         }
 
         internal void GiveWeapon(ItemType itemType)

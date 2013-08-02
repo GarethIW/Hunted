@@ -16,7 +16,8 @@ namespace Hunted
     public enum SpecialParticle
     {
         None,
-        Blood
+        Blood,
+        BloodPool
     }
 
     public enum ParticleBlendMode
@@ -94,6 +95,11 @@ namespace Hunted
                             p.Velocity = Vector2.Zero;
                             p.RotationSpeed = 0f;
                         }
+                        break;
+                    case SpecialParticle.BloodPool:
+                        p.RotationSpeed = 0f;
+                        p.Scale = MathHelper.Lerp(p.Scale, 8f, 0.01f);
+                        
                         break;
                 }
             }
@@ -176,6 +182,15 @@ namespace Hunted
                 float a = (float)Helper.Random.NextDouble() * MathHelper.TwoPi;
                 Vector2 dir = Helper.AngleToVector(a, ((float)Helper.Random.NextDouble() * 10f));
                 Add(d.Position, dir, 10000f, true, new Rectangle(0, 0, 7, 7), -0.01f + ((float)Helper.Random.NextDouble() * 0.02f), 3f, Color.White, 0.5f, SpecialParticle.Blood, ParticleBlendMode.Alpha);
+            }
+        }
+
+        internal void AddBloodPool(Vector2 pos)
+        {
+            for (int i = 0; i < 3 + Helper.Random.Next(2); i++)
+            {
+                Add(pos + new Vector2(-25,-25) + new Vector2((float)Helper.Random.NextDouble() * 50f,(float)Helper.Random.NextDouble() * 50f) , Vector2.Zero, 10000f, true, new Rectangle(0, 0, 7, 7), -0.01f + ((float)Helper.Random.NextDouble() * 0.02f), (float)Helper.Random.NextDouble() * 3f, Color.White, 0.5f, SpecialParticle.BloodPool, ParticleBlendMode.Alpha);
+
             }
         }
     }

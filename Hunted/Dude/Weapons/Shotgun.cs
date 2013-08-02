@@ -20,7 +20,7 @@ namespace Hunted.Weapons
 
         public override void Update(GameTime gameTime)
         {
-            if (coolDown > 50 && coolDown < 75) AudioController.PlaySFX("shotgunreload", 0.4f, 0f, 0f, owner.Position);
+            if (coolDown > 50 && coolDown < 75 && owner.Weapons[owner.SelectedWeapon]==this && owner.Ammo>0) AudioController.PlaySFX("shotgunreload", 0.4f, 0f, 0f, owner.Position);
             
             base.Update(gameTime);
         }

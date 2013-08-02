@@ -205,13 +205,13 @@ namespace Hunted
             // Feet
             sb.Draw(spriteSheet, Position, Animations["feet"].CellRect, lightingEngine.CurrentSunColor, (Speed.Length()>0f)?Helper.V2ToAngle(Speed)+MathHelper.PiOver2:Rotation, new Vector2(100,100)/2, 1f, SpriteEffects.None, 1);
             // Hands
-            sb.Draw(spriteSheet, Position, Animations["hands"].CellRect, lightingEngine.CurrentSunColor, Rotation-0.2f, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
+            sb.Draw(spriteSheet, Position, Animations["hands"].CellRect, lightingEngine.CurrentSunColor, Rotation-0.15f, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
             // Gun
-            sb.Draw(spriteSheet, Position, Animations["gun"].CellRect, lightingEngine.CurrentSunColor, Rotation - 0.2f, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
+            sb.Draw(spriteSheet, Position, Animations["gun"].CellRect, lightingEngine.CurrentSunColor, Rotation - 0.15f, new Vector2(50, 60), 1f, SpriteEffects.None, 1);
             // Arms
-            sb.Draw(spriteSheet, Position, Animations["arms"].CellRect, lightingEngine.CurrentSunColor, Rotation - 0.2f, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
+            sb.Draw(spriteSheet, Position, Animations["arms"].CellRect, lightingEngine.CurrentSunColor, Rotation - 0.15f, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
             // Head
-            sb.Draw(spriteSheet, Position, Animations["head"].CellRect, lightingEngine.CurrentSunColor, Rotation - 0.2f, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
+            sb.Draw(spriteSheet, Position, Animations["head"].CellRect, lightingEngine.CurrentSunColor, Rotation - 0.15f, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
         }
         
         public virtual void DrawShadows(SpriteBatch sb, LightingEngine lightingEngine)
@@ -225,9 +225,9 @@ namespace Hunted
 
                 Vector2 pos = Position + new Vector2(lightingEngine.CurrentShadowVect.X * i, lightingEngine.CurrentShadowVect.Y * i);
 
-                sb.Draw(spriteSheet, pos, Animations["hands"].CellRect, Color.Black * 0.03f, Rotation - 0.2f, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
-                sb.Draw(spriteSheet, pos, Animations["gun"].CellRect, Color.Black * 0.03f, Rotation - 0.2f, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
-                sb.Draw(spriteSheet, pos, Animations["arms"].CellRect, Color.Black * 0.03f, Rotation - 0.2f, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
+                sb.Draw(spriteSheet, pos, Animations["hands"].CellRect, Color.Black * 0.03f, Rotation - 0.15f, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
+                sb.Draw(spriteSheet, pos, Animations["gun"].CellRect, Color.Black * 0.03f, Rotation - 0.15f, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
+                sb.Draw(spriteSheet, pos, Animations["arms"].CellRect, Color.Black * 0.03f, Rotation - 0.15f, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
             }
         }
 
@@ -237,9 +237,9 @@ namespace Hunted
 
             if (drivingVehicle != null) return;
             // Arms
-            sb.Draw(spriteSheet, Position, Animations["gun"].CellRect, Color.Black, Rotation - 0.2f, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
-            sb.Draw(spriteSheet, Position, Animations["hands"].CellRect, Color.Black, Rotation - 0.2f, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
-            sb.Draw(spriteSheet, Position, Animations["arms"].CellRect, Color.Black, Rotation - 0.2f, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
+            sb.Draw(spriteSheet, Position, Animations["gun"].CellRect, Color.Black, Rotation - 0.15f, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
+            sb.Draw(spriteSheet, Position, Animations["hands"].CellRect, Color.Black, Rotation - 0.15f, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
+            sb.Draw(spriteSheet, Position, Animations["arms"].CellRect, Color.Black, Rotation - 0.15f, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
         }
 
         public virtual void Collided() { }

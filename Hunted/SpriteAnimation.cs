@@ -80,7 +80,7 @@ namespace Hunted
             if (HasRestFrame) CurrentFrame = NumFrames;
             else CurrentFrame = 0;
             CurrentFrameTime = 0;
-            CellRect.X = CellRect.Width * CurrentFrame;
+            CellRect.X = CellRect.Width * (CurrentFrame + XOffset);
 
         }
     }

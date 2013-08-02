@@ -39,6 +39,7 @@ namespace Hunted
             Active = true;
             Dead = false;
             Health = 100f;
+            Ammo = 100;
         }
 
         public void LoadContent(Texture2D sheet, GraphicsDevice gd, LightingEngine le, HeroDude gameHero)
@@ -84,6 +85,8 @@ namespace Hunted
             }
 
             SelectedWeapon = Weapons.Count - 1;
+
+            
 
         }
 
@@ -222,6 +225,8 @@ namespace Hunted
                 Dead = true;
                 SpawnDrops(gameMap, gameHero);
                 LightingEngine.Instance.RemoveSource(HeadTorch);
+                ParticleController.Instance.AddBloodPool(Position);
+
             }
 
             if (IsGeneral)
@@ -235,6 +240,11 @@ namespace Hunted
 
             HeadTorch.Position = Helper.PointOnCircle(ref Position, 30, Rotation - MathHelper.PiOver2);
             HeadTorch.Rotation = Rotation - MathHelper.PiOver2;
+
+            if (IsGeneral)
+                Animations["head"].XOffset = 4;
+            else
+                Animations["head"].XOffset = 2;
 
             if (Dead)
             {
@@ -368,8 +378,10 @@ namespace Hunted
             base.Draw(sb, lightingEngine);
 
             // Head
-            if(IsGeneral)
-                sb.Draw(spriteSheet, Position, Animations["head"].CellRect, Color.Red, Rotation, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
+            //if(IsGeneral)
+            //    sb.Draw(spriteSheet, Position, Animations["head"].CellRect, Color.Red, Rotation, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
+            //else
+            //    sb.Draw(spriteSheet, Position, Animations["head"].CellRect, Color.LightBlue, Rotation, new Vector2(100, 100) / 2, 1f, SpriteEffects.None, 1);
         }
 
         void DrawChasePath(SpriteBatch sb, BreadCrumb p)

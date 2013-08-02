@@ -33,6 +33,12 @@ namespace Hunted
             Lights.Add(new LightSource(gd, 500, LightAreaQuality.High, Color.White, BeamStencilType.Narrow, SpotStencilType.None));
             le.LightSources.Add(Lights[0]);
             le.LightSources.Add(Lights[1]);
+
+            CollisionVerts.Add(Helper.PointOnCircle(ref Position, 150, -0.44f + (Rotation)));
+            CollisionVerts.Add(Helper.PointOnCircle(ref Position, 150, 0.44f + (Rotation)));
+            CollisionVerts.Add(Helper.PointOnCircle(ref Position, 150, -0.44f + MathHelper.Pi + (Rotation)));
+            CollisionVerts.Add(Helper.PointOnCircle(ref Position, 150, 0.44f + MathHelper.Pi + (Rotation)));
+
             base.Initialize();
         }
 

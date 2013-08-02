@@ -118,5 +118,25 @@ namespace Hunted
                 }
             }
         }
+
+        internal bool CheckVehicleCollision(Vector2 pos)
+        {
+
+            foreach (Vehicle v in Vehicles)
+            {
+                if(Helper.IsPointInShape(pos, v.CollisionVerts)) return true;
+            }
+
+            return false;
+        }
+
+        internal void ClearSpawn(Vector2 pos)
+        {
+            foreach (Vehicle v in Vehicles.Where(e => (pos - e.Position).Length() < 800f).ToList())
+            {
+                foreach(LightSource l in v.Lights) LightingEngine.Instance.RemoveSource(l);
+                v.Active = false;
+            }
+        }
     }
 }
