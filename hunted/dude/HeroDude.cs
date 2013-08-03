@@ -10,8 +10,59 @@ using TiledLib;
 
 namespace Hunted
 {
+    public class HuntedLevel
+    {
+        public float Level;
+        public Vector2 LastKnownPosition;
+        public double TimeSinceLastSeen;
+        
+        double updateTime;
+
+        public void Update(GameTime gameTime)
+        {
+            TimeSinceLastSeen += gameTime.ElapsedGameTime.TotalMilliseconds;
+            updateTime += gameTime.ElapsedGameTime.TotalMilliseconds;
+
+            if (updateTime >= 1000)
+            {
+                updateTime = 0;
+                if (TimeSinceLastSeen > 5000)
+                    Level -= 1f;
+            }
+
+            Level = MathHelper.Clamp(Level, 0f, 100f);
+        }
+
+        public void Seen(Vector2 pos)
+        {
+            if (TimeSinceLastSeen > 1000)
+            {
+                TimeSinceLastSeen = 0;
+                LastKnownPosition = pos + new Vector2(-100f + ((float)Helper.Random.NextDouble() * 200f), -100f + ((float)Helper.Random.NextDouble() * 200f));
+                Level += 2f;
+            }
+        }
+
+        public void Heard(Vector2 pos, bool wasGunshot)
+        {
+            if (TimeSinceLastSeen > 10000)
+            {
+                LastKnownPosition = pos + new Vector2(-300f + ((float)Helper.Random.NextDouble() * 600f), -300f + ((float)Helper.Random.NextDouble() * 600f));
+                Level += 1f;
+            }
+
+            if (wasGunshot && TimeSinceLastSeen > 1000)
+            {
+                TimeSinceLastSeen = 0;
+                LastKnownPosition = pos + new Vector2(-200f + ((float)Helper.Random.NextDouble() * 400f), -200f + ((float)Helper.Random.NextDouble() * 400f));
+                Level += 1f;
+            }
+        }
+    }
+
     public class HeroDude : Dude
     {
+        public HuntedLevel HuntedLevel = new HuntedLevel();
 
         public HeroDude(Vector2 pos) : base(pos)
         {
@@ -43,7 +94,9 @@ namespace Hunted
         {
             base.Update(gameTime, gameMap, mapFog);
 
-            HeadTorch.Position = Helper.PointOnCircle(ref Position, 30, Rotation - MathHelper.PiOver2);
+            HuntedLevel.Update(gameTime);
+
+            HeadTorch.Position = Helper.PointOnCircle(ref Position, 32, Rotation - MathHelper.PiOver2);
             HeadTorch.Rotation = Rotation - MathHelper.PiOver2;
 
             foreach (Compound c in gameMap.Compounds)
@@ -90,10 +143,23 @@ namespace Hunted
                     Weapons.Clear();
                     Weapons.Add(new Knife(this));  
                     SelectedWeapon = 0;
+                    HuntedLevel.Level = 0f;
                     EnemyController.Instance.ClearSpawn(gameMap.HeroSpawn);
                     VehicleController.Instance.ClearSpawn(gameMap.HeroSpawn);
                     Ammo = 0;
                 }
+            }
+
+            if (!(drivingVehicle is Chopper))
+            {
+                foreach (Compound c in gameMap.Compounds)
+                    foreach (Building b in c.Buildings)
+                        if (b.Type == BuildingType.Building)
+                        {
+                            Point pos = Helper.VtoP(Position / 100);
+                            if (b.Rect.Contains(pos) && b.RoofFade > 0.1f) b.RoofFade -= 0.01f;
+                            else if (b.RoofFade < 1f) b.RoofFade += 0.01f;
+                        }
             }
 
             if (!Dead && deadAlpha < 1f) deadAlpha += 0.01f;
@@ -127,23 +193,33 @@ namespace Hunted
 
         internal void GiveWeapon(ItemType itemType)
         {
+            int weapon = 0;
+
             switch(itemType)
             {
                 case ItemType.Pistol:
-                    if (Weapons.Count(w => w is Pistol) == 0) Weapons.Add(new Pistol(this));
+                    if (Weapons.Count(w => w is Pistol) == 0)
+                    {
+                        Weapons.Add(new Pistol(this));
+                        weapon = 1;
+                    }
                         break;
                 case ItemType.Shotgun:
-                        if (Weapons.Count(w => w is Shotgun) == 0) Weapons.Add(new Shotgun(this));
+                        if (Weapons.Count(w => w is Shotgun) == 0) { Weapons.Add(new Shotgun(this)); weapon = 2; }
                         break;
                 case ItemType.SMG:
-                        if (Weapons.Count(w => w is SMG) == 0) Weapons.Add(new SMG(this));
+                        if (Weapons.Count(w => w is SMG) == 0) { Weapons.Add(new SMG(this)); weapon = 3; }
                         break;
                 case ItemType.Rifle:
-                        if (Weapons.Count(w => w is Rifle) == 0) Weapons.Add(new Rifle(this));
+                        if (Weapons.Count(w => w is Rifle) == 0) { Weapons.Add(new Rifle(this)); weapon = 4; }
                         break;
             }
 
             Weapons = Weapons.OrderBy(w => w.sortOrder).ToList();
+
+            if(weapon!=0)
+                foreach (Weapon w in Weapons)
+                    if (w.sortOrder == weapon) SelectedWeapon = Weapons.IndexOf(w);
             
         }
     }

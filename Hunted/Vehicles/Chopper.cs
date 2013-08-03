@@ -213,6 +213,10 @@ namespace Hunted
                     Vector2 pos = Helper.PointOnCircle(ref Position, r, a);
                     if (gameMap.CheckTileCollision(pos)) found = true;
                     foreach (Vehicle v in VehicleController.Instance.Vehicles) if (v != this && Helper.IsPointInShape(pos, v.CollisionVerts)) found = true;
+                    foreach (Compound c in gameMap.Compounds)
+                        foreach (Building b in c.Buildings)
+                            if (b.Type == BuildingType.Building)
+                                if (b.Rect.Contains(Helper.VtoP(Position / 100))) found = true;
                 }
             }
 

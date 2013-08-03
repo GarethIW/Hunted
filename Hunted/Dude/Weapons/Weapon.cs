@@ -68,6 +68,8 @@ namespace Hunted.Weapons
             
             //}
 
+            if (owner is HeroDude && !(this is Knife)) EnemyController.Instance.HeroFiredShot((HeroDude)owner);
+
             return true;
         }
 

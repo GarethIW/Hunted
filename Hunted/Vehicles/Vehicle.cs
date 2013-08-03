@@ -77,7 +77,16 @@ namespace Hunted
 
             Health = MathHelper.Clamp(Health, 0f, 100f);
 
-           
+            if (gameHero.drivingVehicle == this)
+            {
+                foreach (LightSource l in Lights) l.Active = false;
+            }
+            else
+            {
+                foreach (LightSource l in Lights) l.Active = true;
+
+            }
+
         }
 
         public virtual void Move(Vector2 amount)

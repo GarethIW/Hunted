@@ -17,7 +17,8 @@ namespace Hunted
         Chasing,
         FollowingPath,
         Fleeing,
-        Attacking
+        Attacking,
+        Investigating
     }
 
     public class AIDude : Dude
@@ -129,6 +130,7 @@ namespace Hunted
                     // Chase player if in LOS
                     if (CheckLineOfSight(gameHero.Position, gameMap))
                     {
+                        gameHero.HuntedLevel.Seen(gameHero.Position);
                         Target = Position; // Stop dead in tracks
                         if (gameHero.drivingVehicle == null)
                             State = AIState.Chasing; // Begin chasing player
@@ -140,10 +142,13 @@ namespace Hunted
 
                     // Allow the enemy to "hear" the player if player moves close to enemy
                     if ((gameHero.Speed.Length() > 0f && (gameHero.Position - Position).Length() < 250f) || gameHero.drivingVehicle != null)
+                    {
+                        gameHero.HuntedLevel.Heard(gameHero.Position, false);
                         LookAt(gameHero.Position);
+                    }
 
                     if ((gameHero.Position - Position).Length() < 800f && 
-                        gameHero.drivingVehicle != null && 
+                        insideBuilding == null && 
                         gameHero.drivingVehicle is Chopper && 
                         ((Chopper)gameHero.drivingVehicle).Height >0f &&
                         !(Weapons[SelectedWeapon] is Knife)) State = AIState.Attacking;
@@ -152,6 +157,7 @@ namespace Hunted
                 case AIState.Chasing:
                     Target = gameHero.Position;
                     LookAt(gameHero.Position);
+                    if(gameHero.drivingVehicle is Chopper) State = AIState.Patrolling;
                     if (((gameHero.Position - Position).Length() < 450f && CheckLineOfSight(gameHero.Position, gameMap)) || ((gameHero.Position - Position).Length() < 800f && gameHero.drivingVehicle is Chopper))
                     {
                         Target = Position;
@@ -182,6 +188,8 @@ namespace Hunted
                     }
                     break;
                 case AIState.Attacking:
+                    if(gameHero.drivingVehicle is Chopper && insideBuilding!=null) State = AIState.Patrolling;
+
                     LookAt(gameHero.Position);
                     bool shootUp = (gameHero.drivingVehicle != null && gameHero.drivingVehicle is Chopper && ((Chopper)gameHero.drivingVehicle).Height >0f);
                     Attack(gameTime, gameHero.Position, true, gameCamera, !shootUp);
@@ -214,6 +222,30 @@ namespace Hunted
                     }
 
                     break;
+                case AIState.Investigating:
+                    if (Target == Position)
+                    {
+                        if (chasePath == null || regeneratePath)
+                        {
+                            regeneratePath = false;
+                            chasePath = PathFinder.FindPath(gameMap.AStarWorld, new Point3D((int)(Position.X / gameMap.TileWidth), (int)(Position.Y / gameMap.TileHeight), 0), new Point3D((int)(gameHero.HuntedLevel.LastKnownPosition.X / gameMap.TileWidth), (int)(gameHero.HuntedLevel.LastKnownPosition.Y / gameMap.TileHeight), 0));
+                            if (chasePath != null) Target = new Vector2((chasePath.position.X * gameMap.TileWidth) + (gameMap.TileWidth / 2), (chasePath.position.Y * gameMap.TileHeight) + (gameMap.TileHeight / 2));
+                            else State = AIState.Patrolling;
+                        }
+                        else
+                        {
+                            chasePath = chasePath.next;
+                            if (chasePath != null) Target = new Vector2((chasePath.position.X * gameMap.TileWidth) + (gameMap.TileWidth / 2), (chasePath.position.Y * gameMap.TileHeight) + (gameMap.TileHeight / 2));
+                            else State = AIState.Patrolling;
+                        }
+                    }
+                    if ((Position - gameHero.HuntedLevel.LastKnownPosition).Length() < 200f) State = AIState.Patrolling;
+                    if (CheckLineOfSight(gameHero.Position, gameMap))
+                    {
+                        Target = Position; // Stop dead in tracks
+                        State = AIState.Chasing; // Begin chasing player
+                    }
+                    break;
             }
 
             if (gameHero.Dead) State = AIState.Patrolling;
@@ -238,8 +270,16 @@ namespace Hunted
                 }
             }
 
-            HeadTorch.Position = Helper.PointOnCircle(ref Position, 30, Rotation - MathHelper.PiOver2);
+            HeadTorch.Position = Helper.PointOnCircle(ref Position, 32, Rotation - MathHelper.PiOver2);
             HeadTorch.Rotation = Rotation - MathHelper.PiOver2;
+
+            if ((Position.X < gameCamera.Position.X - ((gameCamera.Width / gameCamera.Zoom) / 2) || Position.X > gameCamera.Position.X + ((gameCamera.Width / gameCamera.Zoom) / 2) ||
+               Position.Y < gameCamera.Position.Y - ((gameCamera.Height/ gameCamera.Zoom) / 2) || Position.Y > gameCamera.Position.Y + (gameCamera.Height / 2)) &&
+               LineCollision(gameHero.Position, gameMap))
+            {
+                HeadTorch.Active = false;
+            }
+            else if(!Dead) HeadTorch.Active = true;
 
             if (IsGeneral)
                 Animations["head"].XOffset = 4;
@@ -416,6 +456,12 @@ namespace Hunted
             State = AIState.Chasing;
         }
 
+        internal void InvestigatePosition()
+        {
+            regeneratePath = true;
+            Target = Position;
+            State = AIState.Investigating;
+        }
         
     }
 

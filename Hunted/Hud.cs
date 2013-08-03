@@ -47,6 +47,9 @@ namespace Hunted
             heroHealthTarget = (gameHero.drivingVehicle==null?gameHero.Health:gameHero.drivingVehicle.Health);
             if (heroHealthTarget > 99f && heroHealthTarget < 100f) heroHealthTarget = 100f;
 
+            huntedLevelTarget = gameHero.HuntedLevel.Level;
+            huntedLevel = MathHelper.Lerp(huntedLevel, huntedLevelTarget, 0.1f);
+
             heroHealth = MathHelper.Lerp(heroHealth, heroHealthTarget, 0.1f);
 
             showAmmo = gameHero.SelectedWeapon > 0;
@@ -66,6 +69,9 @@ namespace Hunted
             Rectangle vp = sb.GraphicsDevice.Viewport.Bounds;
 
             sb.Draw(hudTex, new Vector2(vp.Width - 240, 18), new Rectangle(319,0,230,236), Color.White);
+
+            sb.Draw(hudTex, new Vector2(vp.Width - 238, 120 - (int)huntedLevel), new Rectangle(550, 2 + (100 - (int)huntedLevel), 16, (int)huntedLevel*2), Color.White, 0f, new Vector2(0,0), 1f, SpriteEffects.None, 1);
+
             sb.DrawString(hudFont, "Day " + day, new Vector2(vp.Width - 216, 221), Color.White);
             sb.DrawString(hudFont, timeOfDay.Hour.ToString("00") + ":" + timeOfDay.Minute.ToString("00"), new Vector2(vp.Width - 24 - hudFont.MeasureString(timeOfDay.Hour.ToString("00") + ":" + timeOfDay.Minute.ToString("00")).X, 221), Color.White);
 

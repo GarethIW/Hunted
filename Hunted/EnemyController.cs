@@ -40,10 +40,20 @@ namespace Hunted
             {
                 count++;
                 e.Update(gameTime, gameMap, gameHero, mapFog, gameCamera);
+
+                bool alerted = false;
+                if(gameHero.HuntedLevel.Level>0f)
+                {
+                    if (!alerted && Helper.Random.Next(10000 - (int)(gameHero.HuntedLevel.Level * 100)) == 1 && e.State == AIState.Patrolling && (gameHero.Position - e.Position).Length() < 2000f)
+                    {
+                        e.InvestigatePosition();
+                        alerted = true;
+                    }
+                }
             }
 
             // Spawn some new enemies
-            if (count < 10)
+            if (count < 10 + (int)(gameHero.HuntedLevel.Level / 10))
             {
                 Vector2 pos = Helper.RandomPointInCircle(gameHero.Position, 2000f, 4000f);
                 if (!gameMap.CheckTileCollision(pos) && pos.X > 0 && pos.X < (gameMap.Width * gameMap.TileWidth) && pos.Y > 0 && pos.Y < (gameMap.Height * gameMap.TileHeight) && !VehicleController.Instance.CheckVehicleCollision(pos))
@@ -102,6 +112,20 @@ namespace Hunted
             {
                 LightingEngine.Instance.RemoveSource(d.HeadTorch);
                 d.Active = false;
+            }
+        }
+
+        internal void HeroFiredShot(HeroDude gameHero)
+        {
+            int numAlerted = 0;
+            foreach (Dude d in Enemies.Where(e => (gameHero.Position - e.Position).Length() < 1200f).OrderBy(e => (gameHero.Position - e.Position).Length()).ToList())
+            {
+                if (numAlerted < 1 + (int)(gameHero.HuntedLevel.Level / 10))
+                {
+                    numAlerted++;
+                    gameHero.HuntedLevel.Heard(gameHero.Position, true);
+                    ((AIDude)d).InvestigatePosition();
+                }
             }
         }
     }

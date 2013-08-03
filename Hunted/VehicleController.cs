@@ -122,7 +122,7 @@ namespace Hunted
         internal bool CheckVehicleCollision(Vector2 pos)
         {
 
-            foreach (Vehicle v in Vehicles)
+            foreach (Vehicle v in Vehicles.Where(veh=>(veh.Position - pos).Length()<500f))
             {
                 if(Helper.IsPointInShape(pos, v.CollisionVerts)) return true;
             }

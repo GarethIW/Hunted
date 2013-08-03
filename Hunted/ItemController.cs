@@ -72,7 +72,7 @@ namespace Hunted
             switch (i.Type)
             {
                 case ItemType.Health:
-                    gameHero.Health += 25f;
+                    gameHero.Health += 25f + (float)Helper.Random.Next(25);
                     break;
                 case ItemType.Ammo:
                     AudioController.PlaySFX("ammo", 1f, 0f, 0f, i.Position);
@@ -108,6 +108,7 @@ namespace Hunted
                 case ItemType.Shotgun:
                 case ItemType.SMG:
                 case ItemType.Rifle:
+                    gameHero.Ammo += 10 + Helper.Random.Next(15);
                     gameHero.GiveWeapon(i.Type);
                     break;
             }

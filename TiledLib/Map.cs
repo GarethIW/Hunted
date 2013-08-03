@@ -433,6 +433,71 @@ namespace TiledLib
 
         }
 
+        public void DrawRoofLayer(SpriteBatch spriteBatch, Camera gameCamera, LightingEngine lightingEngine, Color color, Vector2 vector2)
+        {
+            TileLayer tileLayer = GetLayer("Roof") as TileLayer;
+            if (tileLayer != null)
+            {
+                Rectangle worldArea = new Rectangle((int)((gameCamera.Position.X - (int)(((float)gameCamera.Width)))), (int)((gameCamera.Position.Y - (int)(((float)gameCamera.Height)))), (int)((gameCamera.Width) * 2), (int)((gameCamera.Height) * 2));
+
+                //Rectangle worldArea = new Rectangle(0, (int)gameCamera.Position.Y - (int)(((float)gameCamera.Height) * (2f-scale)), TileWidth * Width, (int)(((float)gameCamera.Height*2 ) * (3f-(2f*scale))));
+
+                // figure out the min and max tile indices to draw
+                worldArea.Inflate((int)((gameCamera.Width / gameCamera.Zoom) - (gameCamera.Width)), (int)((gameCamera.Height / gameCamera.Zoom) - (gameCamera.Height)));
+
+                int minX = Math.Max((int)Math.Floor((float)worldArea.Left / TileWidth), 0);
+                int maxX = Math.Min((int)Math.Ceiling((float)worldArea.Right / TileWidth), Width);
+
+                int minY = Math.Max((int)Math.Floor((float)worldArea.Top / TileHeight), 0);
+                int maxY = Math.Min((int)Math.Ceiling((float)worldArea.Bottom / TileHeight), Height);
+
+                //minX = 0;
+                //maxX = 1000;
+                //minY = 0;
+                //maxY = 1000;
+
+                for (int x = minX; x < maxX; x++)
+                {
+                    for (int y = minY; y < maxY; y++)
+                    {
+                        //if ((new Vector2((x * TileWidth) + (TileWidth / 2), (y * TileHeight) + (TileHeight / 2)) - new Vector2(worldArea.Center.X, worldArea.Center.Y)).Length() < gameCamera.Width * 0.75)
+                        //{
+                        Tile tile = tileLayer.Tiles[x, y];
+
+                        if (tile == null)
+                            continue;
+
+                        if (AnimFrame > 0 && tile.Properties.Contains("Anim"))
+                        {
+                            tile = TileSetDictionary["ts" + (AnimFrame + 1)][TileSetDictionary["ts1"].IndexOf(tile)];
+                        }
+                        //    if (tile.Properties.Contains("Anim")) tile = Tiles.Where(t => t!=null && t.Properties.Contains("Anim") && t.Properties["Anim"] == tile.Properties["Anim"] + AnimFrame).First();
+                        // - tile.Source.Height + TileHeight;
+                        //Rectangle r = new Rectangle(x * TileWidth, y * TileHeight, tile.Source.Width, tile.Source.Height);
+
+                        float a = 1f;
+
+                        foreach (Compound c in Compounds)
+                            foreach (Building b in c.Buildings)
+                            {
+                                Rectangle r = b.Rect;
+                                r.Inflate(2, 2);
+                                if (r.Contains(x, y)) a = b.RoofFade;
+                            }
+
+                        spriteBatch.Draw(tile.Texture, new Vector2((x * TileWidth), (y * TileHeight)), tile.Source, (color == Color.White ? lightingEngine.CurrentSunColor : color) * a);
+
+                        //if (!AStarWorld.PositionIsFree(new AStar.Point3D(x, y, 0))) 
+                        //    spriteBatch.Draw(tile.Texture, new Vector2((x * TileWidth), (y * TileHeight)), new Rectangle(0,0,100,100), Color.Red);
+                        //}
+
+                    }
+                }
+
+
+            }
+        }
+
         public void DrawShadows(SpriteBatch spriteBatch, string layerName, Camera gameCamera, LightingEngine lightingEngine)
         {
             var l = GetLayer(layerName);
@@ -560,6 +625,7 @@ namespace TiledLib
 
                 TileLayer terrainLayer = GetLayer("Terrain") as TileLayer;
                 TileLayer wallLayer = GetLayer("Wall") as TileLayer;
+                TileLayer roofLayer = GetLayer("Roof") as TileLayer;
 
                for (int x = minX; x < maxX; x++)
                //     for (int x = 0; x < 1; x++)
@@ -581,7 +647,12 @@ namespace TiledLib
                             //Rectangle r = new Rectangle(x * TileWidth, y * TileHeight, tile.Source.Width, tile.Source.Height);
                             spriteBatch.Draw(tile.Texture, new Vector2(x * TileWidth, y * TileHeight), tile.Source, Color.White);
                         }
-
+                        tile = roofLayer.Tiles[x, y];
+                        if (tile != null)
+                        {
+                            //Rectangle r = new Rectangle(x * TileWidth, y * TileHeight, tile.Source.Width, tile.Source.Height);
+                            spriteBatch.Draw(tile.Texture, new Vector2(x * TileWidth, y * TileHeight), tile.Source, Color.White);
+                        }
                     }
                 }
 
@@ -786,5 +857,7 @@ namespace TiledLib
             c.Discovered = true;
             
         }
+
+        
     }
 }

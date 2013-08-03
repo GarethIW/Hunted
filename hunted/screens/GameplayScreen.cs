@@ -440,6 +440,7 @@ namespace Hunted
             lightingEngine.DrawSpots(spriteBatch, gameCamera, gameMap);
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
+            gameMap.DrawRoofLayer(spriteBatch, gameCamera, lightingEngine, Color.White, gameHero.Position);
             vehicleController.DrawHeliShadows(spriteBatch, lightingEngine, gameHero);      
             vehicleController.DrawHelis(spriteBatch, lightingEngine, gameHero);
             spriteBatch.End();
@@ -493,7 +494,7 @@ namespace Hunted
                         j.Rotation = (float)Helper.Random.NextDouble() * MathHelper.TwoPi;
                         j.LoadContent(vehicleController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine);
                         vehicleController.Vehicles.Add(j);
-                        // gameHero.Position = j.Position + new Vector2(300, 0);
+                        //gameHero.Position = j.Position + new Vector2(300, 0);
                     }
 
                     if (b.Type == BuildingType.Helipad)

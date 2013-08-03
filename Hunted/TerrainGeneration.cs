@@ -83,6 +83,16 @@ namespace Hunted
         const int WALL_BL = 51 + PAGE;
         const int WALL_BR = 53 + PAGE;
 
+        const int ROOF_EDGE_UP = 62 + PAGE;
+        const int ROOF_EDGE_DOWN = 82 + PAGE;
+        const int ROOF_EDGE_LEFT = 71 + PAGE;
+        const int ROOF_EDGE_RIGHT = 73 + PAGE;
+        const int ROOF_TL = 61 + PAGE;
+        const int ROOF_TR = 63 + PAGE;
+        const int ROOF_BL = 81 + PAGE;
+        const int ROOF_BR = 83 + PAGE;
+        const int ROOF = 72 + PAGE;
+
         const int TREE = 31;
         static int[] TREES = new int[] { 31, 41, 51, 93, 94, 95, 96, 97, 98, 99, 100 };
         static List<Rectangle> BIG_TREES = new List<Rectangle>() {
@@ -113,6 +123,7 @@ namespace Hunted
             TileLayer terrainLayer = map.GetLayer("Terrain") as TileLayer;
             TileLayer wallLayer = map.GetLayer("Wall") as TileLayer;
             TileLayer waterLayer = map.GetLayer("Water") as TileLayer;
+            TileLayer roofLayer = map.GetLayer("Roof") as TileLayer;
 
             float[][] noise = null;
 
@@ -177,8 +188,8 @@ namespace Hunted
                 PercentComplete = 20;
 
                 // Compounds
-                CreateCompounds(map, terrainLayer, wallLayer, compounds, noise, 0.65f, 20000f, 20, lightingEngine, gd);
-                CreateCompounds(map, terrainLayer, wallLayer, compounds, noise, 0.75f, 12000f, 30, lightingEngine, gd);
+                CreateCompounds(map, terrainLayer, wallLayer, roofLayer, compounds, noise, 0.65f, 20000f, 20, lightingEngine, gd);
+                CreateCompounds(map, terrainLayer, wallLayer, roofLayer, compounds, noise, 0.75f, 12000f, 30, lightingEngine, gd);
 
                 // Test to see if compounds are okay
                 int numOKComps = 0;
@@ -529,7 +540,7 @@ namespace Hunted
             return canFit;
         }
 
-        private static void CreateCompounds(Map map, TileLayer terrainLayer, TileLayer wallLayer, List<Compound> compounds, float[][] noise, float height, float distance, int minsize, LightingEngine lightingEngine, GraphicsDevice gd)
+        private static void CreateCompounds(Map map, TileLayer terrainLayer, TileLayer wallLayer, TileLayer roofLayer, List<Compound> compounds, float[][] noise, float height, float distance, int minsize, LightingEngine lightingEngine, GraphicsDevice gd)
         {
             for (int y = 40; y < map.Width - 40; y++)
             {
@@ -718,7 +729,7 @@ namespace Hunted
                                 //        for (int yy = carpark.Rect.Top; yy < carpark.Rect.Bottom; yy++)
                                 //             terrainLayer.Tiles[xx, yy] = map.Tiles[CARPARK];
 
-                                MakeBuildings(map, wallLayer, terrainLayer, newCompound);
+                                MakeBuildings(map, wallLayer, terrainLayer, roofLayer, newCompound);
 
                                 compounds.Add(newCompound);
                             }
@@ -728,7 +739,7 @@ namespace Hunted
             }
         }
 
-        private static void MakeBuildings(Map map, TileLayer wallLayer, TileLayer terrainLayer, Compound newCompound)
+        private static void MakeBuildings(Map map, TileLayer wallLayer, TileLayer terrainLayer, TileLayer roofLayer, Compound newCompound)
         {
             Rectangle innerBounds = newCompound.InnerBounds;
             innerBounds.Inflate(-2, -2);
@@ -806,15 +817,34 @@ namespace Hunted
                     wallLayer.Tiles[rect.Left, rect.Bottom] = map.Tiles[WALL_BL];
                     wallLayer.Tiles[rect.Right, rect.Bottom] = map.Tiles[WALL_BR];
 
+                    roofLayer.Tiles[rect.Left, rect.Top] = map.Tiles[ROOF_TL];
+                    roofLayer.Tiles[rect.Right, rect.Top] = map.Tiles[ROOF_TR];
+                    roofLayer.Tiles[rect.Left, rect.Bottom] = map.Tiles[ROOF_BL];
+                    roofLayer.Tiles[rect.Right, rect.Bottom] = map.Tiles[ROOF_BR];
+
                     for (int xx = rect.Left + 1; xx <= rect.Right - 1; xx++)
                     {
                         wallLayer.Tiles[xx, rect.Top] = map.Tiles[WALL_EDGE_UP];
                         wallLayer.Tiles[xx, rect.Bottom] = map.Tiles[WALL_EDGE_DOWN];
+
+                        roofLayer.Tiles[xx, rect.Top] = map.Tiles[ROOF_EDGE_UP];
+                        roofLayer.Tiles[xx, rect.Bottom] = map.Tiles[ROOF_EDGE_DOWN];
                     } 
                     for (int yy = rect.Top + 1; yy <= rect.Bottom - 1; yy++)
                     {
                         wallLayer.Tiles[rect.Left,yy] = map.Tiles[WALL_EDGE_LEFT];
                         wallLayer.Tiles[rect.Right,yy] = map.Tiles[WALL_EDGE_RIGHT];
+
+                        roofLayer.Tiles[rect.Left, yy] = map.Tiles[ROOF_EDGE_LEFT];
+                        roofLayer.Tiles[rect.Right, yy] = map.Tiles[ROOF_EDGE_RIGHT];
+                    }
+
+                    for (int xx = rect.Left+1; xx <= rect.Right-1; xx++)
+                    {
+                        for (int yy = rect.Top+1; yy <= rect.Bottom-1; yy++)
+                        {
+                            roofLayer.Tiles[xx, yy] = map.Tiles[ROOF];
+                        }
                     }
 
                     // Exits
@@ -824,22 +854,22 @@ namespace Hunted
                     if (exits[0])
                     {
                         int doorx = rand.Next(rect.Width - 7) + 3;
-                        for (int xx = rect.Left + doorx; xx < (rect.Left + doorx) + 4; xx++) wallLayer.Tiles[xx, rect.Top] = null;
+                        for (int xx = rect.Left + doorx; xx < (rect.Left + doorx) + 4; xx++) { wallLayer.Tiles[xx, rect.Top] = null; roofLayer.Tiles[xx, rect.Top] = null; }
                     }
                     if (exits[1])
                     {
                         int doorx = rand.Next(rect.Width - 7) + 3;
-                        for (int xx = rect.Left + doorx; xx < (rect.Left + doorx) + 4; xx++) wallLayer.Tiles[xx, rect.Bottom] = null;
+                        for (int xx = rect.Left + doorx; xx < (rect.Left + doorx) + 4; xx++) { wallLayer.Tiles[xx, rect.Bottom] = null; roofLayer.Tiles[xx, rect.Bottom] = null; }
                     }
                     if (exits[2])
                     {
                         int doory = rand.Next(rect.Height - 7) + 3;
-                        for (int yy = rect.Top + doory; yy < (rect.Top + doory) + 4; yy++) wallLayer.Tiles[rect.Left, yy] = null;
+                        for (int yy = rect.Top + doory; yy < (rect.Top + doory) + 4; yy++) {wallLayer.Tiles[rect.Left, yy] = null; roofLayer.Tiles[rect.Left, yy] = null;}
                     }
                     if (exits[3])
                     {
                         int doory = rand.Next(rect.Height - 7) + 3;
-                        for (int yy = rect.Top + doory; yy < (rect.Top + doory) + 4; yy++) wallLayer.Tiles[rect.Right, yy] = null;
+                        for (int yy = rect.Top + doory; yy < (rect.Top + doory) + 4; yy++){ wallLayer.Tiles[rect.Right, yy] = null; roofLayer.Tiles[rect.Right, yy] = null;}
                     }
 
                     //for (int xx = newBuilding.Rect.Left; xx < newBuilding.Rect.Right; xx++)

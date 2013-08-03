@@ -39,6 +39,8 @@ namespace Hunted
         internal double deadTime;
         internal float deadAlpha;
 
+        internal Building insideBuilding = null;
+
         public Dude(Vector2 pos)
         {
             Position = pos;
@@ -128,7 +130,16 @@ namespace Hunted
                 deadTime -= gameTime.ElapsedGameTime.TotalMilliseconds;
                 
             }
-            
+
+            insideBuilding = null;
+            foreach (Compound c in gameMap.Compounds)
+                foreach (Building b in c.Buildings)
+                    if (b.Type == BuildingType.Building)
+                    {
+                        Point pos = Helper.VtoP(Position / 100);
+                        if (b.Rect.Contains(pos)) insideBuilding = b;
+                    }
+
         }
 
         public virtual void Move(Vector2 amount)
@@ -285,6 +296,7 @@ namespace Hunted
             while ((testVector - testPos).Length() > 30)
             {
                 if (gameMap.CheckCollision(testVector)) return true;
+                if(VehicleController.Instance.CheckVehicleCollision(testVector)) return true;
                 testVector += (testLine / 50f);
             }
 
@@ -359,6 +371,8 @@ namespace Hunted
         }
 
 
+
+        
     }
 
     

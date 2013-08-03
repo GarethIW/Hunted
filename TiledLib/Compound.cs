@@ -28,5 +28,7 @@ namespace TiledLib
     {
         public BuildingType Type;
         public Rectangle Rect;
+
+        public float RoofFade =1f;
     }
 }
