@@ -93,6 +93,9 @@ namespace Hunted
         const int ROOF_BR = 83 + PAGE;
         const int ROOF = 72 + PAGE;
 
+        const int JETTY_V = 64 + PAGE;
+        const int JETTY_H = 65 + PAGE;
+
         const int TREE = 31;
         static int[] TREES = new int[] { 31, 41, 51, 93, 94, 95, 96, 97, 98, 99, 100 };
         static List<Rectangle> BIG_TREES = new List<Rectangle>() {
@@ -475,7 +478,7 @@ namespace Hunted
             {
                 for (int yy = bounds.Top; yy < bounds.Bottom; yy++)
                 {
-                    terrainLayer.Tiles[xx, yy] = map.Tiles[GRASS];
+                    terrainLayer.Tiles[xx, yy] = (direction.Y!=0?map.Tiles[JETTY_H]:map.Tiles[JETTY_V]);
                     waterLayer.Tiles[xx, yy] = null;
                 }
             }

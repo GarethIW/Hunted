@@ -261,7 +261,7 @@ namespace Hunted
             if(IsActive)
             {
                 if ((keyboardState.IsKeyDown(Keys.Tab) && !lastKeyboardState.IsKeyDown(Keys.Tab)) || gamePadState.IsButtonDown(Buttons.Back)) ScreenManager.AddScreen(new MapScreen(gameMap, mapFog, gameHero, mapIcons), null);
-                if (keyboardState.IsKeyDown(Keys.Space) && !lastKeyboardState.IsKeyDown(Keys.Space)) ThreadPool.QueueUserWorkItem(new WaitCallback(GenerateTerrainAsync));
+                //if (keyboardState.IsKeyDown(Keys.Space) && !lastKeyboardState.IsKeyDown(Keys.Space)) ThreadPool.QueueUserWorkItem(new WaitCallback(GenerateTerrainAsync));
 
                 if (keyboardState.IsKeyDown(Keys.D1) && !lastKeyboardState.IsKeyDown(Keys.D1)) gameHero.SelectWeapon(0, false);
                 if (keyboardState.IsKeyDown(Keys.D2) && !lastKeyboardState.IsKeyDown(Keys.D2)) gameHero.SelectWeapon(1, false);
@@ -490,6 +490,7 @@ namespace Hunted
 
             
             List<Compound> possibleComps = new List<Compound>();
+            List<Building> possibleHelipads = new List<Building>();
 
             // Spawn vehicles
             foreach (Compound c in gameMap.Compounds)
@@ -502,18 +503,27 @@ namespace Hunted
                         j.Rotation = (float)Helper.Random.NextDouble() * MathHelper.TwoPi;
                         j.LoadContent(vehicleController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine);
                         vehicleController.Vehicles.Add(j);
-                        gameHero.Position = j.Position + new Vector2(300, 0);
+                        //gameHero.Position = j.Position + new Vector2(300, 0);
                     }
 
                     if (b.Type == BuildingType.Helipad)
                     {
-                        Chopper chop = new Chopper((new Vector2(b.Rect.Center.X, b.Rect.Center.Y) * new Vector2(gameMap.TileWidth, gameMap.TileHeight)) + new Vector2(50, 50));
-                        chop.Rotation = (float)Helper.Random.NextDouble() * MathHelper.TwoPi;
-                        chop.LoadContent(vehicleController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine);
-                        vehicleController.Vehicles.Add(chop);
-                        //gameHero.Position = chop.Position + new Vector2(300, 0);
+                        possibleHelipads.Add(b);
                     }
                 }
+            }
+
+            for (int i = 0; i < 5; i++)
+            {
+                Building b = possibleHelipads[Helper.Random.Next(possibleHelipads.Count)];
+                
+                Chopper chop = new Chopper((new Vector2(b.Rect.Center.X, b.Rect.Center.Y) * new Vector2(gameMap.TileWidth, gameMap.TileHeight)) + new Vector2(50, 50));
+                chop.Rotation = (float)Helper.Random.NextDouble() * MathHelper.TwoPi;
+                chop.LoadContent(vehicleController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine);
+                vehicleController.Vehicles.Add(chop);
+
+                possibleHelipads.Remove(b);
+                if (possibleHelipads.Count == 0) break;
             }
 
             // Spawn enemies
@@ -552,6 +562,8 @@ namespace Hunted
                     }
                 }
             }
+
+           
 
             // Spawn Generals
             for (int i = 0; i < 3; i++)

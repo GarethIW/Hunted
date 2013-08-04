@@ -62,6 +62,12 @@
     <Compile Include="..\TiledLib\Camera.cs">
       <Link>Camera.cs</Link>
     </Compile>
+    <Compile Include="..\TiledLib\Compound.cs">
+      <Link>Compound.cs</Link>
+    </Compile>
+    <Compile Include="..\TiledLib\Jetty.cs">
+      <Link>Jetty.cs</Link>
+    </Compile>
     <Compile Include="..\TiledLib\Layer.cs">
       <Link>Layer.cs</Link>
     </Compile>

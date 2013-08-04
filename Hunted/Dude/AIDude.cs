@@ -292,6 +292,11 @@ namespace Hunted
                 LightingEngine.Instance.RemoveSource(HeadTorch);
                 ParticleController.Instance.AddBloodPool(Position);
 
+                if (IsGeneral)
+                {
+                    Hud.Instance.Ticker.AddLine("> You have eliminated a General! " + (3 - EnemyController.Instance.Enemies.Count(e => e.IsGeneral)) + "/" + (3));
+
+                }
             }
 
             if (IsGeneral)
@@ -438,12 +443,13 @@ namespace Hunted
                     regeneratePath = true;
                     break;
                 case AIState.Attacking:
-                    if ((Target - Position).Length() > 100f)
-                    {
-                        Target = Position;
-                        State = AIState.FollowingPath;
-                        regeneratePath = true;
-                    }
+                    Target = Position;
+                    //if ((Target - Position).Length() > 100f)
+                    //{
+                    //    Target = Position;
+                    //    State = AIState.FollowingPath;
+                    //    regeneratePath = true;
+                    //}
                     break;
             }
 

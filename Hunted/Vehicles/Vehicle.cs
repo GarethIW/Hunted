@@ -1,5 +1,6 @@
 ﻿using Hunted.Weapons;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -44,6 +45,7 @@ namespace Hunted
         internal List<Weapon> Weapons = new List<Weapon>();
         internal int SelectedWeapon = 0;
 
+        internal SoundEffectInstance engineSound;
         
 
         public Vehicle(Vector2 pos)
@@ -155,13 +157,18 @@ namespace Hunted
         {
             Health -= p.Damage/2f;
             //AudioController.PlaySFX("hit", 0.5f, -0.4f, 0.4f, Position);
-            if (p.Type != ProjectileType.Knife)
+            if (p.Type == ProjectileType.Knife)
             {
-                //ParticleController.Instance.AddGSW(p);
+                AudioController.PlaySFX("metal-hit", 0.8f, -0.2f, 0.2f, Position);
             }
             else
             {
-                //ParticleController.Instance.AddKnifeWound(p);
+                if (Helper.Random.Next(5) == 1)
+                {
+                    AudioController.PlaySFX("ricochet", 0.8f, -0.2f, 0.2f, Position);
+                }
+                else AudioController.PlaySFX("metal-hit", 0.8f, -0.2f, 0.2f, Position);
+
             }
         }
 

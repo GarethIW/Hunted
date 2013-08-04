@@ -138,5 +138,51 @@ namespace Hunted
                 v.Active = false;
             }
         }
+
+        internal void SpawnNearestVehicles(Vector2 pos, Map gameMap)
+        {
+            
+            bool jeepSpawned = false;
+            foreach (Compound c in gameMap.Compounds.OrderBy(comp => (comp.Position - pos).Length()))
+            {
+                foreach (Building b in c.Buildings.Where(bu => bu.Type == BuildingType.Carpark))
+                {
+                    Vector2 spawnPos = (new Vector2(b.Rect.Center.X, b.Rect.Center.Y) * new Vector2(gameMap.TileWidth, gameMap.TileHeight)) + new Vector2(50, 50);
+
+                    bool jeepFound = false;
+                    foreach (Vehicle v in Vehicles) if ((v.Position - spawnPos).Length() < 300) jeepFound = true;
+
+                    if (!jeepFound)
+                    {
+                        Jeep j = new Jeep((new Vector2(b.Rect.Center.X, b.Rect.Center.Y) * new Vector2(gameMap.TileWidth, gameMap.TileHeight)) + new Vector2(50, 50));
+                        j.Rotation = (float)Helper.Random.NextDouble() * MathHelper.TwoPi;
+                        j.LoadContent(SpriteSheet, graphicsDevice, lightingEngine);
+                        Vehicles.Add(j);
+                        jeepSpawned = true;
+                        break;
+                    }
+                }
+                if (jeepSpawned) break;
+            }
+
+            foreach (Jetty j in gameMap.Jetties.OrderBy(comp => (comp.Position - pos).Length()))
+            {
+               
+
+                bool boatFound = false;
+                foreach (Vehicle v in Vehicles) if ((v.Position - j.BoatPosition).Length() < 300) boatFound = true;
+
+                if (!boatFound)
+                {
+                    Boat b = new Boat(j.BoatPosition);
+                    b.Rotation = j.BoatRotation;
+                    b.LoadContent(SpriteSheet, graphicsDevice, lightingEngine);
+                    Vehicles.Add(b);
+                    jeepSpawned = true;
+                    break;
+                }
+
+            }
+        }
     }
 }

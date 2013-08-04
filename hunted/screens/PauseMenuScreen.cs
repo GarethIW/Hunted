@@ -39,7 +39,7 @@ namespace Hunted
 
             MenuEntry saveMenuEntry = new MenuEntry("Save");
             MenuEntry loadMenuEntry = new MenuEntry("Load");
-            MenuEntry exitMenuEntry = new MenuEntry("Exit to Title");
+            MenuEntry exitMenuEntry = new MenuEntry("Quit Game");
 
             // Hook up menu event handlers.
             resumeGameMenuEntry.Selected += ResumeGameMenuEntrySelected;
@@ -90,8 +90,9 @@ namespace Hunted
         /// </summary>
         void ExitMenuEntrySelected(object sender, PlayerIndexEventArgs e)
         {
-            LoadingScreen.Load(ScreenManager, false, e.PlayerIndex, new GameplayScreen(),
-                               new MainMenuScreen());
+            //LoadingScreen.Load(ScreenManager, false, e.PlayerIndex, new GameplayScreen(),
+              //                 new MainMenuScreen());
+            ScreenManager.Game.Exit();
         }
 
 

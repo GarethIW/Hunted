@@ -1,5 +1,6 @@
 ﻿using Hunted.Weapons;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -41,6 +42,11 @@ namespace Hunted
 
         internal Building insideBuilding = null;
 
+        Dictionary<string, SoundEffectInstance> footSteps = new Dictionary<string, SoundEffectInstance>();
+
+        double checkColTime = 0;
+
+
         public Dude(Vector2 pos)
         {
             Position = pos;
@@ -61,14 +67,22 @@ namespace Hunted
             Animations.Add("gun", new SpriteAnimation(1, 100, 0, 4, new Rectangle(0, 0, 100, 100), true, false));
             Active = true;
             Dead = false;
+
+            footSteps.Add("sand", AudioController.effects["fstep-sand"].CreateInstance());
+            footSteps.Add("grass", AudioController.effects["fstep-grass"].CreateInstance());
+            footSteps.Add("dirt", AudioController.effects["fstep-dirt"].CreateInstance());
+            footSteps.Add("concrete", AudioController.effects["fstep-concrete"].CreateInstance());
         }
 
         public virtual void Update(GameTime gameTime, Map gameMap, bool[,] mapFog, HeroDude gameHero)
         {
             if (!Dead)
             {
+                checkColTime += gameTime.ElapsedGameTime.TotalMilliseconds;
 
+                
                 DoCollisions(gameMap, gameHero);
+               
                 Position += Speed;
 
                 Position.X = MathHelper.Clamp(Position.X, 50, (gameMap.Width * gameMap.TileWidth) - 50);
@@ -79,14 +93,24 @@ namespace Hunted
                     Animations["feet"].Update(gameTime);
                     Animations["arms"].Update(gameTime);
                     Animations["head"].Update(gameTime);
-                    
-                    
 
-                    if (Animations["feet"].CurrentFrame == 0 || Animations["feet"].CurrentFrame == 3)
+
+
+                    if ((Animations["feet"].CurrentFrame == 0 || Animations["feet"].CurrentFrame == 3) && (Position - gameHero.Position).Length() < 700f && Animations["feet"].CurrentFrameTime==0)
                     {
                         // Footsteps
                         Tile t = ((TileLayer)gameMap.GetLayer("Terrain")).Tiles[(int)(Position.X / gameMap.TileWidth), (int)(Position.Y / gameMap.TileWidth)];
-                        if (t.Properties.Contains("fstep")) AudioController.PlaySFX("fstep-" + t.Properties["fstep"], 0.1f, -0.3f, 0.3f, Position);
+                        if (t.Properties.Contains("fstep"))
+                        {
+                            footSteps[t.Properties["fstep"]].Volume = 0.2f;
+                            footSteps[t.Properties["fstep"]].Pitch = -0.3f + ((float)Helper.Random.NextDouble() * (0.6f));
+                            footSteps[t.Properties["fstep"]].Pan = MathHelper.Clamp((Vector2.Transform(Position, Camera.Instance.CameraMatrix).X - (Camera.Instance.Width / 2)) / (Camera.Instance.Width / 2), -1f, 1f);
+#if(OPENGL)
+                            if (t.Properties.Contains("fstep")) { footSteps[t.Properties["fstep"]].Stop(); footSteps[t.Properties["fstep"]].Play(); }
+#else
+                            AudioController.PlaySFX("fstep-" + t.Properties["fstep"], 0.2f, -0.3f, 0.3f, Position);
+#endif
+                        }
                     }
                 }
                 else
@@ -315,7 +339,7 @@ namespace Hunted
                 if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 50, 0f))) RCollision = true;
                 if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 50, -0.4f))) RCollision = true;
                 if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 50, 0.4f))) RCollision = true;
-                foreach (Vehicle veh in VehicleController.Instance.Vehicles)
+                foreach (Vehicle veh in VehicleController.Instance.Vehicles.Where(veh => (Position - veh.Position).Length() < 500f))
                 {
                     if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 50, 0f), veh.CollisionVerts)) RCollision = true;
                     if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 50, -0.4f), veh.CollisionVerts)) RCollision = true;
@@ -342,7 +366,7 @@ namespace Hunted
                 if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 50, MathHelper.Pi))) LCollision = true;
                 if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 50, MathHelper.Pi - 0.4f))) LCollision = true;
                 if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 50, MathHelper.Pi + 0.4f))) LCollision = true;
-                foreach (Vehicle veh in VehicleController.Instance.Vehicles)
+                foreach (Vehicle veh in VehicleController.Instance.Vehicles.Where(veh => (Position - veh.Position).Length() < 500f))
                 {
                     if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 50, MathHelper.Pi), veh.CollisionVerts)) LCollision = true;
                     if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 50, MathHelper.Pi - 0.4f), veh.CollisionVerts)) LCollision = true;
@@ -368,7 +392,7 @@ namespace Hunted
                 if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 50, (MathHelper.PiOver2 + MathHelper.Pi)))) UCollision = true;
                 if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 50, (MathHelper.PiOver2 + MathHelper.Pi) - 0.4f))) UCollision = true;
                 if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 50, (MathHelper.PiOver2 + MathHelper.Pi) + 0.4f))) UCollision = true;
-                foreach (Vehicle veh in VehicleController.Instance.Vehicles)
+                foreach (Vehicle veh in VehicleController.Instance.Vehicles.Where(veh => (Position - veh.Position).Length() < 500f))
                 {
                     if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 50, (MathHelper.PiOver2 + MathHelper.Pi)), veh.CollisionVerts)) UCollision = true;
                     if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 50, (MathHelper.PiOver2 + MathHelper.Pi) - 0.4f), veh.CollisionVerts)) UCollision = true;
@@ -395,7 +419,7 @@ namespace Hunted
                 if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 50, MathHelper.PiOver2))) DCollision = true;
                 if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 50, MathHelper.PiOver2 - 0.4f))) DCollision = true;
                 if (gameMap.CheckCollision(Helper.PointOnCircle(ref Position, 50, MathHelper.PiOver2 + 0.4f))) DCollision = true;
-                foreach (Vehicle veh in VehicleController.Instance.Vehicles)
+                foreach (Vehicle veh in VehicleController.Instance.Vehicles.Where(veh => (Position - veh.Position).Length() < 500f))
                 {
                     if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 50, MathHelper.PiOver2), veh.CollisionVerts)) DCollision = true;
                     if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 50, MathHelper.PiOver2 - 0.4f), veh.CollisionVerts)) DCollision = true;

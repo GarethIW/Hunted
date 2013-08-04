@@ -27,6 +27,8 @@ namespace Hunted
         {
             spriteSheet = sheet;
             Initialize(gd, le);
+
+            engineSound = AudioController.effects["boat"].CreateInstance();
         }
 
         internal void Initialize(GraphicsDevice gd, LightingEngine le)
@@ -102,10 +104,28 @@ namespace Hunted
 
             if (gameHero.drivingVehicle == this)
             {
+                engineSound.Play();
+
                 if (maxSpeed > 0f)
                     gameCamera.ZoomTarget = 1f - ((0.5f / maxSpeed) * (float)Math.Abs(linearSpeed));
                 else gameCamera.ZoomTarget = 1f;
+
+                if (Health > 0f)
+                {
+                    engineSound.Volume = 0.2f + ((1f / 15f) * (float)Math.Abs(linearSpeed));
+                    engineSound.Pitch = -0.3f + (((0.6f / 12f) * (float)Math.Abs(linearSpeed)));
+                }
+                else
+                {
+                    engineSound.Volume = 0f;
+                }
             }
+            else
+            {
+                engineSound.Stop();
+            }
+
+            
         }
 
         public override void Draw(SpriteBatch sb, LightingEngine lightingEngine)
@@ -134,6 +154,9 @@ namespace Hunted
 
         public override void Collided()
         {
+            if (linearSpeed > 1f)
+                AudioController.PlaySFX("crash", 0.3f, 0.3f, 0f);
+
             Health -= ((float)Math.Abs(linearSpeed) / 2f);
             linearSpeed = 0f;
             Speed = Vector2.Zero;

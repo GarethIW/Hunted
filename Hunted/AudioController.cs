@@ -53,7 +53,15 @@ namespace Hunted
             effects.Add("fstep-concrete", content.Load<SoundEffect>("audio/sfx/fstep-concrete"));
             effects.Add("ammo", content.Load<SoundEffect>("audio/sfx/ammo"));
             effects.Add("ticker", content.Load<SoundEffect>("audio/sfx/typewriter"));
-           
+            effects.Add("boat", content.Load<SoundEffect>("audio/sfx/boat"));
+            effects.Add("chopper", content.Load<SoundEffect>("audio/sfx/chopper"));
+            effects.Add("truck", content.Load<SoundEffect>("audio/sfx/truck"));
+            effects.Add("engine", content.Load<SoundEffect>("audio/sfx/engine"));
+            effects.Add("crash", content.Load<SoundEffect>("audio/sfx/crash"));
+            effects.Add("metal-hit", content.Load<SoundEffect>("audio/sfx/metalhit4"));
+            effects.Add("ricochet", content.Load<SoundEffect>("audio/sfx/ricochet"));
+            effects.Add("medkit", content.Load<SoundEffect>("audio/sfx/medikit"));
+
 
 
             songs = new Dictionary<string, SoundEffectInstance>();

@@ -33,6 +33,9 @@ namespace Hunted
         {
             spriteSheet = sheet;
             Initialize(gd, le);
+
+            engineSound = AudioController.effects["chopper"].CreateInstance();
+
         }
 
         internal void Initialize(GraphicsDevice gd, LightingEngine le)
@@ -114,7 +117,18 @@ namespace Hunted
 
             if (gameHero.drivingVehicle == this)
             {
+                engineSound.Play();
+
                 gameCamera.ZoomTarget = 1f - ((maxCameraScale / 1f) * Height);
+
+                
+                engineSound.Volume = ((1f / 0.5f) * (float)Math.Abs(bladesSpeed));
+          
+             
+            }
+            else
+            {
+                engineSound.Stop();
             }
 
             if (Health <= 0f)

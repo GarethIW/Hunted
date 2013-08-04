@@ -158,6 +158,7 @@ namespace Hunted
                     HuntedLevel.Level = 0f;
                     EnemyController.Instance.ClearSpawn(gameMap.HeroSpawn);
                     VehicleController.Instance.ClearSpawn(gameMap.HeroSpawn);
+                    VehicleController.Instance.SpawnNearestVehicles(gameMap.HeroSpawn, gameMap);
                     Ammo = 0;
                 }
             }

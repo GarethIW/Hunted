@@ -39,15 +39,19 @@ namespace Hunted
             foreach (AIDude e in Enemies.Where(en => (gameHero.Position - en.Position).Length() < 4000f))
             {
                 count++;
-                e.Update(gameTime, gameMap, gameHero, mapFog, gameCamera);
 
-                bool alerted = false;
-                if(gameHero.HuntedLevel.Level>0f)
+                if ((gameHero.Position - e.Position).Length() < 2000f)
                 {
-                    if (!alerted && Helper.Random.Next(11000 - (int)(gameHero.HuntedLevel.Level * 100)) == 1 && e.State == AIState.Patrolling && (gameHero.Position - e.Position).Length() < 2000f)
+                    e.Update(gameTime, gameMap, gameHero, mapFog, gameCamera);
+
+                    bool alerted = false;
+                    if (gameHero.HuntedLevel.Level > 0f)
                     {
-                        //e.InvestigatePosition();
-                        alerted = true;
+                        if (!alerted && Helper.Random.Next(11000 - (int)(gameHero.HuntedLevel.Level * 100)) == 1 && e.State == AIState.Patrolling && (gameHero.Position - e.Position).Length() < 2000f)
+                        {
+                            //e.InvestigatePosition();
+                            alerted = true;
+                        }
                     }
                 }
             }

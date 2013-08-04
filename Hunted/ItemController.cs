@@ -72,6 +72,8 @@ namespace Hunted
             switch (i.Type)
             {
                 case ItemType.Health:
+                    AudioController.PlaySFX("medkit", 0.5f, -0.4f, -0.4f, i.Position);
+
                     gameHero.Health += 25f + (float)Helper.Random.Next(25);
                     break;
                 case ItemType.Ammo:

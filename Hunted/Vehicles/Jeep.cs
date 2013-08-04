@@ -1,5 +1,6 @@
 ﻿using Hunted.Weapons;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -12,6 +13,7 @@ namespace Hunted
 {
     public class Jeep : Vehicle
     {
+        SoundEffectInstance engineIdleSound;
 
         public Jeep(Vector2 pos):base(pos)
         {
@@ -23,6 +25,15 @@ namespace Hunted
         {
             spriteSheet = sheet;
             Initialize(gd, le);
+
+            engineSound = AudioController.effects["engine"].CreateInstance();
+            engineIdleSound = AudioController.effects["truck"].CreateInstance();
+
+            engineIdleSound.Volume = 0f;
+            engineIdleSound.IsLooped = true;
+            engineSound.Volume = 0f;
+            engineSound.IsLooped = true;
+            
         }
 
         internal void Initialize(GraphicsDevice gd, LightingEngine le)
@@ -107,10 +118,32 @@ namespace Hunted
 
             if (gameHero.drivingVehicle == this)
             {
+                engineSound.Play();
+                engineIdleSound.Play();
+
                 if (maxSpeed > 0f)
                     gameCamera.ZoomTarget = 1f - ((0.5f / maxSpeed) * (float)Math.Abs(linearSpeed));
                 else gameCamera.ZoomTarget = 1f;
+
+                if (Health > 0f)
+                {
+                    engineIdleSound.Volume = 1f - ((1f / 13f) * (float)Math.Abs(linearSpeed));
+                    engineSound.Volume = ((1f / 13f) * (float)Math.Abs(linearSpeed));
+                    engineSound.Pitch = -0.5f + (((1f / 12f) * (float)Math.Abs(linearSpeed)));
+                    engineIdleSound.Volume = MathHelper.Clamp(engineIdleSound.Volume, 0f, 0.5f);
+                }
+                else
+                {
+                    engineIdleSound.Volume = 0f;
+                    engineSound.Volume = 0f;
+                }
             }
+            else
+            {
+                engineSound.Stop();
+                engineIdleSound.Stop();
+            }
+
         }
 
         public override void Draw(SpriteBatch sb, LightingEngine lightingEngine)
@@ -139,9 +172,13 @@ namespace Hunted
 
         public override void Collided()
         {
+            if (linearSpeed > 1f)
+                AudioController.PlaySFX("crash", 0.3f, 0.3f, 0f);
+
             Health -= ((float)Math.Abs(linearSpeed) / 2f);
             linearSpeed = 0f;
             Speed = Vector2.Zero;
+            
 
             base.Collided();
         }

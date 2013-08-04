@@ -40,7 +40,7 @@ namespace Hunted
         SpriteFont font;
         Texture2D blankTexture;
 
-        Texture2D texCrosshair;
+        Texture2D logoTex;
 
         bool isInitialized;
 
@@ -126,6 +126,7 @@ namespace Hunted
             spriteBatch = new SpriteBatch(GraphicsDevice);
             font = content.Load<SpriteFont>("font");
             blankTexture = content.Load<Texture2D>("blank");
+            logoTex = content.Load<Texture2D>("logo");
 
             //texCrosshair = content.Load<Texture2D>("crosshair");
 
@@ -241,7 +242,12 @@ namespace Hunted
             spriteBatch.Begin();
             if (TerrainGeneration.Generating)
             {
-                spriteBatch.DrawString(font, "Generating Terrain: " + TerrainGeneration.PercentComplete + "%", Vector2.One * 20f, Color.White);
+                spriteBatch.Draw(logoTex, new Vector2(20, 20), null, Color.White);
+                spriteBatch.DrawString(font, "ALPHA for One Game a Month July 2013", new Vector2(20, 150), Color.White, 0f, Vector2.Zero, 0.6f, SpriteEffects.None, 1);
+                spriteBatch.DrawString(font, "Save/Load disabled", new Vector2(20, 170), Color.Gray, 0f, Vector2.Zero, 0.6f, SpriteEffects.None, 1);
+                spriteBatch.DrawString(font, "Currently no win/lose conditions - feel free to explore and shoot stuff!", new Vector2(20, 190), Color.Gray, 0f, Vector2.Zero, 0.6f, SpriteEffects.None, 1);
+                spriteBatch.DrawString(font, "Generating Terrain: " + TerrainGeneration.PercentComplete + "%", new Vector2(20,230), Color.White);
+
             }
             //spriteBatch.Draw(texCrosshair, new Vector2(input.CurrentMouseState.X, input.CurrentMouseState.Y), null, Color.White, 0f, new Vector2(23,23), 1f, SpriteEffects.None, 1);
             spriteBatch.End();

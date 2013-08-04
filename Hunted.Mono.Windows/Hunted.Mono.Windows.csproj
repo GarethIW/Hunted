@@ -38,14 +38,35 @@
     <Compile Include="..\Hunted\AudioController.cs">
       <Link>AudioController.cs</Link>
     </Compile>
-    <Compile Include="..\Hunted\Compound.cs">
-      <Link>Compound.cs</Link>
+    <Compile Include="..\Hunted\Dude\AIDude.cs">
+      <Link>Dude\AIDude.cs</Link>
     </Compile>
     <Compile Include="..\Hunted\Dude\Dude.cs">
       <Link>Dude\Dude.cs</Link>
     </Compile>
     <Compile Include="..\Hunted\Dude\HeroDude.cs">
       <Link>Dude\HeroDude.cs</Link>
+    </Compile>
+    <Compile Include="..\Hunted\Dude\Weapons\Knife.cs">
+      <Link>Dude\Weapons\Knife.cs</Link>
+    </Compile>
+    <Compile Include="..\Hunted\Dude\Weapons\Pistol.cs">
+      <Link>Dude\Weapons\Pistol.cs</Link>
+    </Compile>
+    <Compile Include="..\Hunted\Dude\Weapons\Rifle.cs">
+      <Link>Dude\Weapons\Rifle.cs</Link>
+    </Compile>
+    <Compile Include="..\Hunted\Dude\Weapons\Shotgun.cs">
+      <Link>Dude\Weapons\Shotgun.cs</Link>
+    </Compile>
+    <Compile Include="..\Hunted\Dude\Weapons\SMG.cs">
+      <Link>Dude\Weapons\SMG.cs</Link>
+    </Compile>
+    <Compile Include="..\Hunted\Dude\Weapons\Weapon.cs">
+      <Link>Dude\Weapons\Weapon.cs</Link>
+    </Compile>
+    <Compile Include="..\Hunted\EnemyController.cs">
+      <Link>EnemyController.cs</Link>
     </Compile>
     <Compile Include="..\Hunted\Game.cs">
       <Link>Game.cs</Link>
@@ -56,11 +77,23 @@
     <Compile Include="..\Hunted\Helper.cs">
       <Link>Helper.cs</Link>
     </Compile>
+    <Compile Include="..\Hunted\Hud.cs">
+      <Link>Hud.cs</Link>
+    </Compile>
+    <Compile Include="..\Hunted\ItemController.cs">
+      <Link>ItemController.cs</Link>
+    </Compile>
+    <Compile Include="..\Hunted\Items\Item.cs">
+      <Link>Items\Item.cs</Link>
+    </Compile>
     <Compile Include="..\Hunted\ParticleController.cs">
       <Link>ParticleController.cs</Link>
     </Compile>
     <Compile Include="..\Hunted\PerlinNoise.cs">
       <Link>PerlinNoise.cs</Link>
+    </Compile>
+    <Compile Include="..\Hunted\ProjectileController.cs">
+      <Link>ProjectileController.cs</Link>
     </Compile>
     <Compile Include="..\Hunted\ScreenManager\GameScreen.cs">
       <Link>ScreenManager\GameScreen.cs</Link>
@@ -85,6 +118,9 @@
     </Compile>
     <Compile Include="..\Hunted\Screens\MainMenuScreen.cs">
       <Link>Screens\MainMenuScreen.cs</Link>
+    </Compile>
+    <Compile Include="..\Hunted\screens\MapScreen.cs">
+      <Link>Screens\MapScreen.cs</Link>
     </Compile>
     <Compile Include="..\Hunted\Screens\MenuEntry.cs">
       <Link>Screens\MenuEntry.cs</Link>
@@ -112,6 +148,24 @@
     </Compile>
     <Compile Include="..\Hunted\TerrainGeneration.cs">
       <Link>TerrainGeneration.cs</Link>
+    </Compile>
+    <Compile Include="..\Hunted\TickerText.cs">
+      <Link>TickerText.cs</Link>
+    </Compile>
+    <Compile Include="..\Hunted\VehicleController.cs">
+      <Link>VehicleController.cs</Link>
+    </Compile>
+    <Compile Include="..\Hunted\Vehicles\Boat.cs">
+      <Link>Vehicles\Boat.cs</Link>
+    </Compile>
+    <Compile Include="..\Hunted\Vehicles\Chopper.cs">
+      <Link>Vehicles\Chopper.cs</Link>
+    </Compile>
+    <Compile Include="..\Hunted\Vehicles\Jeep.cs">
+      <Link>Vehicles\Jeep.cs</Link>
+    </Compile>
+    <Compile Include="..\Hunted\Vehicles\Vehicle.cs">
+      <Link>Vehicles\Vehicle.cs</Link>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -144,7 +198,34 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Content\sfx\" />
+    <Content Include="..\Hunted\bin\x86\Debug\Content\audio\sfx\boat.xnb">
+      <Link>Content\audio\sfx\boat.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\audio\sfx\chopper.xnb">
+      <Link>Content\audio\sfx\chopper.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\audio\sfx\crash.xnb">
+      <Link>Content\audio\sfx\crash.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\audio\sfx\engine.xnb">
+      <Link>Content\audio\sfx\engine.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\audio\sfx\metalhit4.xnb">
+      <Link>Content\audio\sfx\metalhit4.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\audio\sfx\ricochet.xnb">
+      <Link>Content\audio\sfx\ricochet.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\audio\sfx\truck.xnb">
+      <Link>Content\audio\sfx\truck.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\Hunted\bin\x86\Debug\Content\blank.xnb">
@@ -204,6 +285,122 @@
   <ItemGroup>
     <Content Include="..\Hunted\bin\x86\Debug\Content\dude.xnb">
       <Link>Content\dude.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\audio\sfx\ammo.xnb">
+      <Link>Content\audio\sfx\ammo.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\audio\sfx\explode.xnb">
+      <Link>Content\audio\sfx\explode.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\audio\sfx\fstep-concrete.xnb">
+      <Link>Content\audio\sfx\fstep-concrete.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\audio\sfx\fstep-dirt.xnb">
+      <Link>Content\audio\sfx\fstep-dirt.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\audio\sfx\fstep-grass.xnb">
+      <Link>Content\audio\sfx\fstep-grass.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\audio\sfx\fstep-sand.xnb">
+      <Link>Content\audio\sfx\fstep-sand.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\audio\sfx\hit.xnb">
+      <Link>Content\audio\sfx\hit.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\audio\sfx\machinegun.xnb">
+      <Link>Content\audio\sfx\machinegun.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\audio\sfx\mortar.xnb">
+      <Link>Content\audio\sfx\mortar.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\audio\sfx\pistol.xnb">
+      <Link>Content\audio\sfx\pistol.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\audio\sfx\rifle.xnb">
+      <Link>Content\audio\sfx\rifle.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\audio\sfx\shotgun.xnb">
+      <Link>Content\audio\sfx\shotgun.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\audio\sfx\shotreload.xnb">
+      <Link>Content\audio\sfx\shotreload.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\audio\sfx\smg.xnb">
+      <Link>Content\audio\sfx\smg.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\audio\sfx\sniper.xnb">
+      <Link>Content\audio\sfx\sniper.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\audio\sfx\sword.xnb">
+      <Link>Content\audio\sfx\sword.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\audio\sfx\typewriter.xnb">
+      <Link>Content\audio\sfx\typewriter.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\crosshair.xnb">
+      <Link>Content\crosshair.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\font.xnb">
+      <Link>Content\font.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\hud.xnb">
+      <Link>Content\hud.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\hudfont.xnb">
+      <Link>Content\hudfont.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\items.xnb">
+      <Link>Content\items.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\logo.xnb">
+      <Link>Content\logo.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\mapicons.xnb">
+      <Link>Content\mapicons.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\particles.xnb">
+      <Link>Content\particles.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\projectiles.xnb">
+      <Link>Content\projectiles.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\vehicles.xnb">
+      <Link>Content\vehicles.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\Hunted\bin\x86\Debug\Content\audio\sfx\medikit.xnb">
+      <Link>Content\audio\sfx\medikit.xnb</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
