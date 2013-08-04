@@ -79,12 +79,37 @@ namespace Hunted
 
             if (gameHero.drivingVehicle == this)
             {
-                foreach (LightSource l in Lights) l.Active = false;
+                foreach (LightSource l in Lights) l.Active = true;
             }
             else
             {
-                foreach (LightSource l in Lights) l.Active = true;
+                foreach (LightSource l in Lights) l.Active = false;
 
+            }
+
+            if (Health < 30f)
+            {
+                if(Helper.Random.Next(((int)Health/15))==0)
+                {
+                    Vector2 smokePos = Helper.RandomPointInCircle(Position, 0f, 300f);
+                    if (Helper.IsPointInShape(smokePos, CollisionVerts))
+                        ParticleController.Instance.AddSmoke(smokePos);
+                }
+            }
+
+            if (Health <= 0f)
+            {
+                if ((gameHero.Position - Position).Length() > 3000f)
+                {
+                    for (int l=0;l<Lights.Count;l++)
+                    {
+                        LightingEngine.Instance.LightSources.Remove(Lights[l]);
+                        Lights[l].Active = false;
+                        Lights[l] = null;
+                    }
+
+                    Active = false;
+                }
             }
 
         }

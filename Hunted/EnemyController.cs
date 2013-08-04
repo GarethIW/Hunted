@@ -44,9 +44,9 @@ namespace Hunted
                 bool alerted = false;
                 if(gameHero.HuntedLevel.Level>0f)
                 {
-                    if (!alerted && Helper.Random.Next(10000 - (int)(gameHero.HuntedLevel.Level * 100)) == 1 && e.State == AIState.Patrolling && (gameHero.Position - e.Position).Length() < 2000f)
+                    if (!alerted && Helper.Random.Next(11000 - (int)(gameHero.HuntedLevel.Level * 100)) == 1 && e.State == AIState.Patrolling && (gameHero.Position - e.Position).Length() < 2000f)
                     {
-                        e.InvestigatePosition();
+                        //e.InvestigatePosition();
                         alerted = true;
                     }
                 }

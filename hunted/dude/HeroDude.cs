@@ -28,6 +28,11 @@ namespace Hunted
                 updateTime = 0;
                 if (TimeSinceLastSeen > 5000)
                     Level -= 1f;
+                if (TimeSinceLastSeen > 10000)
+                    Level -= 1f;
+                if (TimeSinceLastSeen > 15000)
+                    Level -= 1f;
+
             }
 
             Level = MathHelper.Clamp(Level, 0f, 100f);
@@ -45,18 +50,15 @@ namespace Hunted
 
         public void Heard(Vector2 pos, bool wasGunshot)
         {
-            if (TimeSinceLastSeen > 10000)
-            {
-                LastKnownPosition = pos + new Vector2(-300f + ((float)Helper.Random.NextDouble() * 600f), -300f + ((float)Helper.Random.NextDouble() * 600f));
-                Level += 1f;
-            }
-
-            if (wasGunshot && TimeSinceLastSeen > 1000)
+            if (TimeSinceLastSeen > 1000)
             {
                 TimeSinceLastSeen = 0;
-                LastKnownPosition = pos + new Vector2(-200f + ((float)Helper.Random.NextDouble() * 400f), -200f + ((float)Helper.Random.NextDouble() * 400f));
+                LastKnownPosition = pos + new Vector2(-300f + ((float)Helper.Random.NextDouble() * 600f), -300f + ((float)Helper.Random.NextDouble() * 600f));
                 Level += 1f;
+                if(wasGunshot) Level += 1f;
             }
+
+           
         }
     }
 
@@ -67,7 +69,7 @@ namespace Hunted
         public HeroDude(Vector2 pos) : base(pos)
         {
             Health = 100f;
-            Ammo = 100;
+            //Ammo = 100;
         }
 
         public void LoadContent(ContentManager content, GraphicsDevice gd, LightingEngine le)
@@ -90,9 +92,9 @@ namespace Hunted
             base.Initialize();
         }
 
-        public override void Update(GameTime gameTime, Map gameMap, bool[,] mapFog)
+        public override void Update(GameTime gameTime, Map gameMap, bool[,] mapFog, HeroDude gameHero)
         {
-            base.Update(gameTime, gameMap, mapFog);
+            base.Update(gameTime, gameMap, mapFog, gameHero);
 
             HuntedLevel.Update(gameTime);
 
@@ -116,6 +118,16 @@ namespace Hunted
                 Rotation = drivingVehicle.Rotation + MathHelper.PiOver2;
             }
             else if(!Dead) HeadTorch.Active = true;
+
+            if (Health < 30f)
+            {
+                if(Helper.Random.Next((int)Health*10)==1)
+                    ParticleController.Instance.AddBlood(Position);
+
+                if(Health<10f)
+                    if (Helper.Random.Next((int)Health * 100) == 1)
+                        ParticleController.Instance.AddBloodPool(Position);
+            }
 
             if (Health <= 0 && !Dead)
             {

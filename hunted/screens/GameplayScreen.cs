@@ -190,7 +190,7 @@ namespace Hunted
                 itemController.Update(gameTime, gameMap, gameHero, mapFog);
                 vehicleController.Update(gameTime, gameMap, gameHero, gameCamera);
 
-                gameHero.Update(gameTime, gameMap, mapFog);
+                gameHero.Update(gameTime, gameMap, mapFog, gameHero);
                 //lightSource1.Position = new Vector2(1000, 1000);
 
                 //cameraLightSource.Position = gameCamera.Position;
@@ -412,11 +412,11 @@ namespace Hunted
             spriteBatch.End();
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
-            particleController.Draw(spriteBatch, ParticleBlendMode.Alpha, lightingEngine);
+            particleController.Draw(spriteBatch, ParticleBlendMode.Alpha, lightingEngine, false);
             spriteBatch.End();
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
-            particleController.Draw(spriteBatch, ParticleBlendMode.Additive, lightingEngine);
+            particleController.Draw(spriteBatch, ParticleBlendMode.Additive, lightingEngine, false);
             spriteBatch.End();
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
@@ -443,6 +443,14 @@ namespace Hunted
             gameMap.DrawRoofLayer(spriteBatch, gameCamera, lightingEngine, Color.White, gameHero.Position);
             vehicleController.DrawHeliShadows(spriteBatch, lightingEngine, gameHero);      
             vehicleController.DrawHelis(spriteBatch, lightingEngine, gameHero);
+            spriteBatch.End();
+
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
+            particleController.Draw(spriteBatch, ParticleBlendMode.Alpha, lightingEngine, true);
+            spriteBatch.End();
+
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(-(int)gameCamera.Position.X, -(int)gameCamera.Position.Y, 0) * Matrix.CreateScale(gameCamera.Zoom) * Matrix.CreateRotationZ(-gameCamera.Rotation) * Matrix.CreateTranslation(gameCamera.Width / 2, gameCamera.Height / 2, 0));
+            particleController.Draw(spriteBatch, ParticleBlendMode.Additive, lightingEngine, true);
             spriteBatch.End();
 
             spriteBatch.Begin();
@@ -494,7 +502,7 @@ namespace Hunted
                         j.Rotation = (float)Helper.Random.NextDouble() * MathHelper.TwoPi;
                         j.LoadContent(vehicleController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine);
                         vehicleController.Vehicles.Add(j);
-                        //gameHero.Position = j.Position + new Vector2(300, 0);
+                        gameHero.Position = j.Position + new Vector2(300, 0);
                     }
 
                     if (b.Type == BuildingType.Helipad)
@@ -564,12 +572,23 @@ namespace Hunted
                         }
                         Vector2 pos = (new Vector2(b.Rect.Center.X, b.Rect.Center.Y) * new Vector2(gameMap.TileWidth, gameMap.TileHeight)) + new Vector2(50, 50);
                         AIDude newDude = new AIDude(pos);
-                        newDude.LoadContent(enemyController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine, gameHero);
-                        newDude.Health = 50 + Helper.Random.Next(30);
-                        newDude.BelongsToCompound = true;
                         newDude.IsGeneral = true;
+                        newDude.BelongsToCompound = true;
+                        newDude.LoadContent(enemyController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine, gameHero);
+                        newDude.Health = 100f;
                         enemyController.Enemies.Add(newDude);
                         possibleComps.Remove(c);
+
+                        for (int h = 0; h < 5; h++)
+                        {
+                            pos = (new Vector2(b.Rect.Center.X, b.Rect.Center.Y) * new Vector2(gameMap.TileWidth, gameMap.TileHeight)) + new Vector2(50, 50) + new Vector2(-200f + ((float)Helper.Random.NextDouble() * 400f), -200f + ((float)Helper.Random.NextDouble() * 400f));
+                            newDude = new AIDude(pos);
+                            newDude.BelongsToCompound = true;
+                            newDude.LoadContent(enemyController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine, gameHero);
+                            newDude.Health = 50 + Helper.Random.Next(30);
+                            enemyController.Enemies.Add(newDude);
+                        }
+
                         break;
                     }
                 }

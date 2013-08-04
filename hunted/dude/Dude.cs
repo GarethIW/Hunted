@@ -63,12 +63,12 @@ namespace Hunted
             Dead = false;
         }
 
-        public virtual void Update(GameTime gameTime, Map gameMap, bool[,] mapFog)
+        public virtual void Update(GameTime gameTime, Map gameMap, bool[,] mapFog, HeroDude gameHero)
         {
             if (!Dead)
             {
 
-                DoCollisions(gameMap);
+                DoCollisions(gameMap, gameHero);
                 Position += Speed;
 
                 Position.X = MathHelper.Clamp(Position.X, 50, (gameMap.Width * gameMap.TileWidth) - 50);
@@ -181,7 +181,7 @@ namespace Hunted
                         Vector2 pos = Helper.PointOnCircle(ref drivingVehicle.Position, 200, a);
                         if (!gameMap.CheckTileCollision(pos) && !Helper.IsPointInShape(pos, drivingVehicle.CollisionVerts))
                         {
-                            if (drivingVehicle is Boat || !LineCollision(pos, gameMap))
+                            if (drivingVehicle is Boat || !LineCollision(pos, gameMap, true))
                             {
                                 Position = pos;
                                 drivingVehicle = null;
@@ -288,7 +288,7 @@ namespace Hunted
             ParticleController.Instance.AddVehicleWound(this);
         }
 
-        internal bool LineCollision(Vector2 testPos, Map gameMap)
+        internal bool LineCollision(Vector2 testPos, Map gameMap, bool ignoreVehicles)
         {
             Vector2 testVector = Position;
             Vector2 testLine = (testPos - Position);
@@ -296,14 +296,14 @@ namespace Hunted
             while ((testVector - testPos).Length() > 30)
             {
                 if (gameMap.CheckCollision(testVector)) return true;
-                if(VehicleController.Instance.CheckVehicleCollision(testVector)) return true;
+                if(VehicleController.Instance.CheckVehicleCollision(testVector) && !ignoreVehicles) return true;
                 testVector += (testLine / 50f);
             }
 
             return false;
         }
 
-        void DoCollisions(Map gameMap)
+        void DoCollisions(Map gameMap, HeroDude gameHero)
         {
             bool LCollision = false;
             bool RCollision = false;
@@ -321,6 +321,20 @@ namespace Hunted
                     if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 50, -0.4f), veh.CollisionVerts)) RCollision = true;
                     if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 50, 0.4f), veh.CollisionVerts)) RCollision = true;
                 }
+                foreach (Dude d in EnemyController.Instance.Enemies.Where(en => (Position - en.Position).Length() < 200f))
+                {
+                    if (d.Dead || d == this) continue;
+
+                    if ((Helper.PointOnCircle(ref Position, 50, 0f) - d.Position).Length() < 40f) RCollision = true;
+                    if ((Helper.PointOnCircle(ref Position, 50, -0.4f) - d.Position).Length() < 40f) RCollision = true;
+                    if ((Helper.PointOnCircle(ref Position, 50, 0.4f) - d.Position).Length() < 40f) RCollision = true;
+                }
+                if (this is AIDude)
+                {
+                    if ((Helper.PointOnCircle(ref Position, 50, 0f) - gameHero.Position).Length() < 40f) RCollision = true;
+                if ((Helper.PointOnCircle(ref Position, 50, -0.4f) - gameHero.Position).Length() < 40f) RCollision = true;
+                if ((Helper.PointOnCircle(ref Position, 50, 0.4f) - gameHero.Position).Length() < 40f) RCollision = true;
+                }
             }
 
             if (Speed.X < 0f)
@@ -333,6 +347,19 @@ namespace Hunted
                     if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 50, MathHelper.Pi), veh.CollisionVerts)) LCollision = true;
                     if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 50, MathHelper.Pi - 0.4f), veh.CollisionVerts)) LCollision = true;
                     if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 50, MathHelper.Pi + 0.4f), veh.CollisionVerts)) LCollision = true;
+                }
+                foreach (Dude d in EnemyController.Instance.Enemies.Where(en => (Position - en.Position).Length() < 200f))
+                {
+                    if (d.Dead || d == this) continue;
+                    if((Helper.PointOnCircle(ref Position, 50, MathHelper.Pi) - d.Position).Length()<40f) LCollision = true;
+                    if((Helper.PointOnCircle(ref Position, 50, MathHelper.Pi-0.4f)- d.Position).Length()<40f) LCollision = true;
+                    if((Helper.PointOnCircle(ref Position, 50, MathHelper.Pi+0.4f)- d.Position).Length()<40f) LCollision = true; 
+                }
+                if (this is AIDude)
+                {
+                    if ((Helper.PointOnCircle(ref Position, 50, MathHelper.Pi) - gameHero.Position).Length() < 40f) LCollision = true;
+                if ((Helper.PointOnCircle(ref Position, 50, MathHelper.Pi - 0.4f) - gameHero.Position).Length() < 40f) LCollision = true;
+                if ((Helper.PointOnCircle(ref Position, 50, MathHelper.Pi + 0.4f) - gameHero.Position).Length() < 40f) LCollision = true; 
                 }
             }
 
@@ -347,6 +374,20 @@ namespace Hunted
                     if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 50, (MathHelper.PiOver2 + MathHelper.Pi) - 0.4f), veh.CollisionVerts)) UCollision = true;
                     if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 50,(MathHelper.PiOver2 + MathHelper.Pi) + 0.4f), veh.CollisionVerts)) UCollision = true;
                 }
+                foreach (Dude d in EnemyController.Instance.Enemies.Where(en=>(Position - en.Position).Length() < 200f))
+                {
+                    if (d.Dead || d == this) continue;
+
+                    if((Helper.PointOnCircle(ref Position, 50, (MathHelper.PiOver2 + MathHelper.Pi)) - d.Position).Length()<40f) UCollision = true;
+                    if((Helper.PointOnCircle(ref Position, 50, (MathHelper.PiOver2 + MathHelper.Pi)-0.4f)- d.Position).Length()<40f) UCollision = true;
+                    if((Helper.PointOnCircle(ref Position, 50,(MathHelper.PiOver2 + MathHelper.Pi)+0.4f)- d.Position).Length()<40f) UCollision = true; 
+                }
+                if (this is AIDude)
+                {
+                    if ((Helper.PointOnCircle(ref Position, 50, (MathHelper.PiOver2 + MathHelper.Pi)) - gameHero.Position).Length() < 40f) UCollision = true;
+                    if ((Helper.PointOnCircle(ref Position, 50, (MathHelper.PiOver2 + MathHelper.Pi) - 0.4f) - gameHero.Position).Length() < 40f) UCollision = true;
+                    if ((Helper.PointOnCircle(ref Position, 50, (MathHelper.PiOver2 + MathHelper.Pi) + 0.4f) - gameHero.Position).Length() < 40f) UCollision = true;
+                }
             }
 
             if (Speed.Y > 0f)
@@ -359,6 +400,20 @@ namespace Hunted
                     if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 50, MathHelper.PiOver2), veh.CollisionVerts)) DCollision = true;
                     if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 50, MathHelper.PiOver2 - 0.4f), veh.CollisionVerts)) DCollision = true;
                     if (Helper.IsPointInShape(Helper.PointOnCircle(ref Position, 50,MathHelper.PiOver2 + 0.4f), veh.CollisionVerts)) DCollision = true;
+                }
+                foreach (Dude d in EnemyController.Instance.Enemies.Where(en => (Position - en.Position).Length() < 200f))
+                {
+                    if (d.Dead || d==this) continue;
+
+                    if((Helper.PointOnCircle(ref Position, 50, MathHelper.PiOver2) - d.Position).Length()<40f) DCollision = true;
+                    if((Helper.PointOnCircle(ref Position, 50, MathHelper.PiOver2-0.4f)- d.Position).Length()<40f) DCollision = true;
+                    if((Helper.PointOnCircle(ref Position, 50,MathHelper.PiOver2+0.4f)- d.Position).Length()<40f) DCollision = true; 
+                }
+                if (this is AIDude)
+                {
+                    if ((Helper.PointOnCircle(ref Position, 50, MathHelper.PiOver2) - gameHero.Position).Length() < 40f) DCollision = true;
+                    if ((Helper.PointOnCircle(ref Position, 50, MathHelper.PiOver2 - 0.4f) - gameHero.Position).Length() < 40f) DCollision = true;
+                    if ((Helper.PointOnCircle(ref Position, 50, MathHelper.PiOver2 + 0.4f) - gameHero.Position).Length() < 40f) DCollision = true;
                 }
             }
 

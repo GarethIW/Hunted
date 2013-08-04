@@ -33,6 +33,10 @@ namespace Hunted
         BreadCrumb chasePath;
         bool regeneratePath = false;
 
+        double checkLOSTime = 0;
+        double genPathTime = 0;
+        double checkTorchTime = 0;
+
         public AIDude(Vector2 pos) : base(pos)
         {
             Target = pos;
@@ -54,37 +58,43 @@ namespace Hunted
                 Weapons.Add(new Pistol(this));
             }
 
-            if (BelongsToCompound)
+            if (IsGeneral)
             {
-                switch (Helper.Random.Next(20))
-                {
-                    case 1:
-                        Weapons.Add(new Shotgun(this));
-                        break;
-                    case 2:
-                        Weapons.Add(new SMG(this));
-                        break;
-                    case 3:
-                        Weapons.Add(new Rifle(this));
-                        break;
-                }
+                Weapons.Add(new Rifle(this));
             }
             else
             {
-                switch (Helper.Random.Next(gameHero.Weapons.Count > 1 ? (gameHero.Weapons.Count > 2 ? 30 : 50) : 100))
+                if (BelongsToCompound)
                 {
-                    case 1:
-                        Weapons.Add(new Shotgun(this));
-                        break;
-                    case 2:
-                        Weapons.Add(new SMG(this));
-                        break;
-                    case 3:
-                        Weapons.Add(new Rifle(this));
-                        break;
+                    switch (Helper.Random.Next(20))
+                    {
+                        case 1:
+                            Weapons.Add(new Shotgun(this));
+                            break;
+                        case 2:
+                            Weapons.Add(new SMG(this));
+                            break;
+                        case 3:
+                            Weapons.Add(new Rifle(this));
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (Helper.Random.Next(gameHero.Weapons.Count > 1 ? (gameHero.Weapons.Count > 2 ? 30 : 50) : 100))
+                    {
+                        case 1:
+                            Weapons.Add(new Shotgun(this));
+                            break;
+                        case 2:
+                            Weapons.Add(new SMG(this));
+                            break;
+                        case 3:
+                            Weapons.Add(new Rifle(this));
+                            break;
+                    }
                 }
             }
-
             SelectedWeapon = Weapons.Count - 1;
 
             
@@ -100,6 +110,9 @@ namespace Hunted
 
         public void Update(GameTime gameTime, Map gameMap, HeroDude gameHero, bool[,] mapFog, Camera gameCamera)
         {
+            checkLOSTime += gameTime.ElapsedGameTime.TotalMilliseconds;
+            genPathTime += gameTime.ElapsedGameTime.TotalMilliseconds;
+            checkTorchTime += gameTime.ElapsedGameTime.TotalMilliseconds;
             // Moving
             if ((Position - Target).Length() > 10f)
             {
@@ -128,6 +141,8 @@ namespace Hunted
             {
                 case AIState.Patrolling:
                     // Chase player if in LOS
+                    
+                       
                     if (CheckLineOfSight(gameHero.Position, gameMap))
                     {
                         gameHero.HuntedLevel.Seen(gameHero.Position);
@@ -139,9 +154,10 @@ namespace Hunted
                             if (Weapons[SelectedWeapon].GetType() != typeof(Knife)) State = AIState.Attacking;
                         }
                     }
+                    
 
                     // Allow the enemy to "hear" the player if player moves close to enemy
-                    if ((gameHero.Speed.Length() > 0f && (gameHero.Position - Position).Length() < 250f) || gameHero.drivingVehicle != null)
+                    if ((gameHero.Speed.Length() > 0f && (gameHero.Position - Position).Length() < 250f) || (gameHero.drivingVehicle != null && (gameHero.Position - Position).Length() < 800f))
                     {
                         gameHero.HuntedLevel.Heard(gameHero.Position, false);
                         LookAt(gameHero.Position);
@@ -169,10 +185,14 @@ namespace Hunted
                     {
                         if (chasePath == null || regeneratePath)
                         {
-                            regeneratePath = false;
-                            chasePath = PathFinder.FindPath(gameMap.AStarWorld, new Point3D((int)(Position.X / gameMap.TileWidth), (int)(Position.Y / gameMap.TileHeight), 0), new Point3D((int)(gameHero.Position.X / gameMap.TileWidth), (int)(gameHero.Position.Y / gameMap.TileHeight), 0));
-                            if (chasePath != null) Target = new Vector2((chasePath.position.X * gameMap.TileWidth) + (gameMap.TileWidth / 2), (chasePath.position.Y * gameMap.TileHeight) + (gameMap.TileHeight / 2));
-                            else State = AIState.Patrolling;
+                            if (genPathTime > 1000)
+                            {
+                                genPathTime = 0;
+                                regeneratePath = false;
+                                chasePath = PathFinder.FindPath(gameMap.AStarWorld, new Point3D((int)(Position.X / gameMap.TileWidth), (int)(Position.Y / gameMap.TileHeight), 0), new Point3D((int)(gameHero.Position.X / gameMap.TileWidth), (int)(gameHero.Position.Y / gameMap.TileHeight), 0));
+                                if (chasePath != null) Target = new Vector2((chasePath.position.X * gameMap.TileWidth) + (gameMap.TileWidth / 2), (chasePath.position.Y * gameMap.TileHeight) + (gameMap.TileHeight / 2));
+                                else State = AIState.Patrolling;
+                            }
                         }
                         else
                         {
@@ -181,14 +201,20 @@ namespace Hunted
                             else State = AIState.Chasing;
                         }
                     }
-                    if (CheckLineOfSight(gameHero.Position, gameMap))
-                    {
-                        Target = Position; // Stop dead in tracks
-                        State = AIState.Chasing; // Begin chasing player
-                    }
+                    
+                        if (CheckLineOfSight(gameHero.Position, gameMap))
+                        {
+                            Target = Position; // Stop dead in tracks
+                            State = AIState.Chasing; // Begin chasing player
+                        }
+                    
                     break;
                 case AIState.Attacking:
-                    if(gameHero.drivingVehicle is Chopper && insideBuilding!=null) State = AIState.Patrolling;
+                    if (gameHero.drivingVehicle is Chopper && insideBuilding != null)
+                    {
+                        State = AIState.Patrolling;
+                        break;
+                    }
 
                     LookAt(gameHero.Position);
                     bool shootUp = (gameHero.drivingVehicle != null && gameHero.drivingVehicle is Chopper && ((Chopper)gameHero.drivingVehicle).Height >0f);
@@ -216,7 +242,7 @@ namespace Hunted
                         if (gameHero.drivingVehicle == null)
                         {
                             Target = gameHero.Position;
-                            if ((gameHero.Position - Position).Length() < 80f) Target = Position;
+                            if ((gameHero.Position - Position).Length() < 100f) Target = Position;
                         }
                         else State = AIState.Patrolling;
                     }
@@ -227,10 +253,14 @@ namespace Hunted
                     {
                         if (chasePath == null || regeneratePath)
                         {
-                            regeneratePath = false;
-                            chasePath = PathFinder.FindPath(gameMap.AStarWorld, new Point3D((int)(Position.X / gameMap.TileWidth), (int)(Position.Y / gameMap.TileHeight), 0), new Point3D((int)(gameHero.HuntedLevel.LastKnownPosition.X / gameMap.TileWidth), (int)(gameHero.HuntedLevel.LastKnownPosition.Y / gameMap.TileHeight), 0));
-                            if (chasePath != null) Target = new Vector2((chasePath.position.X * gameMap.TileWidth) + (gameMap.TileWidth / 2), (chasePath.position.Y * gameMap.TileHeight) + (gameMap.TileHeight / 2));
-                            else State = AIState.Patrolling;
+                            if (genPathTime > 1000)
+                            {
+                                genPathTime = 0;
+                                regeneratePath = false;
+                                chasePath = PathFinder.FindPath(gameMap.AStarWorld, new Point3D((int)(Position.X / gameMap.TileWidth), (int)(Position.Y / gameMap.TileHeight), 0), new Point3D((int)(gameHero.HuntedLevel.LastKnownPosition.X / gameMap.TileWidth), (int)(gameHero.HuntedLevel.LastKnownPosition.Y / gameMap.TileHeight), 0));
+                                if (chasePath != null) Target = new Vector2((chasePath.position.X * gameMap.TileWidth) + (gameMap.TileWidth / 2), (chasePath.position.Y * gameMap.TileHeight) + (gameMap.TileHeight / 2));
+                                else State = AIState.Patrolling;
+                            }
                         }
                         else
                         {
@@ -240,11 +270,14 @@ namespace Hunted
                         }
                     }
                     if ((Position - gameHero.HuntedLevel.LastKnownPosition).Length() < 200f) State = AIState.Patrolling;
-                    if (CheckLineOfSight(gameHero.Position, gameMap))
-                    {
-                        Target = Position; // Stop dead in tracks
-                        State = AIState.Chasing; // Begin chasing player
-                    }
+                    
+                        
+                        if (CheckLineOfSight(gameHero.Position, gameMap))
+                        {
+                            Target = Position; // Stop dead in tracks
+                            State = AIState.Chasing; // Begin chasing player
+                        }
+                    
                     break;
             }
 
@@ -263,7 +296,7 @@ namespace Hunted
 
             if (IsGeneral)
             {
-                if ((gameHero.Position - Position).Length() < 720f && !Discovered && gameHero.drivingVehicle==null && !LineCollision(gameHero.Position, gameMap)) 
+                if ((gameHero.Position - Position).Length() < 720f && !Discovered && gameHero.drivingVehicle==null && !LineCollision(gameHero.Position, gameMap, true)) 
                 {
                     Discovered = true;
                     Hud.Instance.Ticker.AddLine("> You have found a General!");
@@ -273,13 +306,17 @@ namespace Hunted
             HeadTorch.Position = Helper.PointOnCircle(ref Position, 32, Rotation - MathHelper.PiOver2);
             HeadTorch.Rotation = Rotation - MathHelper.PiOver2;
 
-            if ((Position.X < gameCamera.Position.X - ((gameCamera.Width / gameCamera.Zoom) / 2) || Position.X > gameCamera.Position.X + ((gameCamera.Width / gameCamera.Zoom) / 2) ||
-               Position.Y < gameCamera.Position.Y - ((gameCamera.Height/ gameCamera.Zoom) / 2) || Position.Y > gameCamera.Position.Y + (gameCamera.Height / 2)) &&
-               LineCollision(gameHero.Position, gameMap))
+            if (checkTorchTime > 100)
             {
-                HeadTorch.Active = false;
+                checkTorchTime = 0;
+                if ((Position.X < gameCamera.Position.X - ((gameCamera.Width / gameCamera.Zoom) / 2) || Position.X > gameCamera.Position.X + ((gameCamera.Width / gameCamera.Zoom) / 2) ||
+                   Position.Y < gameCamera.Position.Y - ((gameCamera.Height / gameCamera.Zoom) / 2) || Position.Y > gameCamera.Position.Y + (gameCamera.Height / 2)) &&
+                   LineCollision(gameHero.Position, gameMap, false))
+                {
+                    HeadTorch.Active = false;
+                }
             }
-            else if(!Dead) HeadTorch.Active = true;
+            else if (!Dead) HeadTorch.Active = true;
 
             if (IsGeneral)
                 Animations["head"].XOffset = 4;
@@ -299,7 +336,7 @@ namespace Hunted
                 Active = false;
             }
 
-            base.Update(gameTime, gameMap, mapFog);
+            base.Update(gameTime, gameMap, mapFog, gameHero);
 
             
         }
@@ -401,9 +438,12 @@ namespace Hunted
                     regeneratePath = true;
                     break;
                 case AIState.Attacking:
-                    Target = Position;
-                    State = AIState.FollowingPath;
-                    regeneratePath = true;
+                    if ((Target - Position).Length() > 100f)
+                    {
+                        Target = Position;
+                        State = AIState.FollowingPath;
+                        regeneratePath = true;
+                    }
                     break;
             }
 
@@ -435,14 +475,20 @@ namespace Hunted
 
         bool CheckLineOfSight(Vector2 pos, Map gameMap)
         {
-            
-            for (float a = (Rotation-MathHelper.PiOver2) - MathHelper.PiOver4; a < (Rotation-MathHelper.PiOver2) + MathHelper.PiOver4; a += 0.1f)
+            if ((Position - pos).Length() > 500f) return false;
+
+            if (checkLOSTime > 200)
             {
-                for (int r = 0; r < 500; r += 75)
+                checkLOSTime = 0;
+
+                for (float a = (Rotation - MathHelper.PiOver2) - MathHelper.PiOver4; a < (Rotation - MathHelper.PiOver2) + MathHelper.PiOver4; a += 0.1f)
                 {
-                    Vector2 checkpos = Helper.PointOnCircle(ref Position, r, a);
-                    if (gameMap.CheckTileCollision(checkpos)) break;
-                    if ((checkpos - pos).Length() < 100f) return true;
+                    for (int r = 0; r < 500; r += 50)
+                    {
+                        Vector2 checkpos = Helper.PointOnCircle(ref Position, r, a);
+                        if (gameMap.CheckTileCollision(checkpos)) break;
+                        if ((checkpos - pos).Length() < 50f) return true;
+                    }
                 }
             }
 
@@ -458,9 +504,12 @@ namespace Hunted
 
         internal void InvestigatePosition()
         {
-            regeneratePath = true;
-            Target = Position;
-            State = AIState.Investigating;
+            if (State == AIState.Patrolling)
+            {
+                regeneratePath = true;
+                Target = Position;
+                State = AIState.Investigating;
+            }
         }
         
     }

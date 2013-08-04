@@ -75,7 +75,7 @@ namespace Hunted
 
             foreach (Dude d in EnemyController.Instance.Enemies)
             {
-                if (Helper.IsPointInShape(d.Position, this.CollisionVerts) && d.Health >= 0f)
+                if (Helper.IsPointInShape(d.Position, this.CollisionVerts) && d.Health >= 0f && !d.Dead)
                 {
                     Health -= 0.5f;
                     d.HitByVehicle(this);
@@ -97,10 +97,13 @@ namespace Hunted
 
             //HeadTorch.Position = Helper.PointOnCircle(ref Position, 30, Rotation - MathHelper.PiOver2);
             //HeadTorch.Rotation = Rotation - MathHelper.PiOver2;
-            Lights[0].Position = Helper.PointOnCircle(ref Position, 137, (Rotation) - 0.2f);
-            Lights[1].Position = Helper.PointOnCircle(ref Position, 137, (Rotation) + 0.2f);
-            Lights[0].Rotation = Rotation;
-            Lights[1].Rotation = Rotation;
+            if (Active)
+            {
+                Lights[0].Position = Helper.PointOnCircle(ref Position, 137, (Rotation) - 0.2f);
+                Lights[1].Position = Helper.PointOnCircle(ref Position, 137, (Rotation) + 0.2f);
+                Lights[0].Rotation = Rotation;
+                Lights[1].Rotation = Rotation;
+            }
 
             if (gameHero.drivingVehicle == this)
             {
