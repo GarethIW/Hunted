@@ -521,7 +521,7 @@ namespace Hunted
                 chop.Rotation = (float)Helper.Random.NextDouble() * MathHelper.TwoPi;
                 chop.LoadContent(vehicleController.SpriteSheet, ScreenManager.GraphicsDevice, lightingEngine);
                 vehicleController.Vehicles.Add(chop);
-
+                //gameHero.Position = chop.Position + new Vector2(300, 0);
                 possibleHelipads.Remove(b);
                 if (possibleHelipads.Count == 0) break;
             }

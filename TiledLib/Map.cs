@@ -28,22 +28,22 @@ namespace TiledLib
 		/// <summary>
 		/// Gets the width (in tiles) of the map.
 		/// </summary>
-		public int Width { get; private set; }
+        public int Width;
 
 		/// <summary>
 		/// Gets the height (in tiles) of the map.
 		/// </summary>
-		public int Height { get; private set; }
+        public int Height;
 
 		/// <summary>
 		/// Gets the width of a tile in the map.
 		/// </summary>
-		public int TileWidth { get; private set; }
+        public int TileWidth;
 
 		/// <summary>
 		/// Gets the height of a tile in the map.
 		/// </summary>
-		public int TileHeight { get; private set; }
+        public int TileHeight;
 
 		/// <summary>
 		/// Gets a list of the map's properties.

@@ -311,11 +311,11 @@ namespace Hunted
             HeadTorch.Position = Helper.PointOnCircle(ref Position, 32, Rotation - MathHelper.PiOver2);
             HeadTorch.Rotation = Rotation - MathHelper.PiOver2;
 
-            if (checkTorchTime > 100)
+            if (checkTorchTime > 250)
             {
                 checkTorchTime = 0;
                 if ((Position.X < gameCamera.Position.X - ((gameCamera.Width / gameCamera.Zoom) / 2) || Position.X > gameCamera.Position.X + ((gameCamera.Width / gameCamera.Zoom) / 2) ||
-                   Position.Y < gameCamera.Position.Y - ((gameCamera.Height / gameCamera.Zoom) / 2) || Position.Y > gameCamera.Position.Y + (gameCamera.Height / 2)) &&
+                   Position.Y < gameCamera.Position.Y - ((gameCamera.Height / gameCamera.Zoom) / 2) || Position.Y > gameCamera.Position.Y + ((gameCamera.Height / gameCamera.Zoom) / 2)) &&
                    LineCollision(gameHero.Position, gameMap, false))
                 {
                     HeadTorch.Active = false;

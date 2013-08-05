@@ -140,8 +140,8 @@ namespace Hunted
 
         public override void Draw(SpriteBatch sb, LightingEngine lightingEngine)
         {  
-            sb.Draw(spriteSheet, Position, new Rectangle(200,0,300,400), lightingEngine.CurrentSunColor, Rotation+MathHelper.PiOver2, new Vector2(150,125), 1f, SpriteEffects.None, 1);
-            sb.Draw(spriteSheet, Position, new Rectangle(500, 0, 400, 400), lightingEngine.CurrentSunColor, bladesRot, new Vector2(400, 400) / 2, 1f, SpriteEffects.None, 1);
+            sb.Draw(spriteSheet, Position, new Rectangle(200,0,300,400), lightingEngine.CurrentSunColor, Rotation+MathHelper.PiOver2, new Vector2(150,135), 1f, SpriteEffects.None, 1);
+            sb.Draw(spriteSheet, Position, new Rectangle(500, 0, 400, 400), lightingEngine.CurrentSunColor, bladesRot, new Vector2(200, 200) , 1f, SpriteEffects.None, 1);
         }
 
         public override void DrawShadows(SpriteBatch sb, LightingEngine lightingEngine)
@@ -150,7 +150,7 @@ namespace Hunted
             {
                 Vector2 pos = Position + new Vector2(lightingEngine.CurrentShadowVect.X * i, lightingEngine.CurrentShadowVect.Y * i);
 
-                sb.Draw(spriteSheet, pos, new Rectangle(200, 0, 300, 400), Color.Black * 0.03f, Rotation + MathHelper.PiOver2, new Vector2(150, 125), 1f, SpriteEffects.None, 1);
+                sb.Draw(spriteSheet, pos, new Rectangle(200, 0, 300, 400), Color.Black * 0.03f, Rotation + MathHelper.PiOver2, new Vector2(150, 135), 1f, SpriteEffects.None, 1);
                 sb.Draw(spriteSheet, pos, new Rectangle(500, 0, 400, 400), Color.Black * 0.03f, bladesRot, new Vector2(400, 400) / 2, 1f, SpriteEffects.None, 1);
 
             }
@@ -159,12 +159,12 @@ namespace Hunted
         public override void DrawLightBlock(SpriteBatch sb)
         {
             // Arms
-            sb.Draw(spriteSheet, Position, new Rectangle(200, 0, 300, 400), Color.Black, Rotation + MathHelper.PiOver2, new Vector2(150, 125), 1f, SpriteEffects.None, 1);
+            sb.Draw(spriteSheet, Position, new Rectangle(200, 0, 300, 400), Color.Black, Rotation + MathHelper.PiOver2, new Vector2(150, 135), 1f, SpriteEffects.None, 1);
         }
 
         internal void DrawInAir(SpriteBatch sb, LightingEngine lightingEngine)
         {
-            sb.Draw(spriteSheet, Position, new Rectangle(200, 0, 300, 400), lightingEngine.CurrentSunColor, Rotation + MathHelper.PiOver2, new Vector2(150, 125), 1f + (maxCameraScale * Height), SpriteEffects.None, 1);
+            sb.Draw(spriteSheet, Position, new Rectangle(200, 0, 300, 400), lightingEngine.CurrentSunColor, Rotation + MathHelper.PiOver2, new Vector2(150, 135), 1f + (maxCameraScale * Height), SpriteEffects.None, 1);
             sb.Draw(spriteSheet, Position, new Rectangle(500, 0, 400, 400), lightingEngine.CurrentSunColor, bladesRot, new Vector2(400, 400) / 2, 1f + (maxCameraScale * Height), SpriteEffects.None, 1);
         }
         internal void DrawShadowsInAir(SpriteBatch sb, LightingEngine lightingEngine)
