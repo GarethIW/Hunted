@@ -294,7 +294,7 @@ namespace Hunted
 
                 if (IsGeneral)
                 {
-                    Hud.Instance.Ticker.AddLine("> You have eliminated a General! " + (3 - EnemyController.Instance.Enemies.Count(e => e.IsGeneral)) + "/" + (3));
+                    Hud.Instance.Ticker.AddLine("> You have eliminated a General! " + (3 - (3-EnemyController.Instance.Enemies.Count(e => e.IsGeneral && !e.Dead))) + "/" + (3));
 
                 }
             }

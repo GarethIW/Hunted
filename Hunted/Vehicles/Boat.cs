@@ -97,7 +97,7 @@ namespace Hunted
 
             //HeadTorch.Position = Helper.PointOnCircle(ref Position, 30, Rotation - MathHelper.PiOver2);
             //HeadTorch.Rotation = Rotation - MathHelper.PiOver2;
-            Lights[0].Position = Helper.PointOnCircle(ref Position, 137, (Rotation));
+            Lights[0].Position = Helper.PointOnCircle(ref Position, 145, (Rotation));
             //Lights[1].Position = Helper.PointOnCircle(ref Position, 137, (Rotation) + 0.2f);
             Lights[0].Rotation = Rotation;
             //Lights[1].Rotation = Rotation;
@@ -112,8 +112,8 @@ namespace Hunted
 
                 if (Health > 0f)
                 {
-                    engineSound.Volume = 0.2f + ((1f / 15f) * (float)Math.Abs(linearSpeed));
-                    engineSound.Pitch = -0.3f + (((0.6f / 12f) * (float)Math.Abs(linearSpeed)));
+                    engineSound.Volume = MathHelper.Clamp(0.2f + ((1f / 18f) * (float)Math.Abs(linearSpeed)), 0f, 1f);
+                    engineSound.Pitch = -0.3f + (((0.6f / 18f) * (float)Math.Abs(linearSpeed)));
                 }
                 else
                 {
